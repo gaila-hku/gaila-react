@@ -1,6 +1,9 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 
 import clsx from 'clsx';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+
+import Clickable from 'components/input/Clickable';
 
 import Badge, { badgeClasses } from '../Badge';
 
@@ -22,6 +25,8 @@ type Props = {
     children?: string;
     footer?: string;
   };
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
   className?: string;
   footer?: React.ReactNode;
 };
@@ -35,9 +40,13 @@ function Card({
   action,
   children,
   footer,
+  collapsible,
+  defaultCollapsed = false,
   classes,
   className,
 }: Props) {
+  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+
   const hasHeader =
     !!title || !!badgeText || !!status || !!description || !!action;
 
@@ -74,15 +83,29 @@ function Card({
               </Badge>
             </div>
           )}
-          {(!!title || !!action) && (
-            <div className="flex gap-4 items-center mb-2">
+          {(!!title || !!action || collapsible) && (
+            <div
+              className={clsx(
+                'flex gap-4 items-center transition-pb duration-300 ease-in-out',
+                isCollapsed ? ' -mb-1.5' : 'pb-2',
+              )}
+            >
               <h3
                 className={clsx(['flex-1 leading-none', classes?.title])}
                 data-slot="card-title"
               >
                 {title}
               </h3>
-              <div>{action}</div>
+              <div className="ml-auto">{action}</div>
+              {!!collapsible && (
+                <Clickable onClick={() => setIsCollapsed(!isCollapsed)}>
+                  {isCollapsed ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                </Clickable>
+              )}
             </div>
           )}
           {!!description && (
@@ -97,23 +120,31 @@ function Card({
       )}
 
       <div
-        className={clsx(['[&:not(:last-child)]:pb-6', classes?.children])}
-        data-slot="card-content"
+        className={clsx([
+          collapsible &&
+            'overflow-hidden transition-max-h duration-300 ease-in-out',
+          isCollapsed ? 'max-h-0' : 'max-h-[1000px]',
+        ])}
       >
-        {children}
-      </div>
-
-      {!!footer && (
         <div
-          className={clsx(
-            classes?.footer,
-            'flex items-center [.border-t]:pt-6',
-          )}
-          data-slot="card-footer"
+          className={clsx(['[&:not(:last-child)]:pb-6', classes?.children])}
+          data-slot="card-content"
         >
-          {footer}
+          {children}
         </div>
-      )}
+
+        {!!footer && (
+          <div
+            className={clsx(
+              classes?.footer,
+              'flex items-center [.border-t]:pt-6',
+            )}
+            data-slot="card-footer"
+          >
+            {footer}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

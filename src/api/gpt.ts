@@ -1,6 +1,7 @@
 import { callAPIHandler } from 'api/_base';
 import type { GptLog } from 'types/gpt';
 import type { ListingResponse } from 'types/response';
+import type { PartialBy } from 'utils/types/partialBy';
 
 export interface AskGptRequestData {
   assignment_tool_id: number;
@@ -18,6 +19,11 @@ export const apiAskDictionaryAgent = (
   payload: AskGptStructuredRequestData,
 ): Promise<GptLog> =>
   callAPIHandler('post', '/api/gpt/ask-dictionary', payload, true);
+
+export const apiAskGrammarAgent = (
+  payload: PartialBy<AskGptStructuredRequestData, 'question'>,
+): Promise<GptLog> =>
+  callAPIHandler('post', '/api/gpt/ask-grammar', payload, true);
 
 interface GetGptLogQueryParam {
   assignment_tool_id: number;

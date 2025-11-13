@@ -2,6 +2,9 @@ import React, { useCallback } from 'react';
 
 import { useQuery } from 'react-query';
 
+import ErrorComponent from 'components/display/ErrorComponent';
+import Loading from 'components/display/Loading';
+
 import EssayEditorAutoGradeTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorAutoGradeTool';
 import EssayEditorDictionaryTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorDictionaryTool';
 import EssayEditorGrammarTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorGrammarTool';
@@ -20,7 +23,7 @@ const EssayEditorTools = ({ tools, getEssayContent }: Props) => {
   const grammarTool = tools.find(tool => tool.key === 'grammar');
   const autoGradeTool = tools.find(tool => tool.key === 'autograde');
 
-  const { data } = useQuery(
+  const { data, isLoading, error } = useQuery(
     tuple([
       apiGetLatestSturcturedGptLog.queryKey,
       { assignment_tool_ids: tools.map(tool => tool.id) },
@@ -39,6 +42,14 @@ const EssayEditorTools = ({ tools, getEssayContent }: Props) => {
     [data],
   );
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <ErrorComponent error={error} />;
+  }
+
   return (
     <div className="space-y-4">
       {!!dictionaryTool && (
@@ -47,7 +58,12 @@ const EssayEditorTools = ({ tools, getEssayContent }: Props) => {
           toolId={dictionaryTool.id}
         />
       )}
-      <EssayEditorGrammarTool />
+      {!!grammarTool && (
+        <EssayEditorGrammarTool
+          latestResult={getLatestResult(grammarTool.id)}
+          toolId={grammarTool.id}
+        />
+      )}
       <EssayEditorAutoGradeTool getEssayContent={getEssayContent} />
 
       {/* AI Auto Grading */}

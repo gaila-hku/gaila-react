@@ -26,7 +26,7 @@ type Props = {
 };
 
 const EssayEditorDictionaryTool = ({ toolId, latestResult }: Props) => {
-  const { mutateAsync: askDictionaryAgent, isLoading: isDictionaryLoading } =
+  const { mutateAsync: askDictionaryAgent, isLoading: isAgentLoading } =
     useMutation(apiAskDictionaryAgent);
 
   const [dictionaryWord, setDictionaryWord] = useState('');
@@ -62,6 +62,8 @@ const EssayEditorDictionaryTool = ({ toolId, latestResult }: Props) => {
         children: 'space-y-3',
         root: '!p-4',
       }}
+      collapsible
+      defaultCollapsed
       title={
         <>
           <Languages className="h-4 w-4" />
@@ -84,12 +86,12 @@ const EssayEditorDictionaryTool = ({ toolId, latestResult }: Props) => {
       </div>
       <Button
         className="w-full gap-2"
-        disabled={isDictionaryLoading}
+        disabled={isAgentLoading}
         onClick={handleDictionarySearch}
         size="sm"
       >
         <Search className="h-4 w-4" />
-        {isDictionaryLoading ? 'Searching...' : 'Search'}
+        {isAgentLoading ? 'Searching...' : 'Search'}
       </Button>
 
       {dictionaryResult && (
