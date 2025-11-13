@@ -383,7 +383,12 @@ function AssignmentEssayEditorMain({
             {
               key: 'tools',
               title: 'Tools',
-              content: <EssayEditorTools getEssayContent={getEssayContent} />,
+              content: (
+                <EssayEditorTools
+                  getEssayContent={getEssayContent}
+                  tools={currentStage.tools}
+                />
+              ),
             },
             ...(generalChatTool
               ? [

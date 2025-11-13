@@ -8,4 +8,5 @@ export interface GptLog {
   user_ask_time: number;
   gpt_response_time?: number;
   prompt_category?: string;
+  is_structured?: boolean;
 }

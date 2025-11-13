@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import dayjs from 'dayjs';
-import { Bot, LoaderCircle, Send } from 'lucide-react';
+import { Bot, Send } from 'lucide-react';
 import { useMutation } from 'react-query';
 
 import Card from 'components/display/Card';
@@ -19,7 +19,7 @@ import {
   renderGptLog,
 } from 'containers/common/AIChatBox.tsx/utils';
 
-import { apiAskGpt, apiGetGptLogs } from 'api/gpt';
+import { apiAskGpt, apiGetGptChatLogs } from 'api/gpt';
 import type { GptLog } from 'types/gpt';
 import tuple from 'utils/types/tuple';
 
@@ -40,13 +40,14 @@ const AIChatBox = ({
   suggestedPrompts,
   placeholder,
 }: Props) => {
-  const { mutateAsync: sendQuestion } = useMutation(apiAskGpt);
+  const { mutateAsync: sendQuestion, isLoading: isAgentTyping } =
+    useMutation(apiAskGpt);
 
   const { data, isLoading, endReached, setPages, setPageLimit, error } =
     useInfiniteListing<GptLog>({
-      queryFn: apiGetGptLogs,
+      queryFn: apiGetGptChatLogs,
       queryKey: tuple([
-        apiGetGptLogs.queryKey,
+        apiGetGptChatLogs.queryKey,
         { assignment_tool_id: toolId, page: 1, limit: 10 },
       ]),
       pageLimit: 1,
@@ -54,7 +55,6 @@ const AIChatBox = ({
 
   const [newChatMessages, setNewChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
 
   const chatInit = useRef(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -82,7 +82,7 @@ const AIChatBox = ({
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
-  }, [newChatMessages, data, isTyping]);
+  }, [newChatMessages, data, isAgentTyping]);
 
   // Load new messages when scrolled to top
   useEffect(() => {
@@ -108,34 +108,29 @@ const AIChatBox = ({
     };
   }, [endReached, isLoading, setPageLimit, setPages]);
 
-  const handleSendMessage = useCallback(
-    async (message: string) => {
-      if (!message.trim()) {
-        return;
-      }
-      const userMessage: ChatMessage = {
-        id: Date.now().toString(),
-        role: 'user',
-        content: message,
-        timestamp: dayjs(),
-      };
+  const handleSendMessage = useCallback(async () => {
+    if (!chatInput.trim()) {
+      return;
+    }
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: chatInput,
+      timestamp: dayjs(),
+    };
 
-      setNewChatMessages(prev => [...prev, userMessage]);
-      setChatInput('');
-      setIsTyping(true);
+    setNewChatMessages(prev => [...prev, userMessage]);
+    setChatInput('');
 
-      const gptResponse = await sendQuestion({
-        question: message,
-        assignment_tool_id: toolId,
-      });
-      setNewChatMessages(prev => [
-        ...prev,
-        gptResponseToChatMessage(gptResponse),
-      ]);
-      setIsTyping(false);
-    },
-    [sendQuestion, toolId],
-  );
+    const gptResponse = await sendQuestion({
+      question: chatInput,
+      assignment_tool_id: toolId,
+    });
+    setNewChatMessages(prev => [
+      ...prev,
+      gptResponseToChatMessage(gptResponse),
+    ]);
+  }, [chatInput, sendQuestion, toolId]);
 
   const handlePromptClick = (promptText: string) => {
     setChatInput(promptText);
@@ -162,15 +157,15 @@ const AIChatBox = ({
         ref={chatScrollRef}
       >
         {isLoading && <Loading />}
-        {data.reverse().map(renderGptLog)}
-        {newChatMessages.map(renderChatMessage)}
-        {isTyping && <LoadingMessage />}
+        {data.reverse().map(log => renderGptLog(log))}
+        {newChatMessages.map(message => renderChatMessage(message))}
+        {isAgentTyping && <LoadingMessage />}
       </div>
 
-      {!!suggestedPrompts?.length && (
+      {!chatInput && !!suggestedPrompts?.length && (
         <div className="py-2 border-t">
           <p className="text-xs text-muted-foreground mb-2">Suggested:</p>
-          <div className="flex overflow-auto gap-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             {suggestedPrompts.map((prompt, index) => (
               <Button
                 className="gap-1 text-xs h-auto py-1.5 justify-start"
@@ -197,15 +192,15 @@ const AIChatBox = ({
             onKeyDown={e => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleSendMessage(chatInput);
+                handleSendMessage();
               }
             }}
             placeholder={placeholder || 'Ask anything...'}
             value={chatInput}
           />
           <Button
-            disabled={!chatInput.trim() || isTyping}
-            onClick={() => handleSendMessage(chatInput)}
+            disabled={!chatInput.trim() || isAgentTyping}
+            onClick={handleSendMessage}
             size="icon"
           >
             <Send className="h-4 w-4" />

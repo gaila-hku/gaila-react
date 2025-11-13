@@ -1,0 +1,58 @@
+import React, { useCallback } from 'react';
+
+import { useQuery } from 'react-query';
+
+import EssayEditorAutoGradeTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorAutoGradeTool';
+import EssayEditorDictionaryTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorDictionaryTool';
+import EssayEditorGrammarTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorGrammarTool';
+
+import { apiGetLatestSturcturedGptLog } from 'api/gpt';
+import type { AssignmentProgress } from 'types/assignment';
+import tuple from 'utils/types/tuple';
+
+type Props = {
+  tools: AssignmentProgress['stages'][number]['tools'];
+  getEssayContent: () => string;
+};
+
+const EssayEditorTools = ({ tools, getEssayContent }: Props) => {
+  const dictionaryTool = tools.find(tool => tool.key === 'dictionary');
+  const grammarTool = tools.find(tool => tool.key === 'grammar');
+  const autoGradeTool = tools.find(tool => tool.key === 'autograde');
+
+  const { data } = useQuery(
+    tuple([
+      apiGetLatestSturcturedGptLog.queryKey,
+      { assignment_tool_ids: tools.map(tool => tool.id) },
+    ]),
+    apiGetLatestSturcturedGptLog,
+  );
+
+  const getLatestResult = useCallback(
+    (toolId: number) => {
+      if (!data) {
+        return null;
+      }
+      const result = data.find(log => log.assignment_tool_id === toolId);
+      return result || null;
+    },
+    [data],
+  );
+
+  return (
+    <div className="space-y-4">
+      {!!dictionaryTool && (
+        <EssayEditorDictionaryTool
+          latestResult={getLatestResult(dictionaryTool.id)}
+          toolId={dictionaryTool.id}
+        />
+      )}
+      <EssayEditorGrammarTool />
+      <EssayEditorAutoGradeTool getEssayContent={getEssayContent} />
+
+      {/* AI Auto Grading */}
+    </div>
+  );
+};
+
+export default EssayEditorTools;

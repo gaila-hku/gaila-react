@@ -13,7 +13,7 @@ import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
 import AssignmentSubmissionSwitcher from 'containers/student/AssignmentSubmissionSwitcher';
 import StudentHeader from 'containers/student/StudentHeader';
 
-import { apiGetGptLogs } from 'api/gpt';
+import { apiGetGptChatLogs } from 'api/gpt';
 
 const AssignmentSubmitPage = () => {
   const { id } = useParams();
@@ -24,7 +24,7 @@ const AssignmentSubmitPage = () => {
     isString(id) && isNumber(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
 
   const onBack = useCallback(async () => {
-    await queryClient.invalidateQueries([apiGetGptLogs.queryKey]);
+    await queryClient.invalidateQueries([apiGetGptChatLogs.queryKey]);
     navigate(pathnames.home());
   }, [navigate, queryClient]);
 

@@ -12,7 +12,7 @@ import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
 import AssignmentEditor from 'containers/teacher/AssignmentEditor';
 import TeacherHeader from 'containers/teacher/TeacherHeader';
 
-import { apiGetGptLogs } from 'api/gpt';
+import { apiGetGptChatLogs } from 'api/gpt';
 
 const AssignmentEditPage = () => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const AssignmentEditPage = () => {
     isString(id) && isNumber(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
 
   const onBack = useCallback(async () => {
-    await queryClient.invalidateQueries([apiGetGptLogs.queryKey]);
+    await queryClient.invalidateQueries([apiGetGptChatLogs.queryKey]);
     navigate(pathnames.assignments());
   }, [navigate, queryClient]);
 

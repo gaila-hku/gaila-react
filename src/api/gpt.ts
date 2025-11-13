@@ -2,10 +2,22 @@ import { callAPIHandler } from 'api/_base';
 import type { GptLog } from 'types/gpt';
 import type { ListingResponse } from 'types/response';
 
-export const apiAskGpt = (payload: {
+export interface AskGptRequestData {
   assignment_tool_id: number;
   question: string;
-}): Promise<GptLog> => callAPIHandler('post', '/api/gpt/ask', payload, true);
+}
+
+export const apiAskGpt = (payload: AskGptRequestData): Promise<GptLog> =>
+  callAPIHandler('post', '/api/gpt/ask', payload, true);
+
+export interface AskGptStructuredRequestData extends AskGptRequestData {
+  is_structured: boolean;
+}
+
+export const apiAskDictionaryAgent = (
+  payload: AskGptStructuredRequestData,
+): Promise<GptLog> =>
+  callAPIHandler('post', '/api/gpt/ask-dictionary', payload, true);
 
 interface GetGptLogQueryParam {
   assignment_tool_id: number;
@@ -13,7 +25,7 @@ interface GetGptLogQueryParam {
   limit: number;
 }
 
-export const apiGetGptLogs = async ({
+export const apiGetGptChatLogs = async ({
   queryKey,
 }: {
   queryKey: [string, GetGptLogQueryParam];
@@ -21,14 +33,26 @@ export const apiGetGptLogs = async ({
   const [, queryParam] = queryKey;
   const res = await callAPIHandler<ListingResponse<GptLog>>(
     'get',
-    '/api/gpt/listing',
+    '/api/gpt/listing-chat',
     queryParam,
     true,
   );
   return res;
 };
-apiGetGptLogs.queryKey = '/api/gpt/listing';
+apiGetGptChatLogs.queryKey = '/api/gpt/listing-chat';
 
-export const apiGetGptLogsMutate = async (queryParam: GetGptLogQueryParam) => {
-  return apiGetGptLogs({ queryKey: [apiGetGptLogs.queryKey, queryParam] });
+export const apiGetLatestSturcturedGptLog = async ({
+  queryKey,
+}: {
+  queryKey: [string, { assignment_tool_ids: number[] }];
+}) => {
+  const [, { assignment_tool_ids }] = queryKey;
+  const res = await callAPIHandler<GptLog[]>(
+    'get',
+    '/api/gpt/latest-structured',
+    { assignment_tool_ids: JSON.stringify(assignment_tool_ids) },
+    true,
+  );
+  return res;
 };
+apiGetLatestSturcturedGptLog.queryKey = '/api/gpt/latest-structured';
