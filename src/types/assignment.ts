@@ -22,7 +22,7 @@ export interface Assignment {
 export interface RubricItem {
   criteria: string;
   description: string;
-  points: number;
+  max_points: number;
 }
 
 export type AssignmentListingResponse = ListingResponse<

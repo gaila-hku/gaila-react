@@ -21,7 +21,7 @@ const AssignmentEditorFormRubricsInput = ({
   const handleAddRubricItem = useCallback(() => {
     const newRubrics = [
       ...rubrics,
-      { criteria: '', description: '', points: 0 },
+      { criteria: '', description: '', max_points: 0 },
     ];
     setRubrics(newRubrics);
     onFormDataChange('rubrics', newRubrics);
@@ -40,7 +40,7 @@ const AssignmentEditorFormRubricsInput = ({
     (index: number, field: keyof RubricItem, value: string | number | null) => {
       const newRubrics = [...rubrics];
       let newValue = value;
-      if (field === 'points' && newValue === null) {
+      if (field === 'max_points' && newValue === null) {
         newValue = 1;
       }
       newRubrics[index] = { ...newRubrics[index], [field]: newValue };
@@ -51,7 +51,7 @@ const AssignmentEditorFormRubricsInput = ({
   );
 
   const totalPoints = useMemo(() => {
-    return rubrics.reduce((sum, item) => sum + (item.points || 0), 0);
+    return rubrics.reduce((sum, item) => sum + (item.max_points || 0), 0);
   }, [rubrics]);
 
   useEffect(() => {
@@ -90,9 +90,11 @@ const AssignmentEditorFormRubricsInput = ({
                 <NumberInput
                   inputClass="!w-24"
                   min={1}
-                  onChange={value => handleRubricChange(index, 'points', value)}
+                  onChange={value =>
+                    handleRubricChange(index, 'max_points', value)
+                  }
                   size="sm"
-                  value={item.points}
+                  value={item.max_points}
                 />
               </div>
               <TextInput

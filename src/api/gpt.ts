@@ -6,6 +6,7 @@ import type { PartialBy } from 'utils/types/partialBy';
 export interface AskGptRequestData {
   assignment_tool_id: number;
   question: string;
+  essay: string | undefined;
 }
 
 export const apiAskGpt = (payload: AskGptRequestData): Promise<GptLog> =>
@@ -24,6 +25,11 @@ export const apiAskGrammarAgent = (
   payload: PartialBy<AskGptStructuredRequestData, 'question'>,
 ): Promise<GptLog> =>
   callAPIHandler('post', '/api/gpt/ask-grammar', payload, true);
+
+export const apiAskAutogradeAgent = (
+  payload: PartialBy<AskGptStructuredRequestData, 'question'>,
+): Promise<GptLog> =>
+  callAPIHandler('post', '/api/gpt/ask-autograde', payload, true);
 
 interface GetGptLogQueryParam {
   assignment_tool_id: number;

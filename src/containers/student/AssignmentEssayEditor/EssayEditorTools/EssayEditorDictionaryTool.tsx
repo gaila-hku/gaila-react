@@ -42,6 +42,7 @@ const EssayEditorDictionaryTool = ({ toolId, latestResult }: Props) => {
       question: dictionaryWord,
       assignment_tool_id: toolId,
       is_structured: true,
+      essay: undefined,
     });
     const result = JSON.parse(res.gpt_answer) as DictionaryResult;
     setDictionaryResult(result);

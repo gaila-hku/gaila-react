@@ -60,13 +60,18 @@ const EssayEditorTools = ({ tools, getEssayContent }: Props) => {
       )}
       {!!grammarTool && (
         <EssayEditorGrammarTool
+          getEssayContent={getEssayContent}
           latestResult={getLatestResult(grammarTool.id)}
           toolId={grammarTool.id}
         />
       )}
-      <EssayEditorAutoGradeTool getEssayContent={getEssayContent} />
-
-      {/* AI Auto Grading */}
+      {!!autoGradeTool && (
+        <EssayEditorAutoGradeTool
+          getEssayContent={getEssayContent}
+          latestResult={getLatestResult(autoGradeTool.id)}
+          toolId={autoGradeTool.id}
+        />
+      )}
     </div>
   );
 };

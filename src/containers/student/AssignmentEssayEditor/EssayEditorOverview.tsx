@@ -64,7 +64,7 @@ const EssayEditorOverview = ({
   const overallMaxPoints = useMemo(() => {
     if (assignment.rubrics) {
       return assignment.rubrics?.reduce((acc, rubric) => {
-        return acc + rubric.points;
+        return acc + rubric.max_points;
       }, 0);
     }
     if (grade?.score_breakdown) {
@@ -305,7 +305,7 @@ const EssayEditorOverview = ({
             >
               <span className="text-muted-foreground">{item.criteria}</span>
               <Badge className="text-xs" variant="outline">
-                {item.points}pts
+                {item.max_points}pts
               </Badge>
             </div>
           ))}
@@ -314,7 +314,7 @@ const EssayEditorOverview = ({
             <span>Total</span>
             <Badge className="text-xs">
               {assignment.rubrics.reduce(
-                (total, item) => total + item.points,
+                (total, item) => total + item.max_points,
                 0,
               )}
               pts

@@ -1,98 +1,71 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Bot, Sparkles } from 'lucide-react';
+import { useMutation } from 'react-query';
 
 import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
-import useAlert from 'containers/common/AlertProvider/useAlert';
+import AIChatBoxMini from 'containers/common/AIChatBox.tsx/AIChatBoxMini';
+
+import { apiAskAutogradeAgent } from 'api/gpt';
+import type { GptLog } from 'types/gpt';
 
 interface AutoGradeResult {
-  overallScore: number;
-  totalPoints: number;
-  criteriaScores: {
+  overall_score: number;
+  max_score: number;
+  overall_feedback: string;
+  criteria_scores: {
     criteria: string;
     score: number;
-    maxPoints: number;
+    max_score: number;
     feedback: string;
   }[];
-  overallFeedback: string;
 }
 
 type Props = {
+  toolId: number;
+  latestResult: GptLog | null;
   getEssayContent: () => string;
 };
 
-const EssayEditorAutoGradeTool = ({ getEssayContent }: Props) => {
-  const { errorMsg } = useAlert();
-  // Checklist state
+const EssayEditorAutoGradeTool = ({
+  toolId,
+  latestResult,
+  getEssayContent,
+}: Props) => {
+  const { mutateAsync: askAutogradeAgent, isLoading: isAgentLoading } =
+    useMutation(apiAskAutogradeAgent);
 
-  // Auto grading state
-  const [autoGradeResult, setAutoGradeResult] =
+  // Dictionary state
+  const [autogradeResult, setAutogradeResult] =
     useState<AutoGradeResult | null>(null);
-  const [isAutoGrading, setIsAutoGrading] = useState(false);
 
-  const handleAutoGrade = () => {
-    const essayContent = getEssayContent();
+  const handleAutogradeCheck = useCallback(async () => {
+    const res = await askAutogradeAgent({
+      assignment_tool_id: toolId,
+      is_structured: true,
+      essay: getEssayContent(),
+    });
+    const result = JSON.parse(res.gpt_answer) as AutoGradeResult;
+    setAutogradeResult(result);
+  }, [askAutogradeAgent, getEssayContent, toolId]);
 
-    if (!essayContent.trim()) {
-      errorMsg('Essay is empty');
+  useEffect(() => {
+    if (!latestResult) {
       return;
     }
+    const result = JSON.parse(latestResult.gpt_answer) as AutoGradeResult;
+    setAutogradeResult(result);
+  }, [latestResult]);
 
-    setIsAutoGrading(true);
-
-    // Simulate AI grading
-    setTimeout(() => {
-      const mockGradeResult: AutoGradeResult = {
-        overallScore: 81,
-        totalPoints: 100,
-        criteriaScores: [
-          {
-            criteria: 'Thesis and Argument',
-            score: 21,
-            maxPoints: 25,
-            feedback:
-              'Strong thesis statement that clearly addresses the prompt. Arguments are well-structured and logical. Consider adding more nuanced counterarguments to strengthen your position.',
-          },
-          {
-            criteria: 'Evidence and Sources',
-            score: 19,
-            maxPoints: 25,
-            feedback:
-              'Good use of examples and evidence. However, the essay lacks proper citations. Remember to include at least 5 credible sources with proper MLA formatting to meet requirements.',
-          },
-          {
-            criteria: 'Organization and Structure',
-            score: 17,
-            maxPoints: 20,
-            feedback:
-              'Excellent paragraph structure with clear topic sentences. Smooth transitions between ideas. The conclusion could be stronger by providing more concrete calls to action.',
-          },
-          {
-            criteria: 'Writing Quality',
-            score: 16,
-            maxPoints: 20,
-            feedback:
-              'Clear and engaging writing style. Good vocabulary usage. Watch for passive voice in some sentences. Vary sentence structure more for better flow.',
-          },
-          {
-            criteria: 'Citations and Format',
-            score: 8,
-            maxPoints: 10,
-            feedback:
-              'Format is appropriate but missing in-text citations and a works cited page. Ensure all sources are properly documented in MLA format.',
-          },
-        ],
-        overallFeedback:
-          'This is a solid essay with a clear argument and good organization. Your main strengths are the logical structure and engaging writing style. To improve, focus on adding proper citations for all claims, incorporating more scholarly sources, and developing the conclusion with specific actionable recommendations. The essay demonstrates good understanding of the topic but needs more academic rigor in terms of evidence and documentation.',
-      };
-
-      setAutoGradeResult(mockGradeResult);
-      setIsAutoGrading(false);
-    }, 2500);
-  };
+  const scoreRatio = useMemo(() => {
+    if (!autogradeResult) {
+      return 0;
+    }
+    return (autogradeResult.overall_score / autogradeResult.max_score) * 100;
+  }, [autogradeResult]);
 
   return (
     <Card
@@ -101,6 +74,8 @@ const EssayEditorAutoGradeTool = ({ getEssayContent }: Props) => {
         children: 'space-y-3',
         root: '!p-4',
       }}
+      collapsible
+      defaultCollapsed
       title={
         <>
           <Sparkles className="h-4 w-4" /> AI Auto Grading
@@ -109,15 +84,15 @@ const EssayEditorAutoGradeTool = ({ getEssayContent }: Props) => {
     >
       <Button
         className="w-full gap-2"
-        disabled={isAutoGrading}
-        onClick={handleAutoGrade}
+        disabled={isAgentLoading}
+        onClick={handleAutogradeCheck}
         size="sm"
       >
         <Sparkles className="h-4 w-4" />
-        {isAutoGrading ? 'Grading...' : 'Grade My Essay'}
+        {isAgentLoading ? 'Grading...' : 'Grade My Essay'}
       </Button>
 
-      {autoGradeResult && (
+      {autogradeResult && (
         <div className="max-h-[400px] overflow-auto">
           <div className="space-y-3 pr-4">
             {/* Overall Score */}
@@ -127,24 +102,22 @@ const EssayEditorAutoGradeTool = ({ getEssayContent }: Props) => {
                   Overall Score
                 </p>
                 <p className="text-2xl font-bold text-primary">
-                  {autoGradeResult.overallScore}
-                  <span className="text-sm">
-                    /{autoGradeResult.totalPoints}
-                  </span>
+                  {autogradeResult.overall_score}
+                  <span className="text-sm">/{autogradeResult.max_score}</span>
                 </p>
                 <Badge
                   className="mt-2 text-xs"
                   variant={
-                    autoGradeResult.overallScore >= 80
+                    scoreRatio >= 80
                       ? 'primary'
-                      : autoGradeResult.overallScore >= 60
+                      : scoreRatio >= 60
                         ? 'secondary'
                         : 'destructive'
                   }
                 >
-                  {autoGradeResult.overallScore >= 80
+                  {scoreRatio >= 80
                     ? 'Excellent'
-                    : autoGradeResult.overallScore >= 60
+                    : scoreRatio >= 60
                       ? 'Good'
                       : 'Needs Improvement'}
                 </Badge>
@@ -154,7 +127,7 @@ const EssayEditorAutoGradeTool = ({ getEssayContent }: Props) => {
             {/* Criteria Breakdown */}
             <div className="space-y-2">
               <h4 className="text-xs font-semibold">Score Breakdown</h4>
-              {autoGradeResult.criteriaScores.map((criterion, idx) => (
+              {autogradeResult.criteria_scores.map((criterion, idx) => (
                 <div
                   className="p-2 border rounded text-xs space-y-1.5"
                   key={idx}
@@ -162,10 +135,10 @@ const EssayEditorAutoGradeTool = ({ getEssayContent }: Props) => {
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{criterion.criteria}</span>
                     <Badge className="text-xs" variant="outline">
-                      {criterion.score}/{criterion.maxPoints}
+                      {criterion.score}/{criterion.max_score}
                     </Badge>
                   </div>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {criterion.feedback}
                   </p>
                 </div>
@@ -178,12 +151,21 @@ const EssayEditorAutoGradeTool = ({ getEssayContent }: Props) => {
                 <Bot className="h-3 w-3" />
                 Overall Feedback
               </h4>
-              <p className="text-muted-foreground leading-relaxed">
-                {autoGradeResult.overallFeedback}
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {autogradeResult.overall_feedback}
               </p>
             </div>
           </div>
         </div>
+      )}
+      {!!autogradeResult && (
+        <AIChatBoxMini
+          chatMutateFn={apiAskAutogradeAgent}
+          chatName="Ask Autograde Agent"
+          firstMessage="Ask me about your scores, how to improve specific criteria, or clarify feedback!"
+          getEssayContent={getEssayContent}
+          toolId={toolId}
+        />
       )}
     </Card>
   );

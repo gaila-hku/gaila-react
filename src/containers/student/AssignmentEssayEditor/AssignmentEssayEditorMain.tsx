@@ -395,7 +395,12 @@ function AssignmentEssayEditorMain({
                   {
                     key: 'chat',
                     title: 'AI Chat',
-                    content: <EssayEditorAIChat toolId={generalChatTool.id} />,
+                    content: (
+                      <EssayEditorAIChat
+                        getEssayContent={getEssayContent}
+                        toolId={generalChatTool.id}
+                      />
+                    ),
                   },
                 ]
               : []),

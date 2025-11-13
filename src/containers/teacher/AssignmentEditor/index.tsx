@@ -44,9 +44,9 @@ const defaultData: AssignmentFormData = {
     max_word_count: null,
   },
   rubrics: [
-    { criteria: 'Content', description: '', points: 7 },
-    { criteria: 'Grammar', description: '', points: 7 },
-    { criteria: 'Organization', description: '', points: 7 },
+    { criteria: 'Content', description: '', max_points: 7 },
+    { criteria: 'Grammar', description: '', max_points: 7 },
+    { criteria: 'Organization', description: '', max_points: 7 },
   ],
   tips: [''],
   enrolled_classes: [],

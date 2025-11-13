@@ -26,9 +26,14 @@ interface ChecklistResult {
 type Props = {
   toolId: number;
   latestResult: GptLog | null;
+  getEssayContent: () => string;
 };
 
-const EssayEditorGrammarTool = ({ toolId, latestResult }: Props) => {
+const EssayEditorGrammarTool = ({
+  toolId,
+  latestResult,
+  getEssayContent,
+}: Props) => {
   const { mutateAsync: askGrammarAgent, isLoading: isAgentLoading } =
     useMutation(apiAskGrammarAgent);
 
@@ -41,10 +46,11 @@ const EssayEditorGrammarTool = ({ toolId, latestResult }: Props) => {
     const res = await askGrammarAgent({
       assignment_tool_id: toolId,
       is_structured: true,
+      essay: getEssayContent(),
     });
     const result = JSON.parse(res.gpt_answer) as ChecklistResult;
     setGrammarResult(result);
-  }, [askGrammarAgent, toolId]);
+  }, [askGrammarAgent, getEssayContent, toolId]);
 
   useEffect(() => {
     if (!latestResult) {
@@ -144,6 +150,7 @@ const EssayEditorGrammarTool = ({ toolId, latestResult }: Props) => {
           chatMutateFn={apiAskGrammarAgent}
           chatName="Ask Grammar Agent"
           firstMessage="Ask me about specific issues, how to fix them, or how to improve your scores!"
+          getEssayContent={getEssayContent}
           toolId={toolId}
         />
       )}

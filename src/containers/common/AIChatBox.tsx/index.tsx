@@ -30,6 +30,7 @@ type Props = {
   firstMessage?: string;
   suggestedPrompts?: { icon: any; text: string; category: string }[];
   placeholder?: string;
+  getEssayContent?: () => string;
 };
 
 const AIChatBox = ({
@@ -39,6 +40,7 @@ const AIChatBox = ({
   firstMessage,
   suggestedPrompts,
   placeholder,
+  getEssayContent,
 }: Props) => {
   const { mutateAsync: sendQuestion, isLoading: isAgentTyping } =
     useMutation(apiAskGpt);
@@ -125,12 +127,13 @@ const AIChatBox = ({
     const gptResponse = await sendQuestion({
       question: chatInput,
       assignment_tool_id: toolId,
+      essay: getEssayContent?.(),
     });
     setNewChatMessages(prev => [
       ...prev,
       gptResponseToChatMessage(gptResponse),
     ]);
-  }, [chatInput, sendQuestion, toolId]);
+  }, [chatInput, getEssayContent, sendQuestion, toolId]);
 
   const handlePromptClick = (promptText: string) => {
     setChatInput(promptText);
@@ -153,7 +156,7 @@ const AIChatBox = ({
       }
     >
       <div
-        className="flex-1 overflow-y-auto px-4 py-3 space-y-4"
+        className="flex-1 overflow-y-auto py-3 space-y-4"
         ref={chatScrollRef}
       >
         {isLoading && <Loading />}

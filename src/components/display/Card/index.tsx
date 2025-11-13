@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 
 import clsx from 'clsx';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -49,6 +49,32 @@ function Card({
 
   const hasHeader =
     !!title || !!badgeText || !!status || !!description || !!action;
+
+  const childrenAndFooter = useMemo(
+    () => (
+      <>
+        <div
+          className={clsx(['[&:not(:last-child)]:pb-6', classes?.children])}
+          data-slot="card-content"
+        >
+          {children}
+        </div>
+
+        {!!footer && (
+          <div
+            className={clsx(
+              classes?.footer,
+              'flex items-center [.border-t]:pt-6',
+            )}
+            data-slot="card-footer"
+          >
+            {footer}
+          </div>
+        )}
+      </>
+    ),
+    [children, classes?.children, classes?.footer, footer],
+  );
 
   return (
     <div
@@ -119,32 +145,18 @@ function Card({
         </div>
       )}
 
-      <div
-        className={clsx([
-          collapsible &&
-            'overflow-hidden transition-max-h duration-300 ease-in-out',
-          isCollapsed ? 'max-h-0' : 'max-h-[1000px]',
-        ])}
-      >
+      {collapsible ? (
         <div
-          className={clsx(['[&:not(:last-child)]:pb-6', classes?.children])}
-          data-slot="card-content"
+          className={clsx([
+            'overflow-hidden transition-max-h duration-300 ease-in-out',
+            isCollapsed ? 'max-h-0' : 'max-h-[1000px]',
+          ])}
         >
-          {children}
+          {childrenAndFooter}
         </div>
-
-        {!!footer && (
-          <div
-            className={clsx(
-              classes?.footer,
-              'flex items-center [.border-t]:pt-6',
-            )}
-            data-slot="card-footer"
-          >
-            {footer}
-          </div>
-        )}
-      </div>
+      ) : (
+        childrenAndFooter
+      )}
     </div>
   );
 }
