@@ -11,6 +11,7 @@ import Button from 'components/input/Button';
 
 import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
 import AssignmentSubmissionSwitcher from 'containers/student/AssignmentSubmissionSwitcher';
+import AssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider';
 import StudentHeader from 'containers/student/StudentHeader';
 
 import { apiGetGptChatLogs } from 'api/gpt';
@@ -28,20 +29,26 @@ const AssignmentSubmitPage = () => {
     navigate(pathnames.home());
   }, [navigate, queryClient]);
 
+  if (!isNumber(assignmentId)) {
+    return <ErrorComponent error="Missing assignment ID" />;
+  }
+
   return (
     <AuthPageWrapper isStudentPage>
-      <StudentHeader />
-      <div className="px-6 py-4 max-w-full mx-auto mb-10">
-        <Button className="gap-2 mb-4" onClick={onBack} variant="ghost">
-          <ArrowLeft className="h-4 w-4" />
-          Back to Assignments
-        </Button>
-        {isNumber(assignmentId) ? (
-          <AssignmentSubmissionSwitcher assignmentId={assignmentId} />
-        ) : (
-          <ErrorComponent className="py-10" error="Missing assignment ID" />
-        )}
-      </div>
+      <AssignmentSubmissionProvider assignmentId={assignmentId}>
+        <StudentHeader />
+        <div className="px-6 py-4 max-w-full mx-auto mb-10">
+          <Button className="gap-2 mb-4" onClick={onBack} variant="ghost">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Assignments
+          </Button>
+          {isNumber(assignmentId) ? (
+            <AssignmentSubmissionSwitcher />
+          ) : (
+            <ErrorComponent className="py-10" error="Missing assignment ID" />
+          )}
+        </div>
+      </AssignmentSubmissionProvider>
     </AuthPageWrapper>
   );
 };

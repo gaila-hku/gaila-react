@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 import { isNumber, isString, parseInt } from 'lodash-es';
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router';
 import { pathnames } from 'routes';

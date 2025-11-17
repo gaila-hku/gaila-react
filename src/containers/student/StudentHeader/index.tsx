@@ -82,7 +82,6 @@ export function StudentHeader() {
       <div className="px-4 sm:px-6 py-4 max-w-[1800px] mx-auto">
         <div className="flex items-center justify-between">
           <Logo />
-          {/* Desktop Navigation */}
           {location.pathname.startsWith(
             pathnames.assignmentEditSubmission(''),
           ) ? (

@@ -160,7 +160,6 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
       });
       return;
     }
-    console.log('hi');
     createAssignment(assignmentPayload);
   }, [
     assignmentId,

@@ -19,25 +19,18 @@ import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
 import AssignmentReflectionStatistics from 'containers/student/AssignmentReflectionEditor/AssignmentReflectionStatistics';
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import {
   apiSaveAssignmentSubmission,
   apiViewAssignmentProgress,
 } from 'api/assignment';
-import type {
-  AssignmentProgress,
-  AssignmentReflectionContent,
-} from 'types/assignment';
+import type { AssignmentReflectionContent } from 'types/assignment';
 
-type Props = {
-  assignmentProgress: AssignmentProgress;
-  currentStage: AssignmentProgress['stages'][number];
-};
+const AssignmentReflectionEditor = () => {
+  const { assignmentProgress, currentStage } =
+    useAssignmentSubmissionProvider();
 
-const AssignmentReflectionEditor = ({
-  assignmentProgress,
-  currentStage,
-}: Props) => {
   const queryClient = useQueryClient();
   const { alertMsg, successMsg, errorMsg } = useAlert();
 
@@ -67,6 +60,10 @@ const AssignmentReflectionEditor = ({
 
   const handleSubmit = useCallback(
     (isFinal: boolean, isManual: boolean) => {
+      if (!assignmentProgress || !currentStage) {
+        return;
+      }
+
       const answeredCount = Object.values(reflections).filter(r =>
         r?.trim(),
       ).length;
@@ -86,26 +83,24 @@ const AssignmentReflectionEditor = ({
         is_manual: isManual,
       });
     },
-    [
-      alertMsg,
-      assignmentProgress.assignment.id,
-      currentStage.id,
-      reflections,
-      saveSubmission,
-    ],
+    [alertMsg, assignmentProgress, currentStage, reflections, saveSubmission],
   );
 
-  const generalChatTool = currentStage.tools.find(
+  const generalChatTool = currentStage?.tools.find(
     tool => tool.key === 'reflection_general',
   );
 
   useEffect(() => {
-    if (currentStage.submission?.content) {
+    if (currentStage?.submission?.content) {
       setReflections(
         currentStage.submission.content as AssignmentReflectionContent,
       );
     }
-  }, [currentStage.submission]);
+  }, [currentStage]);
+
+  if (!assignmentProgress || !currentStage) {
+    return <></>;
+  }
 
   return (
     <>

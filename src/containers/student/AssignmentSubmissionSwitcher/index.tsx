@@ -1,31 +1,17 @@
 import React, { useMemo } from 'react';
 
-import { useQuery } from 'react-query';
-
 import ErrorComponent from 'components/display/ErrorComponent';
 import Loading from 'components/display/Loading';
 
 import AssignmentEssayEditor from 'containers/student/AssignmentEssayEditor';
 import AssignmentGoalEditor from 'containers/student/AssignmentGoalEditor';
 import AssignmentReflectionEditor from 'containers/student/AssignmentReflectionEditor';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 import usePageTracking from 'containers/student/AssignmentSubmissionSwitcher/usePageTracking';
 
-import { apiViewAssignmentProgress } from 'api/assignment';
-import tuple from 'utils/types/tuple';
-
-type Props = {
-  assignmentId: number;
-};
-
-const AssignmentSubmissionSwitcher = ({ assignmentId }: Props) => {
-  const {
-    data: assignmentProgress,
-    isLoading,
-    error,
-  } = useQuery(
-    tuple([apiViewAssignmentProgress.queryKey, assignmentId]),
-    apiViewAssignmentProgress,
-  );
+const AssignmentSubmissionSwitcher = () => {
+  const { assignmentProgress, isLoading, error, currentStage } =
+    useAssignmentSubmissionProvider();
 
   usePageTracking(assignmentProgress);
 
@@ -34,8 +20,6 @@ const AssignmentSubmissionSwitcher = ({ assignmentId }: Props) => {
       return <></>;
     }
 
-    const currentStage =
-      assignmentProgress.stages[Math.max(assignmentProgress.current_stage, 0)];
     if (!currentStage) {
       return (
         <ErrorComponent
@@ -46,36 +30,21 @@ const AssignmentSubmissionSwitcher = ({ assignmentId }: Props) => {
     }
 
     if (currentStage.stage_type === 'goal_setting') {
-      return (
-        <AssignmentGoalEditor
-          assignmentProgress={assignmentProgress}
-          currentStage={currentStage}
-        />
-      );
+      return <AssignmentGoalEditor />;
     }
 
     if (currentStage.stage_type === 'writing') {
-      return (
-        <AssignmentEssayEditor
-          assignmentProgress={assignmentProgress}
-          currentStage={currentStage}
-        />
-      );
+      return <AssignmentEssayEditor />;
     }
 
     if (currentStage.stage_type === 'reflection') {
-      return (
-        <AssignmentReflectionEditor
-          assignmentProgress={assignmentProgress}
-          currentStage={currentStage}
-        />
-      );
+      return <AssignmentReflectionEditor />;
     }
 
     return (
       <ErrorComponent className="py-10" error="System error. Invalid stage." />
     );
-  }, [assignmentProgress]);
+  }, [assignmentProgress, currentStage]);
 
   if (isLoading) {
     return <Loading />;

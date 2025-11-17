@@ -11,29 +11,28 @@ import AIChatBox from 'containers/common/AIChatBox.tsx';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
 import GOAL_QUESTIONS from 'containers/student/AssignmentGoalEditor/goalQuestions';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import {
   apiSaveAssignmentSubmission,
   apiViewAssignmentProgress,
 } from 'api/assignment';
-import type { AssignmentGoal, AssignmentProgress } from 'types/assignment';
+import type { AssignmentGoal } from 'types/assignment';
 import isObjEmpty from 'utils/helper/isObjEmpty';
-
-type Props = {
-  assignmentProgress: AssignmentProgress;
-  currentStage: AssignmentProgress['stages'][number];
-};
 
 const defaultResponses = GOAL_QUESTIONS.reduce(
   (acc, q) => ({ ...acc, [q.category]: [''] }),
   {},
 );
 
-const AssignmentGoalEditor = ({ assignmentProgress, currentStage }: Props) => {
+const AssignmentGoalEditor = () => {
+  const { assignmentProgress, currentStage } =
+    useAssignmentSubmissionProvider();
+
   const queryClient = useQueryClient();
   const { alertMsg, successMsg, errorMsg } = useAlert();
 
-  const generalChatTool = currentStage.tools.find(
+  const generalChatTool = currentStage?.tools.find(
     tool => tool.key === 'goal_general',
   );
 
@@ -64,7 +63,6 @@ const AssignmentGoalEditor = ({ assignmentProgress, currentStage }: Props) => {
   }, []);
 
   const handleRemoveGoal = useCallback((category: string, index: number) => {
-    console.log(index);
     setResponses(prev => ({
       ...prev,
       [category]: prev[category].filter((_, i) => i !== index),
@@ -83,6 +81,9 @@ const AssignmentGoalEditor = ({ assignmentProgress, currentStage }: Props) => {
 
   const handleSubmit = useCallback(
     (isFinal: boolean, isManual: boolean) => {
+      if (!assignmentProgress || !currentStage) {
+        return;
+      }
       const goals: AssignmentGoal[] = GOAL_QUESTIONS.filter(
         q => !isObjEmpty(responses[q.category]),
       ).map(q => ({
@@ -105,17 +106,11 @@ const AssignmentGoalEditor = ({ assignmentProgress, currentStage }: Props) => {
         is_manual: isManual,
       });
     },
-    [
-      alertMsg,
-      assignmentProgress.assignment.id,
-      currentStage.id,
-      responses,
-      saveSubmission,
-    ],
+    [alertMsg, assignmentProgress, currentStage, responses, saveSubmission],
   );
 
   useEffect(() => {
-    if (currentStage.submission?.content) {
+    if (currentStage?.submission?.content) {
       const goals = currentStage.submission.content as AssignmentGoal[];
       setResponses({
         ...defaultResponses,
@@ -129,6 +124,10 @@ const AssignmentGoalEditor = ({ assignmentProgress, currentStage }: Props) => {
       });
     }
   }, [currentStage]);
+
+  if (!assignmentProgress || !currentStage) {
+    return <></>;
+  }
 
   return (
     <>

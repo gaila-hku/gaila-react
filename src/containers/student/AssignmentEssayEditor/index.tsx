@@ -6,14 +6,7 @@ import Tabs from 'components/navigation/Tabs';
 
 import AssignmentEssayEditorMain from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain';
 
-import type { AssignmentProgress } from 'types/assignment';
-
-type Props = {
-  assignmentProgress: AssignmentProgress;
-  currentStage: AssignmentProgress['stages'][number];
-};
-
-const AssignmentEssayEditor = ({ assignmentProgress, currentStage }: Props) => {
+const AssignmentEssayEditor = () => {
   return (
     <Tabs
       classes={{
@@ -29,12 +22,7 @@ const AssignmentEssayEditor = ({ assignmentProgress, currentStage }: Props) => {
               <PenTool className="h-4 w-4" /> Essay Editor
             </div>
           ),
-          content: (
-            <AssignmentEssayEditorMain
-              assignmentProgress={assignmentProgress}
-              currentStage={currentStage}
-            />
-          ),
+          content: <AssignmentEssayEditorMain />,
         },
         {
           key: 'analytics',

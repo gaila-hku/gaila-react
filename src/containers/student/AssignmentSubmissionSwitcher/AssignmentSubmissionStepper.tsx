@@ -1,26 +1,25 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
-import { isNumber, isString } from 'lodash-es';
-import { useQuery } from 'react-query';
-import { useParams } from 'react-router';
 
-import { apiViewAssignmentProgress } from 'api/assignment';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
+
 import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
-import tuple from 'utils/types/tuple';
 
 const AssignmentSubmissionStepper = () => {
-  const { id } = useParams();
+  const { assignmentProgress, isStepperClickable, setCurrentStageIndex } =
+    useAssignmentSubmissionProvider();
 
-  const assignmentId =
-    isString(id) && isNumber(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
-
-  const { data: assignmentProgress } = useQuery(
-    tuple([apiViewAssignmentProgress.queryKey, assignmentId as number]),
-    apiViewAssignmentProgress,
-    { enabled: !!isNumber(assignmentId) },
+  const handleStepClick = useCallback(
+    (index: number) => {
+      if (!isStepperClickable) {
+        return;
+      }
+      setCurrentStageIndex(index);
+    },
+    [isStepperClickable, setCurrentStageIndex],
   );
 
   if (!assignmentProgress) {
@@ -35,11 +34,22 @@ const AssignmentSubmissionStepper = () => {
   );
 
   return (
-    <Stepper activeStep={stepperActiveStep} className="basis-[400px]">
+    <Stepper
+      activeStep={
+        isStepperClickable
+          ? assignmentProgress.stages.length - 1
+          : stepperActiveStep
+      }
+      className="basis-[400px]"
+    >
       {assignmentProgress.stages
         .filter(s => s.enabled)
-        .map(stage => (
-          <Step key={stage.stage_type}>
+        .map((stage, index) => (
+          <Step
+            className={isStepperClickable ? 'cursor-pointer' : ''}
+            key={stage.stage_type}
+            onClick={() => handleStepClick(index)}
+          >
             <StepLabel>{getStageTypeLabel(stage)}</StepLabel>
           </Step>
         ))}

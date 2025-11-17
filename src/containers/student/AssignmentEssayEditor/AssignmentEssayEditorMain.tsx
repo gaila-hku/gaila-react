@@ -23,31 +23,23 @@ import EssayEditorAIChat from 'containers/student/AssignmentEssayEditor/EssayEdi
 import EssayEditorInput from 'containers/student/AssignmentEssayEditor/EssayEditorInput';
 import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/EssayEditorOverview';
 import EssayEditorTools from 'containers/student/AssignmentEssayEditor/EssayEditorTools';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import {
   apiSaveAssignmentSubmission,
   apiViewAssignmentProgress,
 } from 'api/assignment';
-import type {
-  AssignmentEssayContent,
-  AssignmentGoal,
-  AssignmentProgress,
-} from 'types/assignment';
-
-type Props = {
-  assignmentProgress: AssignmentProgress;
-  currentStage: AssignmentProgress['stages'][number];
-};
+import type { AssignmentEssayContent, AssignmentGoal } from 'types/assignment';
 
 type WordCountStatus = {
   color: string;
   text: string;
 };
 
-function AssignmentEssayEditorMain({
-  assignmentProgress,
-  currentStage,
-}: Props) {
+function AssignmentEssayEditorMain() {
+  const { assignmentProgress, currentStage } =
+    useAssignmentSubmissionProvider();
+
   const queryClient = useQueryClient();
   const { alertMsg, successMsg, errorMsg } = useAlert();
 
@@ -67,12 +59,15 @@ function AssignmentEssayEditorMain({
   });
 
   const [assignment, teacherGrade, isGraded] = useMemo(() => {
+    if (!assignmentProgress || !currentStage) {
+      return [null, null, false];
+    }
     const grade = currentStage.grade;
     return [assignmentProgress.assignment, grade, !!grade];
   }, [assignmentProgress, currentStage]);
 
-  const readonly = isGraded || assignmentProgress.is_finished;
-  const generalChatTool = currentStage.tools.find(
+  const readonly = isGraded || assignmentProgress?.is_finished || false;
+  const generalChatTool = currentStage?.tools.find(
     tool => tool.key === 'writing_general',
   );
 
@@ -140,6 +135,10 @@ function AssignmentEssayEditorMain({
   }, [essayContent, getWordCountStatus]);
 
   useEffect(() => {
+    if (!assignmentProgress || !currentStage) {
+      return;
+    }
+
     const submission = currentStage.submission;
 
     if (!submission) {
@@ -162,10 +161,14 @@ function AssignmentEssayEditorMain({
     } catch (e) {
       console.error(e);
     }
-  }, [assignmentProgress.stages, currentStage, getWordCountStatus]);
+  }, [assignmentProgress, currentStage, getWordCountStatus]);
 
   const handleSave = useCallback(
     (isFinal: boolean, isManual: boolean) => {
+      if (!assignmentProgress || !currentStage) {
+        return;
+      }
+
       if (isFinal) {
         // Check word count
         if (
@@ -209,9 +212,9 @@ function AssignmentEssayEditorMain({
     },
     [
       alertMsg,
-      assignment.requirements,
-      assignmentProgress.assignment.id,
-      currentStage.id,
+      assignment,
+      assignmentProgress,
+      currentStage,
       goals,
       saveSubmission,
       title,
@@ -220,6 +223,10 @@ function AssignmentEssayEditorMain({
 
   const onChangeGoals = useCallback(
     (newGoals: AssignmentGoal[]) => {
+      if (!assignmentProgress || !currentStage) {
+        return;
+      }
+
       setGoals(newGoals);
       saveSubmission({
         assignment_id: assignmentProgress.assignment.id,
@@ -233,8 +240,12 @@ function AssignmentEssayEditorMain({
         is_manual: false,
       });
     },
-    [assignmentProgress.assignment.id, currentStage.id, saveSubmission, title],
+    [assignmentProgress, currentStage, saveSubmission, title],
   );
+
+  if (!assignmentProgress || !currentStage || !assignment) {
+    return <></>;
+  }
 
   return (
     <div className="space-y-6">
