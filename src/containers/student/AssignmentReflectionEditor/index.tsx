@@ -37,6 +37,7 @@ const AssignmentReflectionEditor = () => {
   const { mutate: saveSubmission } = useMutation(apiSaveAssignmentSubmission, {
     onSuccess: async (res, req) => {
       if (res.is_final) {
+        successMsg('Reflections submitted.');
         await queryClient.invalidateQueries([
           apiViewAssignmentProgress.queryKey,
         ]);

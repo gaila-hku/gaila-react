@@ -39,6 +39,7 @@ const AssignmentGoalEditor = () => {
   const { mutate: saveSubmission } = useMutation(apiSaveAssignmentSubmission, {
     onSuccess: async (res, req) => {
       if (res.is_final) {
+        successMsg('Goals submitted.');
         await queryClient.invalidateQueries([
           apiViewAssignmentProgress.queryKey,
         ]);

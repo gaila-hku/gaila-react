@@ -46,6 +46,7 @@ function AssignmentEssayEditorMain() {
   const { mutate: saveSubmission } = useMutation(apiSaveAssignmentSubmission, {
     onSuccess: async (res, req) => {
       if (res.is_final) {
+        successMsg('Essay submitted.');
         await queryClient.invalidateQueries([
           apiViewAssignmentProgress.queryKey,
         ]);
