@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
+import dayjs from 'dayjs';
 import {
   AlertCircle,
   BookOpen,
@@ -62,18 +63,13 @@ const EssayEditorOverview = ({
   ]);
 
   const overallMaxPoints = useMemo(() => {
-    if (assignment.rubrics) {
-      return assignment.rubrics?.reduce((acc, rubric) => {
-        return acc + rubric.max_points;
-      }, 0);
+    if (!assignment.rubrics) {
+      return 0;
     }
-    if (grade?.score_breakdown) {
-      return grade?.score_breakdown?.reduce((acc, rubric) => {
-        return acc + rubric.max_score;
-      }, 0);
-    }
-    return 0;
-  }, [assignment.rubrics, grade?.score_breakdown]);
+    return assignment.rubrics?.reduce((acc, rubric) => {
+      return acc + rubric.max_points;
+    }, 0);
+  }, [assignment.rubrics]);
 
   const hasWordCountRequirement = useMemo(() => {
     return (
@@ -111,7 +107,6 @@ const EssayEditorOverview = ({
 
   return (
     <div className="space-y-4">
-      {/* Teacher Grade - Only show when graded */}
       {!!grade && (
         <Card
           classes={{
@@ -130,38 +125,43 @@ const EssayEditorOverview = ({
           <div className="text-center p-3 bg-white rounded-lg border-2 border-purple-200">
             <p className="text-xs text-muted-foreground mb-1">Final Score</p>
             <p className="text-3xl font-bold text-purple-600">
-              {grade.score}
-              <span className="text-lg text-muted-foreground">
-                /{overallMaxPoints}
-              </span>
+              {grade.overall_score}
+              {!!overallMaxPoints && (
+                <span className="text-lg text-muted-foreground">
+                  /{overallMaxPoints}
+                </span>
+              )}
             </p>
-            <Badge className="mt-2 bg-purple-600 text-xs">
-              {Math.round((grade.score / overallMaxPoints) * 100)}%
-            </Badge>
+            {!!overallMaxPoints && (
+              <Badge className="mt-2 bg-purple-600 text-xs">
+                {Math.round((grade.overall_score / overallMaxPoints) * 100)}%
+              </Badge>
+            )}
           </div>
 
           {/* Criteria Breakdown */}
           <div className="max-h-[400px] overflow-auto">
             <div className="space-y-2 pr-4">
-              {!!grade.score_breakdown && (
-                <h4 className="text-xs font-semibold">Score Breakdown</h4>
-              )}
-              {grade.score_breakdown?.map((criterion, idx) => (
-                <div
-                  className="p-2 bg-white border rounded text-xs space-y-1.5"
-                  key={idx}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{criterion.criteria}</span>
-                    <Badge className="text-xs" variant="outline">
-                      {criterion.score}/{criterion.max_score}
-                    </Badge>
+              {Object.entries(grade.rubrics_breakdown)?.map(
+                ([criterion, score]) => (
+                  <div
+                    className="p-2 bg-white border rounded text-xs space-y-1.5"
+                    key={criterion}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{criterion}</span>
+                      <Badge className="text-xs" variant="outline">
+                        {score}/
+                        {
+                          assignment.rubrics?.find(
+                            r => r.criteria === criterion,
+                          )?.max_points
+                        }
+                      </Badge>
+                    </div>
                   </div>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {criterion.feedback}
-                  </p>
-                </div>
-              ))}
+                ),
+              )}
 
               {/* Overall Feedback */}
               <div className="p-2 bg-white border rounded text-xs mt-2">
@@ -169,13 +169,13 @@ const EssayEditorOverview = ({
                   <GraduationCap className="h-3 w-3" />
                   Teacher Feedback
                 </h4>
-                <p className="text-muted-foreground leading-relaxed mb-2">
-                  {grade.feedback}
+                <p className="text-sm whitespace-pre-wrap leading-relaxed mb-2">
+                  {grade.overall_feedback}
                 </p>
                 <Divider className="my-2" />
                 <div className="flex flex-col gap-1 text-muted-foreground">
                   <span>Graded by: {grade.graded_by}</span>
-                  <span>{grade.graded_at}</span>
+                  <span>{dayjs(grade.graded_at).format('MMM D, YYYY')}</span>
                 </div>
               </div>
             </div>
@@ -206,7 +206,7 @@ const EssayEditorOverview = ({
               </Badge>
               {group.goals.map((goal, index) => (
                 <Clickable
-                  className="flex items-start gap-2 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors"
+                  className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors"
                   disabled={readonly}
                   key={`${group.category}-${index}`}
                   onClick={() => handleGoalToggle(group.category, index)}

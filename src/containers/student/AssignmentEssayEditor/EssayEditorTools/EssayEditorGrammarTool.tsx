@@ -11,17 +11,7 @@ import Button from 'components/input/Button';
 import AIChatBoxMini from 'containers/common/AIChatBox.tsx/AIChatBoxMini';
 
 import { apiAskGrammarAgent } from 'api/gpt';
-import type { GptLog } from 'types/gpt';
-
-interface ChecklistResult {
-  score: number;
-  mistakes: {
-    severity: any;
-    description: string;
-    original_sentence: string;
-    corrected_sentence: string;
-  }[];
-}
+import type { GptLog, GrammarResult } from 'types/gpt';
 
 type Props = {
   toolId: number;
@@ -38,7 +28,7 @@ const EssayEditorGrammarTool = ({
     useMutation(apiAskGrammarAgent);
 
   // Dictionary state
-  const [grammarResult, setGrammarResult] = useState<ChecklistResult | null>(
+  const [grammarResult, setGrammarResult] = useState<GrammarResult | null>(
     null,
   );
 
@@ -48,7 +38,7 @@ const EssayEditorGrammarTool = ({
       is_structured: true,
       essay: getEssayContent(),
     });
-    const result = JSON.parse(res.gpt_answer) as ChecklistResult;
+    const result = JSON.parse(res.gpt_answer) as GrammarResult;
     setGrammarResult(result);
   }, [askGrammarAgent, getEssayContent, toolId]);
 
@@ -56,7 +46,7 @@ const EssayEditorGrammarTool = ({
     if (!latestResult) {
       return;
     }
-    const result = JSON.parse(latestResult.gpt_answer) as ChecklistResult;
+    const result = JSON.parse(latestResult.gpt_answer) as GrammarResult;
     setGrammarResult(result);
   }, [latestResult]);
 

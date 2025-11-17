@@ -10,6 +10,7 @@ import TextInput from 'components/input/TextInput';
 import AIChatBox from 'containers/common/AIChatBox.tsx';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
+import GOAL_QUESTIONS from 'containers/student/AssignmentGoalEditor/goalQuestions';
 
 import {
   apiSaveAssignmentSubmission,
@@ -22,35 +23,6 @@ type Props = {
   assignmentProgress: AssignmentProgress;
   currentStage: AssignmentProgress['stages'][number];
 };
-
-const GOAL_QUESTIONS = [
-  {
-    question: 'What is your main writing goal for this essay?',
-    placeholder:
-      'e.g., Create a strong thesis statement, improve paragraph transitions, develop detailed arguments...',
-    category: 'Main Goals' as const,
-  },
-  {
-    question:
-      'How do you plan to use AI assistance effectively in your writing process?',
-    placeholder:
-      'e.g., Use AI for brainstorming ideas, checking grammar, improving sentence clarity...',
-    category: 'AI usage' as const,
-  },
-  {
-    question: 'Which writing tools will you use to improve your essay quality?',
-    placeholder:
-      'e.g., Use the dictionary for vocabulary, checklist for grammar review, outline feature...',
-    category: 'Tool usage' as const,
-  },
-  {
-    question:
-      'What specific strategies will you implement to stay focused and organized?',
-    placeholder:
-      'e.g., Break writing into sections, take regular breaks, use the rubric as a guide...',
-    category: 'Organize strategy' as const,
-  },
-];
 
 const defaultResponses = GOAL_QUESTIONS.reduce(
   (acc, q) => ({ ...acc, [q.category]: [''] }),

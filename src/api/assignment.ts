@@ -2,10 +2,12 @@ import { callAPIHandler } from 'api/_base';
 import type {
   Assignment,
   AssignmentDetails,
+  AssignmentGrade,
   AssignmentListingResponse,
   AssignmentProgress,
   AssignmentRecentSubmissionListingItem,
   AssignmentSubmission,
+  AssignmentSubmissionDetails,
   AssignmentSubmissionListingItem,
   RubricItem,
 } from 'types/assignment';
@@ -156,3 +158,38 @@ export const apiGetSubmisssionRecentListing = async ({
   return res;
 };
 apiGetSubmisssionRecentListing.queryKey = '/api/submission/listing-recent';
+
+export const apiViewAssignmentSubmission = async ({
+  queryKey,
+}: {
+  queryKey: [string, number, number];
+}): Promise<AssignmentSubmissionDetails> => {
+  const [, assignmentId, studentId] = queryKey;
+  const res = await callAPIHandler<AssignmentSubmissionDetails>(
+    'get',
+    `/api/submission/view`,
+    { assignment_id: assignmentId, student_id: studentId },
+    true,
+  );
+  return res;
+};
+apiViewAssignmentSubmission.queryKey = '/api/submission/view';
+
+type AssignmentSaveGradingPayload = {
+  submission_id: number;
+  overall_score: number;
+  overall_feedback: string | undefined;
+  rubrics_breakdown: Record<string, number | null>;
+};
+export const apiSaveAssignmentGrading = (
+  payload: AssignmentSaveGradingPayload,
+): Promise<AssignmentGrade> =>
+  callAPIHandler(
+    'post',
+    '/api/submission/grade',
+    {
+      ...payload,
+      rubrics_breakdown: JSON.stringify(payload.rubrics_breakdown),
+    },
+    true,
+  );

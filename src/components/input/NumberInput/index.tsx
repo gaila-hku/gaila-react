@@ -15,6 +15,7 @@ type Props = {
   className?: string;
   inputClass?: string;
   size?: 'sm' | 'md';
+  placeholder?: string;
 } & React.ComponentProps<typeof NumberField.Root>;
 
 function NumberInput({
@@ -24,6 +25,7 @@ function NumberInput({
   className,
   inputClass,
   size = 'md',
+  placeholder,
   ...props
 }: Props) {
   const id = React.useId();
@@ -48,6 +50,7 @@ function NumberInput({
             inputClass,
             size === 'sm' && styles.small,
           )}
+          placeholder={placeholder}
         />
         <NumberField.Increment
           className={clsx(styles.increment, size === 'sm' && styles.small)}

@@ -10,15 +10,7 @@ import TextInput from 'components/input/TextInput';
 import AIChatBoxMini from 'containers/common/AIChatBox.tsx/AIChatBoxMini';
 
 import { apiAskDictionaryAgent } from 'api/gpt';
-import type { GptLog } from 'types/gpt';
-
-interface DictionaryResult {
-  original_word: string;
-  parts_of_speech: string;
-  translation: string;
-  definition: string;
-  examples: string[];
-}
+import type { DictionaryResult, GptLog } from 'types/gpt';
 
 type Props = {
   toolId: number;

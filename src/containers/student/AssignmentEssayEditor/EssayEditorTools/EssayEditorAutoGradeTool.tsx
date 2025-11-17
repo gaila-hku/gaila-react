@@ -10,19 +10,7 @@ import Button from 'components/input/Button';
 import AIChatBoxMini from 'containers/common/AIChatBox.tsx/AIChatBoxMini';
 
 import { apiAskAutogradeAgent } from 'api/gpt';
-import type { GptLog } from 'types/gpt';
-
-interface AutoGradeResult {
-  overall_score: number;
-  max_score: number;
-  overall_feedback: string;
-  criteria_scores: {
-    criteria: string;
-    score: number;
-    max_score: number;
-    feedback: string;
-  }[];
-}
+import type { AutoGradeResult, GptLog } from 'types/gpt';
 
 type Props = {
   toolId: number;

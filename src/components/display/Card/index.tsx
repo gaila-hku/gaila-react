@@ -122,7 +122,7 @@ function Card({
               >
                 {title}
               </h3>
-              <div className="ml-auto">{action}</div>
+              {!!action && <div className="ml-auto">{action}</div>}
               {!!collapsible && (
                 <Clickable onClick={() => setIsCollapsed(!isCollapsed)}>
                   {isCollapsed ? (

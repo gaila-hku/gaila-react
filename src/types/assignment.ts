@@ -44,6 +44,7 @@ export interface AssignmentStage {
   id: number;
   stage_type: string;
   enabled: boolean;
+  order_index: number;
   tools: { id: number; key: string; enabled: boolean }[];
 }
 
@@ -89,21 +90,22 @@ export interface AssignmentSubmission {
 }
 
 export interface AssignmentSubmissionListingItem {
-  id: number;
   assignment_id: number;
-  submitted_at?: number;
-  is_final?: boolean;
-  score?: number;
-  stage: {
-    id: number;
-    stage_type: string;
-  };
   student: {
     id: number;
     username: string;
     first_name?: string;
     last_name?: string;
   };
+  submissions: {
+    id: number;
+    stage_id: number;
+    stage_type: string;
+    // content: string | null;
+    submitted_at: number | null;
+    is_final: boolean | null;
+    score: number | null;
+  }[];
 }
 
 export interface AssignmentRecentSubmissionListingItem
@@ -114,16 +116,11 @@ export interface AssignmentRecentSubmissionListingItem
 export interface AssignmentGrade {
   id: number;
   submission_id: number;
-  score: number;
-  score_breakdown?: {
-    criteria: string;
-    score: number;
-    max_score: number;
-    feedback: string;
-  }[];
-  feedback?: string;
-  graded_at?: number;
-  graded_by: string;
+  overall_score: number;
+  overall_feedback: string;
+  rubrics_breakdown: Record<string, number | null>;
+  graded_at: number;
+  graded_by: number;
 }
 
 // TODO: total students
@@ -136,4 +133,40 @@ export interface TeacherAssignmentListingItem extends Assignment {
   graded: number;
   avgScore: number | null;
   status: 'upcoming' | 'active' | 'past-due';
+}
+
+export interface AssignmentSubmissionDetails {
+  id: number;
+  assignment: {
+    id: number;
+    title: string;
+    description: string;
+    start_date?: number;
+    due_date: number;
+    type: string;
+    rubrics?: RubricItem[];
+  };
+  stages: AssignmentStage[];
+  student: {
+    id: number;
+    username: string;
+    first_name?: string;
+    last_name?: string;
+  };
+  teacher_grading_tool_id: number;
+  submissions: {
+    id: number;
+    stage_id: number;
+    stage_type: string;
+    content:
+      | AssignmentGoal[]
+      | AssignmentEssayContent
+      | AssignmentReflectionContent;
+    submitted_at: number;
+    is_final: boolean;
+    grade?: Pick<
+      AssignmentGrade,
+      'overall_score' | 'overall_feedback' | 'graded_at' | 'rubrics_breakdown'
+    >;
+  }[];
 }

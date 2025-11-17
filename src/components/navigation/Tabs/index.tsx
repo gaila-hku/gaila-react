@@ -17,17 +17,19 @@ type Props = {
     indicator?: string;
     tabList?: string;
     panel?: string;
+    root?: string;
   };
+  className?: string;
 };
 
-function Tabs({ tabs, defaultTab, classes }: Props) {
+function Tabs({ tabs, defaultTab, classes, className }: Props) {
   if (!tabs.length) {
     return <></>;
   }
 
   return (
     <BaseTabs.Root
-      className={styles.tabs}
+      className={clsx(styles.tabs, classes?.root, className)}
       defaultValue={defaultTab || tabs[0].key}
     >
       <BaseTabs.List className={clsx(styles.list, classes?.tabList)}>

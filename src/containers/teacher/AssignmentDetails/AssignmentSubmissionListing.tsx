@@ -24,15 +24,31 @@ import type {
   AssignmentSubmissionListingItem,
 } from 'types/assignment';
 import type { ListingResponse } from 'types/response';
-import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
 import getUserName from 'utils/helper/getUserName';
 import tuple from 'utils/types/tuple';
 
-const getStatusBadge = (submission: AssignmentSubmissionListingItem) => {
-  if (isNumber(submission.score))
-    return <Badge className="bg-green-600">Graded</Badge>;
-  if (submission.is_final) return <Badge>Pending</Badge>;
-  return <Badge variant="secondary">Draft</Badge>;
+const getSubmissionItemStatus = (item: AssignmentSubmissionListingItem) => {
+  if (item.submissions.some(submission => isNumber(submission.score)))
+    return 'graded';
+  if (
+    item.submissions.some(
+      submission => submission.stage_type === 'writing' && submission.is_final,
+    )
+  )
+    return 'pending';
+  return 'draft';
+};
+
+const getStatusBadge = (item: AssignmentSubmissionListingItem) => {
+  const status = getSubmissionItemStatus(item);
+  switch (status) {
+    case 'graded':
+      return <Badge className="bg-green-600">Graded</Badge>;
+    case 'pending':
+      return <Badge>Pending</Badge>;
+    default:
+      return <Badge variant="secondary">Draft</Badge>;
+  }
 };
 
 type Props = {
@@ -92,9 +108,10 @@ const AssignmentSubmissionListing = ({ assignmentId, isRecent }: Props) => {
   );
 
   const onViewSubmission = useCallback(
-    (id: number) => {
-      // FIXME: grading page
-      navigate(pathnames.home());
+    (assignmentId: number, studentId: number) => {
+      navigate(
+        pathnames.submissionView(String(assignmentId), String(studentId)),
+      );
     },
     [navigate],
   );
@@ -103,30 +120,27 @@ const AssignmentSubmissionListing = ({ assignmentId, isRecent }: Props) => {
     if (!data?.value.length) {
       return [];
     }
-    return data.value.map(submission => ({
-      id: submission.id,
+    return data.value.map(item => ({
+      id: item.student.id,
       ...(isRecent
         ? {
-            assignment: (submission as AssignmentRecentSubmissionListingItem)
-              .title,
+            assignment: (item as AssignmentRecentSubmissionListingItem).title,
           }
         : {}),
-      name: getUserName(submission.student),
-      stage: getStageTypeLabel(submission.stage),
-      status: getStatusBadge(submission),
-      submitted_at: dayjs(submission.submitted_at).format('MMM D, YYYY'),
-      grade: isNumber(submission.score) ? submission.score : '-',
+      name: getUserName(item.student),
+      status: getStatusBadge(item),
+      last_submitted_at: dayjs(item.submissions[0].submitted_at).format(
+        'MMM D, YYYY',
+      ),
       action: (
         <Button
           className="inline-flex gap-1"
-          onClick={() => onViewSubmission(Number(submission.id))}
+          onClick={() => onViewSubmission(item.assignment_id, item.student.id)}
           size="sm"
           variant="ghost"
         >
           <Eye className="h-3 w-3" />
-          {submission.is_final && !isNumber(submission.score)
-            ? 'Grade'
-            : 'View'}
+          {getSubmissionItemStatus(item) === 'pending' ? 'Grade' : 'View'}
         </Button>
       ),
     }));
@@ -195,10 +209,8 @@ const AssignmentSubmissionListing = ({ assignmentId, isRecent }: Props) => {
             columns={[
               ...(isRecent ? [{ key: 'assignment', title: 'Assignment' }] : []),
               { key: 'name', title: 'Student' },
-              { key: 'stage', title: 'Writing Stage' },
               { key: 'status', title: 'Status' },
               { key: 'submitted_at', title: 'Submitted Date' },
-              { key: 'grade', title: 'Grade' },
               { key: 'action', title: 'Action', align: 'right' },
             ]}
             count={data?.count || 0}

@@ -14,6 +14,8 @@ export const pathnames = {
   assignmentView: (id: string) => `/assignments/view/${id}`,
   assignmentEditDetails: (id: string) => `/assignments/edit/${id}`,
   assignmentEditSubmission: (id: string) => `/assignments/submit/${id}`,
+  submissionView: (assignmentId: string, studentId: string) =>
+    `/submission/${assignmentId}/${studentId}`,
   classDetails: (id: string) => `/class/${id}`,
   style: () => '/style',
 };
@@ -29,6 +31,10 @@ export default [
   route(
     pathnames.assignmentEditSubmission(':id'),
     'pages/assignments.submit.tsx',
+  ),
+  route(
+    pathnames.submissionView(':assignmentId', ':studentId'),
+    'pages/submission.view.tsx',
   ),
   route(pathnames.classDetails(':id'), 'pages/class.tsx'),
   route(pathnames.style(), 'pages/style.tsx'),
