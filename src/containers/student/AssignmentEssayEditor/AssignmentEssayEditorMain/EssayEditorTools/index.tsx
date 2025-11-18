@@ -5,9 +5,10 @@ import { useQuery } from 'react-query';
 import ErrorComponent from 'components/display/ErrorComponent';
 import Loading from 'components/display/Loading';
 
-import EssayEditorAutoGradeTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorAutoGradeTool';
-import EssayEditorDictionaryTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorDictionaryTool';
-import EssayEditorGrammarTool from 'containers/student/AssignmentEssayEditor/EssayEditorTools/EssayEditorGrammarTool';
+import EssayEditorAutoGradeTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorAutoGradeTool';
+import EssayEditorDictionaryTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorDictionaryTool';
+import EssayEditorGrammarTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorGrammarTool';
+import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
 import { apiGetLatestSturcturedGptLog } from 'api/gpt';
 import type { AssignmentProgress } from 'types/assignment';
@@ -15,10 +16,11 @@ import tuple from 'utils/types/tuple';
 
 type Props = {
   tools: AssignmentProgress['stages'][number]['tools'];
-  getEssayContent: () => string;
 };
 
-const EssayEditorTools = ({ tools, getEssayContent }: Props) => {
+const EssayEditorTools = ({ tools }: Props) => {
+  const { getEssayContent } = useAssignmentEssayEditorProvider();
+
   const dictionaryTool = tools.find(tool => tool.key === 'dictionary');
   const grammarTool = tools.find(tool => tool.key === 'grammar');
   const autoGradeTool = tools.find(tool => tool.key === 'autograde');

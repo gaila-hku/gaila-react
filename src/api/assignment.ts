@@ -1,6 +1,7 @@
 import { callAPIHandler } from 'api/_base';
 import type {
   Assignment,
+  AssignmentAnalytics,
   AssignmentDetails,
   AssignmentGrade,
   AssignmentListingResponse,
@@ -105,7 +106,7 @@ export const apiViewAssignmentProgress = async ({
 };
 apiViewAssignmentProgress.queryKey = '/api/assignment/view-progress/id';
 
-type AssignmentSaveSubmissionPayload = {
+export type AssignmentSaveSubmissionPayload = {
   assignment_id: number;
   stage_id: number;
   content: string;
@@ -193,3 +194,19 @@ export const apiSaveAssignmentGrading = (
     },
     true,
   );
+
+export const apiGetAssignmentAnalytics = async ({
+  queryKey,
+}: {
+  queryKey: [string, number];
+}): Promise<AssignmentAnalytics> => {
+  const [, assignmentId] = queryKey;
+  const res = await callAPIHandler<AssignmentAnalytics>(
+    'get',
+    `/api/assignment/analytics-student`,
+    { assignment_id: assignmentId },
+    true,
+  );
+  return res;
+};
+apiGetAssignmentAnalytics.queryKey = '/api/assignment/analytics-student';

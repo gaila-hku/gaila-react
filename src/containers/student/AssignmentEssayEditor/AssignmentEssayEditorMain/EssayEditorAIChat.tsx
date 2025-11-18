@@ -6,14 +6,12 @@ import AIChatBox from 'containers/common/AIChatBox.tsx';
 
 type Props = {
   toolId: number;
-  getEssayContent: () => string;
 };
 
-const EssayEditorAIChat = ({ toolId, getEssayContent }: Props) => {
+const EssayEditorAIChat = ({ toolId }: Props) => {
   return (
     <AIChatBox
       firstMessage="Hi! I'm your AI writing assistant. I can help you improve your essay, check grammar, generate ideas, or create an outline. What would you like help with?"
-      getEssayContent={getEssayContent}
       suggestedPrompts={[
         {
           icon: Sparkles,

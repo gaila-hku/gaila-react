@@ -1,0 +1,40 @@
+import React, { type RefObject } from 'react';
+
+import type {
+  Assignment,
+  AssignmentGoal,
+  AssignmentGrade,
+  AssignmentProgress,
+  AssignmentStage,
+} from 'types/assignment';
+
+export interface AssignmentEssayEditorProviderType {
+  assignmentProgress: AssignmentProgress | undefined;
+  currentStage: AssignmentStage | null;
+  assignment: Assignment | null;
+  teacherGrade: AssignmentGrade | null;
+  essayContent: RefObject<string>;
+  getEssayContent: () => string;
+  getEssayWordCount: (essay?: string) => number;
+  goals: AssignmentGoal[];
+  setGoals: (goals: AssignmentGoal[]) => void;
+  readonly: boolean;
+}
+
+const AssignmentEssayEditorProviderContext =
+  React.createContext<AssignmentEssayEditorProviderType>({
+    assignmentProgress: undefined,
+    currentStage: null,
+    assignment: null,
+    teacherGrade: null,
+    essayContent: { current: '' },
+    getEssayContent: () => '',
+    getEssayWordCount: () => 0,
+    goals: [],
+    setGoals: () => {},
+    readonly: false,
+  });
+
+export const { Provider, Consumer } = AssignmentEssayEditorProviderContext;
+
+export default AssignmentEssayEditorProviderContext;

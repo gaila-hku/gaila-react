@@ -58,6 +58,7 @@ const usePageTracking = (
     };
   }, [location.pathname, saveTraceData]);
 
+  // 3. Track tab switch and close
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();

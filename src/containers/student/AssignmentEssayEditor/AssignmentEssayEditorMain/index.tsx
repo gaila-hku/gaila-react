@@ -1,15 +1,8 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { ArrowRight, CheckCircle, FileText, Save } from 'lucide-react';
-import { useMutation, useQueryClient } from 'react-query';
 
 import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
@@ -19,16 +12,13 @@ import Tabs from 'components/navigation/Tabs';
 
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
-import EssayEditorAIChat from 'containers/student/AssignmentEssayEditor/EssayEditorAIChat';
-import EssayEditorInput from 'containers/student/AssignmentEssayEditor/EssayEditorInput';
-import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/EssayEditorOverview';
-import EssayEditorTools from 'containers/student/AssignmentEssayEditor/EssayEditorTools';
+import EssayEditorAIChat from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorAIChat';
+import EssayEditorInput from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorInput';
+import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOverview';
+import EssayEditorTools from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools';
+import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import {
-  apiSaveAssignmentSubmission,
-  apiViewAssignmentProgress,
-} from 'api/assignment';
 import type { AssignmentEssayContent, AssignmentGoal } from 'types/assignment';
 
 type WordCountStatus = {
@@ -37,59 +27,33 @@ type WordCountStatus = {
 };
 
 function AssignmentEssayEditorMain() {
-  const { assignmentProgress, currentStage } =
+  const { assignmentProgress, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
+  const {
+    assignment,
+    teacherGrade,
+    essayContent,
+    getEssayWordCount,
+    goals,
+    setGoals,
+    readonly,
+  } = useAssignmentEssayEditorProvider();
 
-  const queryClient = useQueryClient();
-  const { alertMsg, successMsg, errorMsg } = useAlert();
+  const { alertMsg } = useAlert();
 
-  const { mutate: saveSubmission } = useMutation(apiSaveAssignmentSubmission, {
-    onSuccess: async (res, req) => {
-      if (res.is_final) {
-        successMsg('Essay submitted.');
-        await queryClient.invalidateQueries([
-          apiViewAssignmentProgress.queryKey,
-        ]);
-        return;
-      }
-      if (req.is_manual) {
-        successMsg('Essay draft saved.');
-      }
-    },
-    onError: errorMsg,
-  });
-
-  const [assignment, teacherGrade, isGraded] = useMemo(() => {
-    if (!assignmentProgress || !currentStage) {
-      return [null, null, false];
-    }
-    const grade = currentStage.grade;
-    return [assignmentProgress.assignment, grade, !!grade];
-  }, [assignmentProgress, currentStage]);
-
-  const readonly = isGraded || assignmentProgress?.is_finished || false;
   const generalChatTool = currentStage?.tools.find(
     tool => tool.key === 'writing_general',
   );
 
   const [title, setTitle] = useState('');
-  const essayContent = useRef('');
   const [wordCountStatus, setWordCountStatus] = useState<WordCountStatus>({
     color: '',
     text: '',
   });
-  const [goals, setGoals] = useState<AssignmentGoal[]>([]);
-
-  const getEssayContent = useCallback(() => {
-    return essayContent.current;
-  }, []);
 
   const getWordCountStatus = useCallback(
     (essayContent: string) => {
-      const wordCount = essayContent
-        .trim()
-        .split(/\s+/)
-        .filter(word => word.length > 0).length;
+      const wordCount = getEssayWordCount(essayContent);
 
       const min = assignment?.requirements?.min_word_count || 0;
       const max = assignment?.requirements?.max_word_count || 0;
@@ -128,6 +92,7 @@ function AssignmentEssayEditorMain() {
     [
       assignment?.requirements?.max_word_count,
       assignment?.requirements?.min_word_count,
+      getEssayWordCount,
     ],
   );
 
@@ -162,7 +127,13 @@ function AssignmentEssayEditorMain() {
     } catch (e) {
       console.error(e);
     }
-  }, [assignmentProgress, currentStage, getWordCountStatus]);
+  }, [
+    assignmentProgress,
+    currentStage,
+    essayContent,
+    getWordCountStatus,
+    setGoals,
+  ]);
 
   const handleSave = useCallback(
     (isFinal: boolean, isManual: boolean) => {
@@ -213,9 +184,10 @@ function AssignmentEssayEditorMain() {
     },
     [
       alertMsg,
-      assignment,
+      assignment?.requirements,
       assignmentProgress,
       currentStage,
+      essayContent,
       goals,
       saveSubmission,
       title,
@@ -241,7 +213,14 @@ function AssignmentEssayEditorMain() {
         is_manual: false,
       });
     },
-    [assignmentProgress, currentStage, saveSubmission, title],
+    [
+      assignmentProgress,
+      currentStage,
+      essayContent,
+      saveSubmission,
+      setGoals,
+      title,
+    ],
   );
 
   if (!assignmentProgress || !currentStage || !assignment) {
@@ -395,24 +374,14 @@ function AssignmentEssayEditorMain() {
             {
               key: 'tools',
               title: 'Tools',
-              content: (
-                <EssayEditorTools
-                  getEssayContent={getEssayContent}
-                  tools={currentStage.tools}
-                />
-              ),
+              content: <EssayEditorTools tools={currentStage.tools} />,
             },
             ...(generalChatTool
               ? [
                   {
                     key: 'chat',
                     title: 'AI Chat',
-                    content: (
-                      <EssayEditorAIChat
-                        getEssayContent={getEssayContent}
-                        toolId={generalChatTool.id}
-                      />
-                    ),
+                    content: <EssayEditorAIChat toolId={generalChatTool.id} />,
                   },
                 ]
               : []),

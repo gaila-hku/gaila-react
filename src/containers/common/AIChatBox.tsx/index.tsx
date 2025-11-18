@@ -18,6 +18,7 @@ import {
   renderChatMessage,
   renderGptLog,
 } from 'containers/common/AIChatBox.tsx/utils';
+import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
 import { apiAskGpt, apiGetGptChatLogs } from 'api/gpt';
 import type { GptLog } from 'types/gpt';
@@ -30,7 +31,6 @@ type Props = {
   firstMessage?: string;
   suggestedPrompts?: { icon: any; text: string; category: string }[];
   placeholder?: string;
-  getEssayContent?: () => string;
 };
 
 const AIChatBox = ({
@@ -40,8 +40,9 @@ const AIChatBox = ({
   firstMessage,
   suggestedPrompts,
   placeholder,
-  getEssayContent,
 }: Props) => {
+  const { getEssayContent } = useAssignmentEssayEditorProvider();
+
   const { mutateAsync: sendQuestion, isLoading: isAgentTyping } =
     useMutation(apiAskGpt);
 

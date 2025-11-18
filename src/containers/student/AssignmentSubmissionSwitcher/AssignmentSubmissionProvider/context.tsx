@@ -1,8 +1,12 @@
 import React from 'react';
 
-import type { AssignmentProgress } from 'types/assignment';
+import type { UseMutateFunction } from 'react-query';
 
-export type Role = 'admin' | 'teacher' | 'student';
+import type { AssignmentSaveSubmissionPayload } from 'api/assignment';
+import type {
+  AssignmentProgress,
+  AssignmentSubmission,
+} from 'types/assignment';
 
 export interface AssignmentSubmissionProviderType {
   assignmentProgress: AssignmentProgress | undefined;
@@ -11,6 +15,12 @@ export interface AssignmentSubmissionProviderType {
   isStepperClickable: boolean;
   currentStage: AssignmentProgress['stages'][number] | null;
   setCurrentStageIndex: (index: number) => void;
+  saveSubmission: UseMutateFunction<
+    AssignmentSubmission,
+    unknown,
+    AssignmentSaveSubmissionPayload,
+    unknown
+  >;
 }
 
 const AssignmentSubmissionProviderContext =
@@ -21,6 +31,7 @@ const AssignmentSubmissionProviderContext =
     isStepperClickable: false,
     currentStage: null,
     setCurrentStageIndex: () => {},
+    saveSubmission: () => {},
   });
 
 export const { Provider, Consumer } = AssignmentSubmissionProviderContext;

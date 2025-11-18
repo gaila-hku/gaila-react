@@ -7,7 +7,6 @@ import {
   MessageSquare,
   Save,
 } from 'lucide-react';
-import { useMutation, useQueryClient } from 'react-query';
 
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
@@ -21,34 +20,13 @@ import AssignmentReflectionStatistics from 'containers/student/AssignmentReflect
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import {
-  apiSaveAssignmentSubmission,
-  apiViewAssignmentProgress,
-} from 'api/assignment';
 import type { AssignmentReflectionContent } from 'types/assignment';
 
 const AssignmentReflectionEditor = () => {
-  const { assignmentProgress, currentStage } =
+  const { assignmentProgress, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
 
-  const queryClient = useQueryClient();
-  const { alertMsg, successMsg, errorMsg } = useAlert();
-
-  const { mutate: saveSubmission } = useMutation(apiSaveAssignmentSubmission, {
-    onSuccess: async (res, req) => {
-      if (res.is_final) {
-        successMsg('Reflections submitted.');
-        await queryClient.invalidateQueries([
-          apiViewAssignmentProgress.queryKey,
-        ]);
-        return;
-      }
-      if (req.is_manual) {
-        successMsg('Reflection draft saved.');
-      }
-    },
-    onError: errorMsg,
-  });
+  const { alertMsg } = useAlert();
 
   const [reflections, setReflections] = useState<{ [key: number]: string }>({});
 

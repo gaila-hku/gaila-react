@@ -1,11 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { isNumber } from 'lodash-es';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
+import useAlert from 'containers/common/AlertProvider/useAlert';
 import { Provider } from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/context';
 
-import { apiViewAssignmentProgress } from 'api/assignment';
+import {
+  apiSaveAssignmentSubmission,
+  apiViewAssignmentProgress,
+} from 'api/assignment';
 import tuple from 'utils/types/tuple';
 
 type Props = {
@@ -14,6 +18,9 @@ type Props = {
 };
 
 const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
+  const queryClient = useQueryClient();
+  const { successMsg, errorMsg } = useAlert();
+
   const {
     data: assignmentProgress,
     isLoading,
@@ -51,6 +58,28 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
     return assignmentProgress.stages[currentStageIndex];
   }, [assignmentProgress, currentStageIndex]);
 
+  const { mutate: saveSubmission } = useMutation(apiSaveAssignmentSubmission, {
+    onSuccess: async (res, req) => {
+      const currentContent =
+        currentStage?.stage_type === 'goal_setting'
+          ? 'Goals'
+          : currentStage?.stage_type === 'writing'
+            ? 'Essay'
+            : 'Reflections';
+      if (res.is_final) {
+        successMsg(`${currentContent} submitted.`);
+        await queryClient.invalidateQueries([
+          apiViewAssignmentProgress.queryKey,
+        ]);
+        return;
+      }
+      if (req.is_manual) {
+        successMsg(`${currentContent} draft saved.`);
+      }
+    },
+    onError: errorMsg,
+  });
+
   const value = useMemo(
     () => ({
       assignmentProgress: assignmentProgress,
@@ -59,8 +88,16 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
       setCurrentStageIndex,
       isLoading,
       error,
+      saveSubmission,
     }),
-    [assignmentProgress, currentStage, error, isLoading, isStepperClickable],
+    [
+      assignmentProgress,
+      currentStage,
+      error,
+      isLoading,
+      isStepperClickable,
+      saveSubmission,
+    ],
   );
 
   return <Provider value={value}>{children}</Provider>;

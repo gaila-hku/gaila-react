@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { ArrowRight, Lightbulb, Plus, Save, Target, X } from 'lucide-react';
-import { useMutation, useQueryClient } from 'react-query';
 
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
@@ -13,10 +12,6 @@ import ResizableSidebar from 'containers/common/ResizableSidebar';
 import GOAL_QUESTIONS from 'containers/student/AssignmentGoalEditor/goalQuestions';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import {
-  apiSaveAssignmentSubmission,
-  apiViewAssignmentProgress,
-} from 'api/assignment';
 import type { AssignmentGoal } from 'types/assignment';
 import isObjEmpty from 'utils/helper/isObjEmpty';
 
@@ -26,31 +21,14 @@ const defaultResponses = GOAL_QUESTIONS.reduce(
 );
 
 const AssignmentGoalEditor = () => {
-  const { assignmentProgress, currentStage } =
+  const { assignmentProgress, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
 
-  const queryClient = useQueryClient();
-  const { alertMsg, successMsg, errorMsg } = useAlert();
+  const { alertMsg } = useAlert();
 
   const generalChatTool = currentStage?.tools.find(
     tool => tool.key === 'goal_general',
   );
-
-  const { mutate: saveSubmission } = useMutation(apiSaveAssignmentSubmission, {
-    onSuccess: async (res, req) => {
-      if (res.is_final) {
-        successMsg('Goals submitted.');
-        await queryClient.invalidateQueries([
-          apiViewAssignmentProgress.queryKey,
-        ]);
-        return;
-      }
-      if (req.is_manual) {
-        successMsg('Goals draft saved.');
-      }
-    },
-    onError: errorMsg,
-  });
 
   const [responses, setResponses] = useState<{ [category: string]: string[] }>(
     defaultResponses,

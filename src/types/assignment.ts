@@ -170,3 +170,16 @@ export interface AssignmentSubmissionDetails {
     >;
   }[];
 }
+
+export interface AssignmentAnalytics {
+  prompt_count: number;
+  nature_counts: {
+    [nature: string]: number;
+  };
+  aspect_counts: {
+    [aspect: string]: number;
+  };
+  tool_counts: {
+    [tool: string]: number;
+  };
+}
