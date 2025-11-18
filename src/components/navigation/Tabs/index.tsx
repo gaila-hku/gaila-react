@@ -20,9 +20,10 @@ type Props = {
     root?: string;
   };
   className?: string;
+  onClick?: (key: string) => void;
 };
 
-function Tabs({ tabs, defaultTab, classes, className }: Props) {
+function Tabs({ tabs, defaultTab, classes, className, onClick }: Props) {
   if (!tabs.length) {
     return <></>;
   }
@@ -37,6 +38,7 @@ function Tabs({ tabs, defaultTab, classes, className }: Props) {
           <BaseTabs.Tab
             className={clsx(styles.tab, classes?.tab)}
             key={tab.key}
+            onClick={onClick ? () => onClick(tab.key) : undefined}
             value={tab.key}
           >
             {tab.title}
