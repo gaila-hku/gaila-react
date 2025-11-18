@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 
-import {
-  AlertTriangle,
-  BarChart3,
-  Lightbulb,
-  NotebookPen,
-  Wrench,
-} from 'lucide-react';
+import { BarChart3, Lightbulb, Wrench } from 'lucide-react';
 import { useQuery } from 'react-query';
 import {
   Cell,
@@ -22,6 +16,7 @@ import ErrorComponent from 'components/display/ErrorComponent';
 import Loading from 'components/display/Loading';
 
 import AssignmentEssayEditorAnalyticsSummary from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorAnalytics/AssignmentEssayEditorAnalyticsSummary';
+import AssignmentEssayEditorPlagiarismDetector from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorAnalytics/AssignmentEssayEditorPlagiarismDetector';
 import AssignmentEssayEditorPromptChart from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorAnalytics/AssignmentEssayEditorPromptChart';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
@@ -30,8 +25,7 @@ import getToolName from 'utils/helper/getToolName';
 import tuple from 'utils/types/tuple';
 
 const AssignmentEssayEditorAnalytics = () => {
-  const { assignmentProgress, getEssayContent } =
-    useAssignmentEssayEditorProvider();
+  const { assignmentProgress } = useAssignmentEssayEditorProvider();
 
   const {
     data: analytics,
@@ -144,29 +138,9 @@ const AssignmentEssayEditorAnalytics = () => {
 
         <AssignmentEssayEditorPromptChart analytics={analytics} />
 
-        <Card
-          classes={{
-            root: 'col-span-2',
-            title: 'flex items-center gap-2',
-            description: '-mt-2 mb-2',
-          }}
-          description="Check your writing for plagiarism"
-          title={
-            <>
-              <NotebookPen />
-              ChatGPT copying detector
-            </>
-          }
-        >
-          <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900 rounded-lg mb-2">
-            <AlertTriangle className="h-4 w-4 text-yellow-600" />
-            <span className="text-sm text-yellow-800 dark:text-yellow-200">
-              Highlighted sections show potential ChatGPT-generated content
-              {/* ({student.aiCopyingPercentage}% of essay) */}
-            </span>
-          </div>
-          {getEssayContent()}
-        </Card>
+        <AssignmentEssayEditorPlagiarismDetector
+          plagiarisedSegments={analytics.plagiarised_segments}
+        />
 
         {/* Tools Used */}
         <Card
@@ -189,18 +163,29 @@ const AssignmentEssayEditorAnalytics = () => {
                   {getToolName(toolKey)}
                 </span>
               </div>
-              <Badge variant="secondary">{count} uses</Badge>
+              <div className="flex items-center gap-2">
+                <Badge className="!bg-[#aac5f2a0]" variant="secondary">
+                  You: {count} uses
+                </Badge>
+                <Badge className="!bg-[#f2b1bca0]" variant="secondary">
+                  Class Avg: {analytics.tool_counts_class[toolKey]} uses
+                </Badge>
+              </div>
             </div>
           ))}
         </Card>
 
         <Card
+          classes={{
+            description: '-mt-2 mb-4',
+            title: 'flex items-center gap-2',
+          }}
           description="Based on your current session"
           title={
-            <div className="flex items-center gap-2">
+            <>
               <Lightbulb className="h-5 w-5" />
               Writing Insights
-            </div>
+            </>
           }
         >
           {/* Insights */}

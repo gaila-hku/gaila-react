@@ -182,4 +182,18 @@ export interface AssignmentAnalytics {
   tool_counts: {
     [tool: string]: number;
   };
+  nature_counts_class: {
+    [nature: string]: number;
+  };
+  aspect_counts_class: {
+    [aspect: string]: number;
+  };
+  tool_counts_class: {
+    [tool: string]: number;
+  };
+  plagiarised_segments: {
+    offset: number;
+    sequence: string;
+    type: 'pasted' | 'repeated';
+  }[];
 }
