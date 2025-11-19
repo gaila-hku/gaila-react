@@ -27,7 +27,7 @@ type WordCountStatus = {
 };
 
 function AssignmentEssayEditorMain() {
-  const { assignmentProgress, currentStage, saveSubmission } =
+  const { assignmentProgress, currentStage, saveSubmission, isSaving } =
     useAssignmentSubmissionProvider();
   const {
     assignment,
@@ -232,7 +232,7 @@ function AssignmentEssayEditorMain() {
           title={
             <>
               <CheckCircle className="h-5 w-5" />
-              Essay Graded
+              {teacherGrade ? 'Essay Graded' : 'Essay Submitted'}
             </>
           }
         >
@@ -261,7 +261,7 @@ function AssignmentEssayEditorMain() {
               <div className="flex gap-2">
                 <Button
                   className="gap-2 w-full sm:w-auto"
-                  disabled={readonly}
+                  disabled={readonly || isSaving}
                   onClick={() => handleSave(false, true)}
                   variant="secondary"
                 >
@@ -270,7 +270,7 @@ function AssignmentEssayEditorMain() {
                 </Button>
                 <Button
                   className="gap-2 w-full sm:w-auto"
-                  disabled={readonly}
+                  disabled={readonly || isSaving}
                   onClick={() => handleSave(true, true)}
                 >
                   Submit

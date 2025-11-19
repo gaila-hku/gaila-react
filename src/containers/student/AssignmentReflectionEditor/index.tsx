@@ -23,8 +23,13 @@ import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmis
 import type { AssignmentReflectionContent } from 'types/assignment';
 
 const AssignmentReflectionEditor = () => {
-  const { assignmentProgress, currentStage, saveSubmission } =
-    useAssignmentSubmissionProvider();
+  const {
+    assignmentProgress,
+    currentStage,
+    saveSubmission,
+    isSaving,
+    readonly,
+  } = useAssignmentSubmissionProvider();
 
   const { alertMsg } = useAlert();
 
@@ -122,6 +127,7 @@ const AssignmentReflectionEditor = () => {
                 </label>
                 <TextInput
                   className="resize-none"
+                  disabled={readonly}
                   multiline
                   onBlur={() => handleSubmit(false, false)}
                   onChange={e =>
@@ -139,6 +145,7 @@ const AssignmentReflectionEditor = () => {
           <div className="flex justify-end gap-4">
             <Button
               className="gap-2"
+              disabled={readonly || isSaving}
               onClick={() => handleSubmit(false, true)}
               size="lg"
               variant="secondary"
@@ -148,6 +155,7 @@ const AssignmentReflectionEditor = () => {
             </Button>
             <Button
               className="gap-2"
+              disabled={readonly || isSaving}
               onClick={() => handleSubmit(true, true)}
               size="lg"
             >

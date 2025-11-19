@@ -58,45 +58,65 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
     return assignmentProgress.stages[currentStageIndex];
   }, [assignmentProgress, currentStageIndex]);
 
-  const { mutate: saveSubmission } = useMutation(apiSaveAssignmentSubmission, {
-    onSuccess: async (res, req) => {
-      const currentContent =
-        currentStage?.stage_type === 'goal_setting'
-          ? 'Goals'
-          : currentStage?.stage_type === 'writing'
-            ? 'Essay'
-            : 'Reflections';
-      if (res.is_final) {
-        successMsg(`${currentContent} submitted.`);
-        await queryClient.invalidateQueries([
-          apiViewAssignmentProgress.queryKey,
-        ]);
-        return;
-      }
-      if (req.is_manual) {
-        successMsg(`${currentContent} draft saved.`);
-      }
+  const { mutate: saveSubmission, isLoading: isSaving } = useMutation(
+    apiSaveAssignmentSubmission,
+    {
+      onSuccess: async (res, req) => {
+        const currentContent =
+          currentStage?.stage_type === 'goal_setting'
+            ? 'Goals'
+            : currentStage?.stage_type === 'writing'
+              ? 'Essay'
+              : 'Reflections';
+        if (res.is_final) {
+          successMsg(`${currentContent} submitted.`);
+          await queryClient.invalidateQueries([
+            apiViewAssignmentProgress.queryKey,
+          ]);
+          return;
+        }
+        if (req.is_manual) {
+          successMsg(`${currentContent} draft saved.`);
+        }
+      },
+      onError: errorMsg,
     },
-    onError: errorMsg,
-  });
+  );
+
+  const [assignment, teacherGrade] = useMemo(() => {
+    if (!assignmentProgress || !currentStage) {
+      return [null, null];
+    }
+    const grade = currentStage.grade;
+    return [assignmentProgress.assignment, grade];
+  }, [assignmentProgress, currentStage]);
+  const readonly = !!teacherGrade || assignmentProgress?.is_finished || false;
 
   const value = useMemo(
     () => ({
       assignmentProgress: assignmentProgress,
       isStepperClickable,
       currentStage,
+      assignment,
+      teacherGrade,
+      readonly,
       setCurrentStageIndex,
       isLoading,
       error,
       saveSubmission,
+      isSaving,
     }),
     [
+      assignment,
       assignmentProgress,
       currentStage,
       error,
       isLoading,
+      isSaving,
       isStepperClickable,
+      readonly,
       saveSubmission,
+      teacherGrade,
     ],
   );
 

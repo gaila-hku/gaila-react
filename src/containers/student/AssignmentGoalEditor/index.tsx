@@ -21,8 +21,13 @@ const defaultResponses = GOAL_QUESTIONS.reduce(
 );
 
 const AssignmentGoalEditor = () => {
-  const { assignmentProgress, currentStage, saveSubmission } =
-    useAssignmentSubmissionProvider();
+  const {
+    assignmentProgress,
+    currentStage,
+    saveSubmission,
+    isSaving,
+    readonly,
+  } = useAssignmentSubmissionProvider();
 
   const { alertMsg } = useAlert();
 
@@ -60,7 +65,7 @@ const AssignmentGoalEditor = () => {
 
   const handleSubmit = useCallback(
     (isFinal: boolean, isManual: boolean) => {
-      if (!assignmentProgress || !currentStage) {
+      if (!assignmentProgress || !currentStage || readonly) {
         return;
       }
       const goals: AssignmentGoal[] = GOAL_QUESTIONS.filter(
@@ -85,7 +90,14 @@ const AssignmentGoalEditor = () => {
         is_manual: isManual,
       });
     },
-    [alertMsg, assignmentProgress, currentStage, responses, saveSubmission],
+    [
+      alertMsg,
+      assignmentProgress,
+      currentStage,
+      readonly,
+      responses,
+      saveSubmission,
+    ],
   );
 
   useEffect(() => {
@@ -150,6 +162,7 @@ const AssignmentGoalEditor = () => {
                   </label>
                   <Button
                     className="gap-2"
+                    disabled={readonly}
                     onClick={() => handleAddGoal(question.category)}
                     size="sm"
                     variant="outline"
@@ -166,6 +179,7 @@ const AssignmentGoalEditor = () => {
                     >
                       <TextInput
                         className="resize-none"
+                        disabled={readonly}
                         onBlur={() => handleSubmit(false, false)}
                         onChange={e =>
                           handleChangeText(
@@ -181,7 +195,9 @@ const AssignmentGoalEditor = () => {
                         value={s}
                       />
                       <Button
-                        disabled={responses[question.category].length === 1}
+                        disabled={
+                          readonly || responses[question.category].length === 1
+                        }
                         onClick={() =>
                           handleRemoveGoal(question.category, goalIndex)
                         }
@@ -201,6 +217,7 @@ const AssignmentGoalEditor = () => {
           <div className="flex justify-end gap-4">
             <Button
               className="gap-2"
+              disabled={readonly || isSaving}
               onClick={() => handleSubmit(false, true)}
               size="lg"
               variant="secondary"
@@ -210,6 +227,7 @@ const AssignmentGoalEditor = () => {
             </Button>
             <Button
               className="gap-2"
+              disabled={readonly || isSaving}
               onClick={() => handleSubmit(true, true)}
               size="lg"
             >

@@ -210,7 +210,7 @@ const AssignmentSubmissionListing = ({ assignmentId, isRecent }: Props) => {
               ...(isRecent ? [{ key: 'assignment', title: 'Assignment' }] : []),
               { key: 'name', title: 'Student' },
               { key: 'status', title: 'Status' },
-              { key: 'submitted_at', title: 'Submitted Date' },
+              { key: 'last_submitted_at', title: 'Last Modified' },
               { key: 'action', title: 'Action', align: 'right' },
             ]}
             count={data?.count || 0}

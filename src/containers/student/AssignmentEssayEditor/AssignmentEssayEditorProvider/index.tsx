@@ -16,8 +16,15 @@ type Props = {
 };
 
 const AssignmentEssayEditorProvider = ({ children }: Props) => {
-  const { assignmentProgress, currentStage, isLoading, error } =
-    useAssignmentSubmissionProvider();
+  const {
+    assignmentProgress,
+    currentStage,
+    isLoading,
+    error,
+    assignment,
+    teacherGrade,
+    readonly,
+  } = useAssignmentSubmissionProvider();
 
   const essayContent = useRef('');
   const [goals, setGoals] = useState<AssignmentGoal[]>([]);
@@ -38,15 +45,6 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       .split(/\s+/)
       .filter(word => word.length > 0).length;
   }, []);
-
-  const [assignment, teacherGrade] = useMemo(() => {
-    if (!assignmentProgress || !currentStage) {
-      return [null, null];
-    }
-    const grade = currentStage.grade;
-    return [assignmentProgress.assignment, grade];
-  }, [assignmentProgress, currentStage]);
-  const readonly = !!teacherGrade || assignmentProgress?.is_finished || false;
 
   useEffect(() => {
     if (!assignmentProgress || !currentStage) {

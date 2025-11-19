@@ -4,6 +4,8 @@ import type { UseMutateFunction } from 'react-query';
 
 import type { AssignmentSaveSubmissionPayload } from 'api/assignment';
 import type {
+  Assignment,
+  AssignmentGrade,
   AssignmentProgress,
   AssignmentSubmission,
 } from 'types/assignment';
@@ -14,6 +16,9 @@ export interface AssignmentSubmissionProviderType {
   error: unknown | null;
   isStepperClickable: boolean;
   currentStage: AssignmentProgress['stages'][number] | null;
+  assignment: Assignment | null;
+  teacherGrade: AssignmentGrade | null;
+  readonly: boolean;
   setCurrentStageIndex: (index: number) => void;
   saveSubmission: UseMutateFunction<
     AssignmentSubmission,
@@ -21,6 +26,7 @@ export interface AssignmentSubmissionProviderType {
     AssignmentSaveSubmissionPayload,
     unknown
   >;
+  isSaving: boolean;
 }
 
 const AssignmentSubmissionProviderContext =
@@ -30,8 +36,12 @@ const AssignmentSubmissionProviderContext =
     error: null,
     isStepperClickable: false,
     currentStage: null,
+    assignment: null,
+    teacherGrade: null,
+    readonly: false,
     setCurrentStageIndex: () => {},
     saveSubmission: () => {},
+    isSaving: false,
   });
 
 export const { Provider, Consumer } = AssignmentSubmissionProviderContext;
