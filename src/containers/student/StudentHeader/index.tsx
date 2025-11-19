@@ -9,6 +9,7 @@ import {
   TriangleAlert,
   User,
 } from 'lucide-react';
+import { useMutation } from 'react-query';
 import { useLocation, useNavigate } from 'react-router';
 import { pathnames } from 'routes';
 
@@ -18,6 +19,8 @@ import DropdownMenu from 'components/navigation/DropdownMenu';
 import useAuth from 'containers/auth/AuthProvider/useAuth';
 import Logo from 'containers/common/Logo';
 import AssignmentSubmissionStepper from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionStepper';
+
+import { apiSaveTraceData } from 'api/trace-data';
 
 // FIXME: api
 const notifications = [
@@ -35,6 +38,7 @@ export function StudentHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logoutAction } = useAuth();
+  const { mutate: saveTraceData } = useMutation(apiSaveTraceData);
 
   const [currentView, setCurrentView] = useState<StudentCurrentView>('home');
   useEffect(() => {
@@ -48,12 +52,26 @@ export function StudentHeader() {
   const onViewChange = useCallback(
     (view: StudentCurrentView) => {
       if (view === 'analytics') {
+        saveTraceData({
+          assignment_id: null,
+          stage_id: null,
+          action: 'ENTER_DASHBOARD',
+          content: JSON.stringify({}),
+        });
         navigate(pathnames.analytics());
         return;
       }
+      if (currentView === 'analytics') {
+        saveTraceData({
+          assignment_id: null,
+          stage_id: null,
+          action: 'LEAVE_DASHBOARD',
+          content: JSON.stringify({}),
+        });
+      }
       navigate(pathnames.home());
     },
-    [navigate],
+    [currentView, navigate, saveTraceData],
   );
 
   const getNotificationIcon = useCallback((type: string) => {

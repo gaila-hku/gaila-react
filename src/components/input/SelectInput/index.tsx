@@ -17,7 +17,7 @@ type Props<T> = {
   className?: string;
 } & Omit<React.ComponentProps<typeof Select>, 'onChange'>;
 
-export function SelectInput<T extends string | number>({
+export function SelectInput<T extends string | number | null>({
   label,
   options,
   emptyOption,
@@ -45,7 +45,7 @@ export function SelectInput<T extends string | number>({
           </MenuItem>
         )}
         {options.map(option => (
-          <MenuItem key={option.value} value={option.value}>
+          <MenuItem key={option.value} value={option.value || ''}>
             {option.label}
           </MenuItem>
         ))}
