@@ -108,12 +108,6 @@ function AssignmentEssayEditorMain() {
     const submission = currentStage.submission;
 
     if (!submission) {
-      const goalStage = assignmentProgress.stages.find(stage => {
-        return stage.stage_type === 'goal_setting';
-      });
-      if (goalStage?.submission) {
-        setGoals(goalStage.submission.content as AssignmentGoal[]);
-      }
       setWordCountStatus(getWordCountStatus(''));
       return;
     }
@@ -121,19 +115,11 @@ function AssignmentEssayEditorMain() {
     try {
       const submissionContent = submission.content as AssignmentEssayContent;
       setTitle(submissionContent.title || '');
-      essayContent.current = submissionContent.content || '';
       setWordCountStatus(getWordCountStatus(submissionContent.content || ''));
-      setGoals(submissionContent.goals || []);
     } catch (e) {
       console.error(e);
     }
-  }, [
-    assignmentProgress,
-    currentStage,
-    essayContent,
-    getWordCountStatus,
-    setGoals,
-  ]);
+  }, [assignmentProgress, currentStage, getWordCountStatus]);
 
   const handleSave = useCallback(
     (isFinal: boolean, isManual: boolean) => {

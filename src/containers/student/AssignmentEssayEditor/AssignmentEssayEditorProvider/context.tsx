@@ -10,6 +10,8 @@ import type {
 
 export interface AssignmentEssayEditorProviderType {
   assignmentProgress: AssignmentProgress | undefined;
+  isLoading: boolean;
+  error: unknown | null;
   currentStage: AssignmentStage | null;
   assignment: Assignment | null;
   teacherGrade: AssignmentGrade | null;
@@ -24,6 +26,8 @@ export interface AssignmentEssayEditorProviderType {
 const AssignmentEssayEditorProviderContext =
   React.createContext<AssignmentEssayEditorProviderType>({
     assignmentProgress: undefined,
+    isLoading: false,
+    error: null,
     currentStage: null,
     assignment: null,
     teacherGrade: null,

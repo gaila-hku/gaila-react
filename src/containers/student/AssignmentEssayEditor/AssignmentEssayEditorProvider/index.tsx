@@ -1,16 +1,22 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { Provider } from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/context';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type { AssignmentGoal } from 'types/assignment';
+import type { AssignmentEssayContent, AssignmentGoal } from 'types/assignment';
 
 type Props = {
   children: React.ReactNode;
 };
 
 const AssignmentEssayEditorProvider = ({ children }: Props) => {
-  const { assignmentProgress, currentStage } =
+  const { assignmentProgress, currentStage, isLoading, error } =
     useAssignmentSubmissionProvider();
 
   const essayContent = useRef('');
@@ -42,9 +48,37 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
   }, [assignmentProgress, currentStage]);
   const readonly = !!teacherGrade || assignmentProgress?.is_finished || false;
 
+  useEffect(() => {
+    if (!assignmentProgress || !currentStage) {
+      return;
+    }
+
+    const submission = currentStage.submission;
+
+    if (!submission) {
+      const goalStage = assignmentProgress.stages.find(stage => {
+        return stage.stage_type === 'goal_setting';
+      });
+      if (goalStage?.submission) {
+        setGoals(goalStage.submission.content as AssignmentGoal[]);
+      }
+      return;
+    }
+
+    try {
+      const submissionContent = submission.content as AssignmentEssayContent;
+      essayContent.current = submissionContent.content || '';
+      setGoals(submissionContent.goals || []);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [assignmentProgress, currentStage, essayContent, setGoals]);
+
   const value = useMemo(
     () => ({
       assignmentProgress,
+      isLoading,
+      error,
       currentStage,
       assignment,
       teacherGrade,
@@ -59,9 +93,11 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       assignment,
       assignmentProgress,
       currentStage,
+      error,
       getEssayContent,
       getEssayWordCount,
       goals,
+      isLoading,
       readonly,
       teacherGrade,
     ],

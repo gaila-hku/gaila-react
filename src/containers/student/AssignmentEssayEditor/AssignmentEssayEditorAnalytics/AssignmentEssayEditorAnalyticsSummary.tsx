@@ -6,13 +6,13 @@ import Card from 'components/display/Card';
 
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
-import type { AssignmentAnalytics } from 'types/assignment';
+import type { PromptAnalytics } from 'types/assignment';
 
 type Props = {
-  analytics: AssignmentAnalytics;
+  promptAnalytics: PromptAnalytics;
 };
 
-const AssignmentEssayEditorAnalyticsSummary = ({ analytics }: Props) => {
+const AssignmentEssayEditorAnalyticsSummary = ({ promptAnalytics }: Props) => {
   const { assignment, getEssayWordCount, goals } =
     useAssignmentEssayEditorProvider();
 
@@ -36,8 +36,11 @@ const AssignmentEssayEditorAnalyticsSummary = ({ analytics }: Props) => {
   }, [assignment]);
 
   const toolUseCount = useMemo(() => {
-    return Object.values(analytics.tool_counts).reduce((acc, t) => acc + t, 0);
-  }, [analytics.tool_counts]);
+    return Object.values(promptAnalytics.tool_counts).reduce(
+      (acc, t) => acc + (t.count || 0),
+      0,
+    );
+  }, [promptAnalytics.tool_counts]);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -63,9 +66,15 @@ const AssignmentEssayEditorAnalyticsSummary = ({ analytics }: Props) => {
           </div>
         }
       >
-        <p className="text-2xl font-bold">{analytics.prompt_count}</p>
+        <p className="text-2xl font-bold">
+          {promptAnalytics.total_prompt_count}
+        </p>
         <p className="text-xs text-muted-foreground mt-1">
-          {analytics.nature_counts['learning']} learning-focused
+          {promptAnalytics.nature_counts.reduce(
+            (acc, n) => acc + (n.key === 'learning' ? n.count || 0 : 0),
+            0,
+          )}{' '}
+          learning-focused
         </p>
       </Card>
 
@@ -80,7 +89,7 @@ const AssignmentEssayEditorAnalyticsSummary = ({ analytics }: Props) => {
         <p className="text-2xl font-bold">{toolUseCount}</p>
         <p className="text-xs text-muted-foreground mt-1">
           {toolUseCount
-            ? `${Object.values(analytics.tool_counts).filter(t => t > 0).length} different tools`
+            ? `${Object.values(promptAnalytics.tool_counts).filter(t => !!t.count).length} different tools`
             : 'No tools used yet'}
         </p>
       </Card>

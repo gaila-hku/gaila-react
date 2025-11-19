@@ -16,7 +16,6 @@ export interface Assignment {
     max_word_count?: number | null;
   };
   rubrics?: RubricItem[];
-  stages: AssignmentStage[];
 }
 
 export interface RubricItem {
@@ -38,6 +37,7 @@ export interface StudentAssignmentListingItem extends Assignment {
 export interface AssignmentDetails extends Assignment {
   enrolled_classes: ClassOption[];
   enrolled_students: UserOption[];
+  stages: AssignmentStage[];
 }
 
 export interface AssignmentStage {
@@ -172,28 +172,38 @@ export interface AssignmentSubmissionDetails {
 }
 
 export interface AssignmentAnalytics {
-  prompt_count: number;
-  nature_counts: {
-    [nature: string]: number;
-  };
-  aspect_counts: {
-    [aspect: string]: number;
-  };
-  tool_counts: {
-    [tool: string]: number;
-  };
-  nature_counts_class: {
-    [nature: string]: number;
-  };
-  aspect_counts_class: {
-    [aspect: string]: number;
-  };
-  tool_counts_class: {
-    [tool: string]: number;
-  };
-  plagiarised_segments: {
-    offset: number;
-    sequence: string;
-    type: 'pasted' | 'repeated';
-  }[];
+  prompt_data: PromptAnalytics;
+  timeline_data: TimelineDataItem[];
+  plagiarised_segments: PlagiarisedSegment[];
 }
+
+export interface PromptAnalytics {
+  total_prompt_count: number;
+  nature_counts: PromptAnalyticsCountItem[];
+  aspect_counts: PromptAnalyticsCountItem[];
+  tool_counts: PromptAnalyticsCountItem[];
+}
+
+export interface PromptAnalyticsCountItem {
+  key: string;
+  stage_type: string;
+  count: number | undefined;
+  class_average: number;
+}
+
+export interface TimelineDataItem {
+  stage_type: string;
+  start_time: number | null;
+  end_time: number | null;
+}
+
+export type PlagiarisedSegment = {
+  offset: number;
+  sequence: string;
+  type: 'pasted' | 'repeated';
+};
+
+export type AssignmentOptions = {
+  id: number;
+  title: string;
+}[];

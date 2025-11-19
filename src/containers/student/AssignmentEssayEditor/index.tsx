@@ -32,6 +32,10 @@ const AssignmentEssayEditor = () => {
     [assignmentProgress, currentStage, saveTraceData],
   );
 
+  if (!assignmentProgress) {
+    return <></>;
+  }
+
   return (
     <AssignmentEssayEditorProvider>
       <Tabs
@@ -58,7 +62,11 @@ const AssignmentEssayEditor = () => {
                 <BarChart3 className="h-4 w-4" /> Analytics
               </div>
             ),
-            content: <AssignmentEssayEditorAnalytics />,
+            content: (
+              <AssignmentEssayEditorAnalytics
+                assignmentId={assignmentProgress?.assignment?.id}
+              />
+            ),
           },
         ]}
       />

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 
-import { LoaderCircle } from 'lucide-react';
 import type { UseQueryOptions } from 'react-query';
 
 import ErrorComponent from 'components/display/ErrorComponent';

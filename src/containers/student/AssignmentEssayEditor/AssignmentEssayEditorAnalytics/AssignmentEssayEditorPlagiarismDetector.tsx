@@ -68,9 +68,9 @@ const AssignmentEssayEditorPlagiarismDetector = ({
   return (
     <Card
       classes={{
-        root: 'col-span-2',
         title: 'flex items-center gap-2',
         description: '-mt-2 mb-2',
+        root: 'h-fit',
       }}
       description="Check your writing for plagiarism"
       title={

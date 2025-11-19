@@ -5,6 +5,7 @@ import type {
   AssignmentDetails,
   AssignmentGrade,
   AssignmentListingResponse,
+  AssignmentOptions,
   AssignmentProgress,
   AssignmentRecentSubmissionListingItem,
   AssignmentSubmission,
@@ -210,3 +211,16 @@ export const apiGetAssignmentAnalytics = async ({
   return res;
 };
 apiGetAssignmentAnalytics.queryKey = '/api/assignment/analytics-student';
+
+export const apiGetAssignmentOptions = async (_: {
+  queryKey: [string];
+}): Promise<AssignmentOptions> => {
+  const res = await callAPIHandler<AssignmentOptions>(
+    'get',
+    `/api/assignment/options`,
+    {},
+    true,
+  );
+  return res;
+};
+apiGetAssignmentOptions.queryKey = '/api/assignment/options';
