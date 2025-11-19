@@ -13,7 +13,7 @@ import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 import Tabs from 'components/navigation/Tabs';
 
-import AIChatBox from 'containers/common/AIChatBox.tsx';
+import AIChatBox from 'containers/common/AIChatBox';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
 import AssignmentReflectionStatistics from 'containers/student/AssignmentReflectionEditor/AssignmentReflectionStatistics';

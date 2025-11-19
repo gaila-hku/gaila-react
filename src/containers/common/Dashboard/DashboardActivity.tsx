@@ -63,7 +63,7 @@ type TimelineChartData = {
   color: string;
 };
 
-const AssignmentEssayEditorActivity = ({ analytics }: Props) => {
+const DashboardActivity = ({ analytics }: Props) => {
   const timelineData: TimelineChartData[] = useMemo(() => {
     return analytics.timeline_data.map(item => {
       let time = 0;
@@ -163,4 +163,4 @@ const AssignmentEssayEditorActivity = ({ analytics }: Props) => {
   );
 };
 
-export default AssignmentEssayEditorActivity;
+export default DashboardActivity;

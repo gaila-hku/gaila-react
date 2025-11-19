@@ -11,13 +11,13 @@ import Loading from 'components/display/Loading';
 import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 
-import LoadingMessage from 'containers/common/AIChatBox.tsx/LoadingMessage';
+import LoadingMessage from 'containers/common/AIChatBox/LoadingMessage';
 import {
   type ChatMessage,
   gptResponseToChatMessage,
   renderChatMessage,
   renderGptLog,
-} from 'containers/common/AIChatBox.tsx/utils';
+} from 'containers/common/AIChatBox/utils';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
 import { apiAskGpt, apiGetGptChatLogs } from 'api/gpt';

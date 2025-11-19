@@ -8,7 +8,7 @@ import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
-import AIChatBoxMini from 'containers/common/AIChatBox.tsx/AIChatBoxMini';
+import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 
 import { apiAskGrammarAgent } from 'api/gpt';
 import type { GptLog, GrammarResult } from 'types/gpt';

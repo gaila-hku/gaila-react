@@ -5,22 +5,31 @@ import { Lightbulb } from 'lucide-react';
 
 import Card from 'components/display/Card';
 
-import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
-
-import type { AssignmentAnalytics } from 'types/assignment';
+import type {
+  AssignmentAnalytics,
+  AssignmentGoal,
+  AssignmentProgress,
+} from 'types/assignment';
 
 type Props = {
   analytics: AssignmentAnalytics;
+  assignmentProgress: AssignmentProgress;
+  getEssayWordCount: () => number;
+  goals: AssignmentGoal[];
 };
 
-const AssignmentEssayEditorInsights = ({ analytics }: Props) => {
-  const { getEssayWordCount, assignmentProgress, assignment, goals } =
-    useAssignmentEssayEditorProvider();
+const DashboardInsights = ({
+  analytics,
+  getEssayWordCount,
+  assignmentProgress,
+  goals,
+}: Props) => {
+  const assignment = assignmentProgress.assignment;
 
   const wordCountProgress = useMemo(() => {
     if (
-      !assignment?.requirements?.min_word_count &&
-      !assignment?.requirements?.max_word_count
+      !assignment.requirements?.min_word_count &&
+      !assignment.requirements?.max_word_count
     ) {
       return '';
     }
@@ -139,4 +148,4 @@ const AssignmentEssayEditorInsights = ({ analytics }: Props) => {
   );
 };
 
-export default AssignmentEssayEditorInsights;
+export default DashboardInsights;

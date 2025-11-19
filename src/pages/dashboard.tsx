@@ -21,7 +21,9 @@ const DashboardPage = () => {
       ) : (
         <>
           <TeacherHeader />
-          Dashboard Page
+          <div className="p-6 max-w-full mx-auto mb-10">
+            <StudentDashboard />
+          </div>
         </>
       )}
     </AuthPageWrapper>

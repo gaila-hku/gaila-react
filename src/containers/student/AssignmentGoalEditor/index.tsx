@@ -6,7 +6,7 @@ import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 
-import AIChatBox from 'containers/common/AIChatBox.tsx';
+import AIChatBox from 'containers/common/AIChatBox';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
 import GOAL_QUESTIONS from 'containers/student/AssignmentGoalEditor/goalQuestions';

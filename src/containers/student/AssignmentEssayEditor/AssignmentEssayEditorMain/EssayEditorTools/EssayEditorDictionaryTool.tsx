@@ -7,7 +7,7 @@ import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 
-import AIChatBoxMini from 'containers/common/AIChatBox.tsx/AIChatBoxMini';
+import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 
 import { apiAskDictionaryAgent } from 'api/gpt';
 import type { DictionaryResult, GptLog } from 'types/gpt';

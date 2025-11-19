@@ -4,18 +4,25 @@ import { FileText, Sparkles, Target, Wrench } from 'lucide-react';
 
 import Card from 'components/display/Card';
 
-import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
-
-import type { PromptAnalytics } from 'types/assignment';
+import type {
+  Assignment,
+  AssignmentGoal,
+  PromptAnalytics,
+} from 'types/assignment';
 
 type Props = {
   promptAnalytics: PromptAnalytics;
+  assignment: Assignment;
+  getEssayWordCount: () => number;
+  goals: AssignmentGoal[];
 };
 
-const AssignmentEssayEditorAnalyticsSummary = ({ promptAnalytics }: Props) => {
-  const { assignment, getEssayWordCount, goals } =
-    useAssignmentEssayEditorProvider();
-
+const DashboardAnalyticsSummary = ({
+  promptAnalytics,
+  assignment,
+  getEssayWordCount,
+  goals,
+}: Props) => {
   const wordCountRequirement = useMemo(() => {
     if (!assignment) {
       return '';
@@ -115,4 +122,4 @@ const AssignmentEssayEditorAnalyticsSummary = ({ promptAnalytics }: Props) => {
   );
 };
 
-export default AssignmentEssayEditorAnalyticsSummary;
+export default DashboardAnalyticsSummary;

@@ -10,13 +10,13 @@ import Loading from 'components/display/Loading';
 import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 
-import LoadingMessage from 'containers/common/AIChatBox.tsx/LoadingMessage';
+import LoadingMessage from 'containers/common/AIChatBox/LoadingMessage';
 import {
   type ChatMessage,
   gptResponseToChatMessage,
   renderChatMessage,
   renderGptLog,
-} from 'containers/common/AIChatBox.tsx/utils';
+} from 'containers/common/AIChatBox/utils';
 
 import { type AskGptStructuredRequestData, apiGetGptChatLogs } from 'api/gpt';
 import type { GptLog } from 'types/gpt';

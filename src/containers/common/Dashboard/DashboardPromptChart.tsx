@@ -36,7 +36,7 @@ const aspectKeyMap = {
   error_correction: 'Error Correction',
 };
 
-const AssignmentEssayEditorPromptChart = ({ promptAnalytics }: Props) => {
+const DashboardPromptChart = ({ promptAnalytics }: Props) => {
   const promptNatureData = useMemo(() => {
     const structuredData = promptAnalytics.nature_counts.reduce((acc, item) => {
       const natureName = natureKeyMap[item.key];
@@ -226,4 +226,4 @@ const AssignmentEssayEditorPromptChart = ({ promptAnalytics }: Props) => {
   );
 };
 
-export default AssignmentEssayEditorPromptChart;
+export default DashboardPromptChart;

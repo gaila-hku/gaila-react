@@ -196,7 +196,7 @@ export const apiSaveAssignmentGrading = (
     true,
   );
 
-export const apiGetAssignmentAnalytics = async ({
+export const apiGetAssignmentStudentAnalytics = async ({
   queryKey,
 }: {
   queryKey: [string, number];
@@ -210,7 +210,23 @@ export const apiGetAssignmentAnalytics = async ({
   );
   return res;
 };
-apiGetAssignmentAnalytics.queryKey = '/api/assignment/analytics-student';
+apiGetAssignmentStudentAnalytics.queryKey = '/api/assignment/analytics-student';
+
+export const apiGetAssignmentTeacherAnalytics = async ({
+  queryKey,
+}: {
+  queryKey: [string, number];
+}): Promise<AssignmentAnalytics> => {
+  const [, assignmentId] = queryKey;
+  const res = await callAPIHandler<AssignmentAnalytics>(
+    'get',
+    `/api/assignment/analytics-teacher`,
+    { assignment_id: assignmentId },
+    true,
+  );
+  return res;
+};
+apiGetAssignmentStudentAnalytics.queryKey = '/api/assignment/analytics-teacher';
 
 export const apiGetAssignmentOptions = async (_: {
   queryKey: [string];

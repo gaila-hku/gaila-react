@@ -5,19 +5,17 @@ import { AlertTriangle, NotebookPen } from 'lucide-react';
 
 import Card from 'components/display/Card';
 
-import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
-
 import type { AssignmentAnalytics } from 'types/assignment';
 
 type Props = {
   plagiarisedSegments: AssignmentAnalytics['plagiarised_segments'];
+  getEssayContent: () => string;
 };
 
-const AssignmentEssayEditorPlagiarismDetector = ({
+const DashboardPlagiarismDetector = ({
   plagiarisedSegments,
+  getEssayContent,
 }: Props) => {
-  const { getEssayContent } = useAssignmentEssayEditorProvider();
-
   const getCopyingPercentage = useCallback(() => {
     const essayLength = getEssayContent().length;
 
@@ -104,4 +102,4 @@ const AssignmentEssayEditorPlagiarismDetector = ({
   );
 };
 
-export default AssignmentEssayEditorPlagiarismDetector;
+export default DashboardPlagiarismDetector;

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { AlertCircle, Lightbulb, Sparkles, Target } from 'lucide-react';
 
-import AIChatBox from 'containers/common/AIChatBox.tsx';
+import AIChatBox from 'containers/common/AIChatBox';
 
 type Props = {
   toolId: number;

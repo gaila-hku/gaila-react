@@ -12,7 +12,7 @@ import ErrorComponent from 'components/display/ErrorComponent';
 import Loading from 'components/display/Loading';
 import Button from 'components/input/Button';
 
-import AIChatBox from 'containers/common/AIChatBox.tsx';
+import AIChatBox from 'containers/common/AIChatBox';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import AssignmentEditorForm from 'containers/teacher/AssignmentEditor/AssignmentEditorForm';
 
