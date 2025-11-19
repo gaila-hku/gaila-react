@@ -6,7 +6,7 @@ import StudentDashboard from 'containers/student/StudentDashboard';
 import StudentHeader from 'containers/student/StudentHeader';
 import TeacherHeader from 'containers/teacher/TeacherHeader';
 
-const AnalyticsPage = () => {
+const DashboardPage = () => {
   const { role } = useAuth();
 
   return (
@@ -21,11 +21,11 @@ const AnalyticsPage = () => {
       ) : (
         <>
           <TeacherHeader />
-          Analytics Page
+          Dashboard Page
         </>
       )}
     </AuthPageWrapper>
   );
 };
 
-export default AnalyticsPage;
+export default DashboardPage;

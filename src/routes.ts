@@ -8,7 +8,7 @@ export const pathnames = {
       ...(redirect ? { r: redirect } : {}),
       ...(clear ? { clear: '1' } : {}),
     }).toString()}`,
-  analytics: () => '/analytics',
+  dashboard: () => '/dashboard',
   assignments: () => '/assignments',
   assignmentCreate: () => '/assignments/create',
   assignmentView: (id: string) => `/assignments/view/${id}`,
@@ -23,7 +23,7 @@ export const pathnames = {
 export default [
   index('pages/home.tsx'),
   route(pathnames.login(), 'pages/login.tsx'),
-  route(pathnames.analytics(), 'pages/analytics.tsx'),
+  route(pathnames.dashboard(), 'pages/dashboard.tsx'),
   route(pathnames.assignments(), 'pages/assignments.tsx'),
   route(pathnames.assignmentView(':id'), 'pages/assignments.view.tsx'),
   route(pathnames.assignmentCreate(), 'pages/assignments.create.tsx'),

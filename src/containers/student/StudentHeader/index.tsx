@@ -32,7 +32,7 @@ const notifications = [
   },
 ];
 
-type StudentCurrentView = 'home' | 'analytics';
+type StudentCurrentView = 'home' | 'dashboard';
 
 export function StudentHeader() {
   const navigate = useNavigate();
@@ -44,24 +44,24 @@ export function StudentHeader() {
   useEffect(() => {
     if (location.pathname === pathnames.home()) {
       setCurrentView('home');
-    } else if (location.pathname === pathnames.analytics()) {
-      setCurrentView('analytics');
+    } else if (location.pathname === pathnames.dashboard()) {
+      setCurrentView('dashboard');
     }
   }, [location.pathname]);
 
   const onViewChange = useCallback(
     (view: StudentCurrentView) => {
-      if (view === 'analytics') {
+      if (view === 'dashboard') {
         saveTraceData({
           assignment_id: null,
           stage_id: null,
           action: 'ENTER_DASHBOARD',
           content: JSON.stringify({}),
         });
-        navigate(pathnames.analytics());
+        navigate(pathnames.dashboard());
         return;
       }
-      if (currentView === 'analytics') {
+      if (currentView === 'dashboard') {
         saveTraceData({
           assignment_id: null,
           stage_id: null,
@@ -116,8 +116,8 @@ export function StudentHeader() {
               </Button>
               <Button
                 className="gap-2 w-full sm:w-auto justify-start"
-                onClick={() => onViewChange('analytics')}
-                variant={currentView === 'analytics' ? 'default' : 'ghost'}
+                onClick={() => onViewChange('dashboard')}
+                variant={currentView === 'dashboard' ? 'default' : 'ghost'}
               >
                 <BarChart3 className="h-4 w-4" />
                 Dashboard

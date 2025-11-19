@@ -10,7 +10,7 @@ import DropdownMenu from 'components/navigation/DropdownMenu';
 import useAuth from 'containers/auth/AuthProvider/useAuth';
 import Logo from 'containers/common/Logo';
 
-type TeacherCurrentView = 'home' | 'assignments' | 'analytics';
+type TeacherCurrentView = 'home' | 'assignments' | 'dashboard';
 
 export function TeacherHeader() {
   const { logoutAction } = useAuth();
@@ -25,8 +25,8 @@ export function TeacherHeader() {
       setCurrentView('home');
     } else if (location.pathname === pathnames.assignments()) {
       setCurrentView('assignments');
-    } else if (location.pathname === pathnames.analytics()) {
-      setCurrentView('analytics');
+    } else if (location.pathname === pathnames.dashboard()) {
+      setCurrentView('dashboard');
     }
   }, [location.pathname]);
 
@@ -39,8 +39,8 @@ export function TeacherHeader() {
         navigate(pathnames.assignments());
         return;
       }
-      if (view === 'analytics') {
-        navigate(pathnames.analytics());
+      if (view === 'dashboard') {
+        navigate(pathnames.dashboard());
         return;
       }
       navigate(pathnames.home());
@@ -88,12 +88,12 @@ export function TeacherHeader() {
             </Button>
             <Button
               className="gap-2"
-              onClick={() => onViewChange('analytics')}
+              onClick={() => onViewChange('dashboard')}
               size="sm"
-              variant={currentView === 'analytics' ? 'default' : 'ghost'}
+              variant={currentView === 'dashboard' ? 'default' : 'ghost'}
             >
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Analytics</span>
+              <span className="hidden sm:inline">Dashboard</span>
             </Button>
           </nav>
 
