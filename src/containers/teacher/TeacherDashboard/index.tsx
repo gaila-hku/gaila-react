@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { useMutation, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 
 import ErrorComponent from 'components/display/ErrorComponent';
 import Loading from 'components/display/Loading';
@@ -11,7 +11,6 @@ import AssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEdi
 import AssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider';
 
 import { apiGetAssignmentOptions } from 'api/assignment';
-import { apiSaveTraceData } from 'api/trace-data';
 import tuple from 'utils/types/tuple';
 
 const TeacherDashboard = () => {
@@ -25,7 +24,6 @@ const TeacherDashboard = () => {
     tuple([apiGetAssignmentOptions.queryKey]),
     apiGetAssignmentOptions,
   );
-  const { mutate: saveTraceData } = useMutation(apiSaveTraceData);
 
   const selectOptions = useMemo(() => {
     if (!options) {
@@ -43,22 +41,12 @@ const TeacherDashboard = () => {
     }
   }, [options]);
 
-  useEffect(() => {
-    if (assignmentId) {
-      saveTraceData({
-        assignment_id: assignmentId,
-        stage_id: null,
-        action: 'SWITCH_DASHBOARD_ASSIGNMENT',
-      });
-    }
-  }, [assignmentId, saveTraceData]);
-
   return (
     <>
       <div className="mb-2">
         <h2 className="text-2xl sm:text-3xl font-bold">Analytics Dashboard</h2>
         <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">
-          Track your writing progress and AI usage patterns
+          Monitor student progress and tool usage patterns
         </p>
       </div>
       {isLoading ? (

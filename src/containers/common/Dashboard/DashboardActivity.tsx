@@ -59,7 +59,7 @@ const getStageColor = (stage: string) => {
 
 type TimelineChartData = {
   stageType: string;
-  Time: number;
+  Time: string;
   color: string;
 };
 
@@ -74,7 +74,7 @@ const DashboardActivity = ({ analytics }: Props) => {
       }
       return {
         stageType: getStageTypeLabel(item),
-        Time: time,
+        Time: time.toFixed(2),
         color: getStageColor(item.stage_type),
       };
     });

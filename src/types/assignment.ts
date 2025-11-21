@@ -11,9 +11,14 @@ export interface Assignment {
   type?: string;
   instructions?: string;
   tips?: string[];
+  config?: {
+    outline_enabled?: boolean;
+    revision_enabled?: boolean;
+  };
   requirements?: {
     min_word_count?: number | null;
     max_word_count?: number | null;
+    title?: boolean;
   };
   rubrics?: RubricItem[];
 }
@@ -123,15 +128,11 @@ export interface AssignmentGrade {
   graded_by: number;
 }
 
-// TODO: total students
-// TODO: submissions
-// TODO: graded
-// TODO: avgScore
 export interface TeacherAssignmentListingItem extends Assignment {
-  total_students: number;
-  submitted: number;
-  graded: number;
-  avgScore: number | null;
+  student_count: number;
+  submitted_count: number;
+  graded_count: number;
+  avg_score: number | null;
   status: 'upcoming' | 'active' | 'past-due';
 }
 

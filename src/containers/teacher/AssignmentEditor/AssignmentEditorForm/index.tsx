@@ -5,6 +5,7 @@ import Label from 'components/display/Label';
 import DateTimeInput from 'components/input/DateTimeInput';
 import NumberInput from 'components/input/NumberInput';
 import SelectInput from 'components/input/SelectInput';
+import SwitchInput from 'components/input/SwitchInput';
 import TextInput from 'components/input/TextInput';
 
 import type { AssignmentFormData } from 'containers/teacher/AssignmentEditor';
@@ -139,7 +140,7 @@ const AssignmentEditorForm = ({
       <div className="space-y-4">
         <h4 className="font-medium">Requirements</h4>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="minWords">Minimum Words</Label>
             <NumberInput
@@ -165,6 +166,14 @@ const AssignmentEditorForm = ({
               }
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="titleRequired">Title Required</Label>
+            <SwitchInput
+              defaultChecked={formData.current.requirements?.title || false}
+              id="titleRequired"
+              onChange={value => onFormDataChange('requirements.title', value)}
+            />
+          </div>
         </div>
       </div>
 
@@ -178,7 +187,8 @@ const AssignmentEditorForm = ({
       <Divider />
 
       <AssignmentEditorFormStageInput
-        formDataValue={formData.current.stages}
+        formDataConfigValue={formData.current.config}
+        formDataStageValue={formData.current.stages}
         isEditing={isEditing}
         onFormDataChange={onFormDataChange}
       />

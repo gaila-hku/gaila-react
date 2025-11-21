@@ -4,6 +4,7 @@ import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
 import useAuth from 'containers/auth/AuthProvider/useAuth';
 import StudentDashboard from 'containers/student/StudentDashboard';
 import StudentHeader from 'containers/student/StudentHeader';
+import TeacherDashboard from 'containers/teacher/TeacherDashboard';
 import TeacherHeader from 'containers/teacher/TeacherHeader';
 
 const DashboardPage = () => {
@@ -22,7 +23,7 @@ const DashboardPage = () => {
         <>
           <TeacherHeader />
           <div className="p-6 max-w-full mx-auto mb-10">
-            <StudentDashboard />
+            <TeacherDashboard />
           </div>
         </>
       )}

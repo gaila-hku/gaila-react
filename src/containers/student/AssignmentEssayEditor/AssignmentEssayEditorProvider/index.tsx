@@ -26,11 +26,13 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
     readonly,
   } = useAssignmentSubmissionProvider();
 
-  const essayContent = useRef('');
+  const essayContent = useRef<Omit<AssignmentEssayContent, 'goals' | 'title'>>({
+    content: '',
+  });
   const [goals, setGoals] = useState<AssignmentGoal[]>([]);
 
   const getEssayContent = useCallback(() => {
-    return essayContent.current;
+    return essayContent.current.content;
   }, []);
 
   const getEssayWordCount = useCallback((essay?: string) => {
@@ -40,7 +42,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
         .split(/\s+/)
         .filter(word => word.length > 0).length;
     }
-    return essayContent.current
+    return essayContent.current.content
       .trim()
       .split(/\s+/)
       .filter(word => word.length > 0).length;
@@ -65,7 +67,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
 
     try {
       const submissionContent = submission.content as AssignmentEssayContent;
-      essayContent.current = submissionContent.content || '';
+      essayContent.current = submissionContent;
       setGoals(submissionContent.goals || []);
     } catch (e) {
       console.error(e);

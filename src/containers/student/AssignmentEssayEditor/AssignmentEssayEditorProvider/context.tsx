@@ -2,6 +2,7 @@ import React, { type RefObject } from 'react';
 
 import type {
   Assignment,
+  AssignmentEssayContent,
   AssignmentGoal,
   AssignmentGrade,
   AssignmentProgress,
@@ -15,7 +16,7 @@ export interface AssignmentEssayEditorProviderType {
   currentStage: AssignmentStage | null;
   assignment: Assignment | null;
   teacherGrade: AssignmentGrade | null;
-  essayContent: RefObject<string>;
+  essayContent: RefObject<Omit<AssignmentEssayContent, 'goals' | 'title'>>;
   getEssayContent: () => string;
   getEssayWordCount: (essay?: string) => number;
   goals: AssignmentGoal[];
@@ -31,7 +32,7 @@ const AssignmentEssayEditorProviderContext =
     currentStage: null,
     assignment: null,
     teacherGrade: null,
-    essayContent: { current: '' },
+    essayContent: { current: { content: '' } },
     getEssayContent: () => '',
     getEssayWordCount: () => 0,
     goals: [],

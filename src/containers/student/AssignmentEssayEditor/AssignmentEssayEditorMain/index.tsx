@@ -97,7 +97,7 @@ function AssignmentEssayEditorMain() {
   );
 
   const updateWordCountStatus = useCallback(() => {
-    setWordCountStatus(getWordCountStatus(essayContent.current));
+    setWordCountStatus(getWordCountStatus(essayContent.current.content));
   }, [essayContent, getWordCountStatus]);
 
   useEffect(() => {
@@ -131,7 +131,7 @@ function AssignmentEssayEditorMain() {
         // Check word count
         if (
           assignment?.requirements?.min_word_count &&
-          essayContent.current.split(/\s+/).length <
+          essayContent.current.content.split(/\s+/).length <
             assignment.requirements.min_word_count
         ) {
           alertMsg(
@@ -144,7 +144,7 @@ function AssignmentEssayEditorMain() {
 
         if (
           assignment?.requirements?.max_word_count &&
-          essayContent.current.split(/\s+/).length >
+          essayContent.current.content.split(/\s+/).length >
             assignment.requirements.max_word_count
         ) {
           alertMsg(
@@ -161,7 +161,7 @@ function AssignmentEssayEditorMain() {
         stage_id: currentStage.id,
         content: JSON.stringify({
           title: title,
-          content: essayContent.current,
+          content: essayContent.current.content,
           goals,
         }),
         is_final: isFinal,
@@ -289,15 +289,17 @@ function AssignmentEssayEditorMain() {
               </>
             }
           >
-            <TextInput
-              className="text-base sm:text-lg font-semibold !mb-4"
-              disabled={readonly}
-              label="Essay Title"
-              onBlur={() => handleSave(false, false)}
-              onChange={e => setTitle(e.target.value)}
-              value={title}
-            />
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+            {!!assignment.requirements?.title && (
+              <TextInput
+                className="text-base sm:text-lg font-semibold"
+                disabled={readonly}
+                label="Essay Title"
+                onBlur={() => handleSave(false, false)}
+                onChange={e => setTitle(e.target.value)}
+                value={title}
+              />
+            )}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4">
               <Badge
                 className={`px-2 py-1 text-xs sm:text-sm ${wordCountStatus.color}`}
                 variant="outline"
@@ -333,9 +335,7 @@ function AssignmentEssayEditorMain() {
             title="Essay Content"
           >
             <EssayEditorInput
-              essayContent={essayContent}
               handleSave={handleSave}
-              isGraded={readonly}
               updateWordCountStatus={updateWordCountStatus}
             />
           </Card>

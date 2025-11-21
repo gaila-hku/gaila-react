@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { isNumber } from 'lodash-es';
 import { Calendar, Edit, FileText } from 'lucide-react';
@@ -35,12 +35,21 @@ const AssignmentCard = ({ assignment }: Props) => {
     },
     [navigate],
   );
+
   const onEditAssignment = useCallback(
     (id: number) => {
       navigate(pathnames.assignmentEditDetails(String(id)));
     },
     [navigate],
   );
+
+  const maxScore = useMemo(() => {
+    if (!assignment.rubrics) return null;
+    return assignment.rubrics.reduce(
+      (acc, rubric) => acc + rubric.max_points,
+      0,
+    );
+  }, [assignment.rubrics]);
 
   return (
     <Card
@@ -71,10 +80,10 @@ const AssignmentCard = ({ assignment }: Props) => {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Submissions</span>
           <span className="font-medium">
-            {assignment.submitted}/{assignment.total_students} (
+            {assignment.submitted_count}/{assignment.student_count} (
             {getProgressPercentage(
-              assignment.submitted,
-              assignment.total_students,
+              assignment.submitted_count,
+              assignment.student_count,
             )}
             %)
           </span>
@@ -83,7 +92,7 @@ const AssignmentCard = ({ assignment }: Props) => {
           <div
             className="bg-primary h-2 rounded-full transition-all"
             style={{
-              width: `${getProgressPercentage(assignment.submitted, assignment.total_students)}%`,
+              width: `${getProgressPercentage(assignment.submitted_count, assignment.student_count)}%`,
             }}
           />
         </div>
@@ -93,13 +102,15 @@ const AssignmentCard = ({ assignment }: Props) => {
         <div>
           <p className="text-xs text-muted-foreground">Graded</p>
           <p className="text-sm font-medium">
-            {assignment.graded}/{assignment.submitted}
+            {assignment.graded_count}/{assignment.student_count}
           </p>
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Avg Score</p>
           <p className="text-sm font-medium">
-            {assignment.avgScore ? `${assignment.avgScore}%` : 'N/A'}
+            {isNumber(assignment.avg_score)
+              ? `${assignment.avg_score}${maxScore ? `/${maxScore}` : ''}`
+              : 'N/A'}
           </p>
         </div>
       </div>

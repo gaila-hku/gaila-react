@@ -24,6 +24,8 @@ type Props = {
     labelOnly?: boolean;
   }[];
   includeAll?: boolean;
+  className?: string;
+  labelSx?: ComponentProps<typeof FormControlLabel>['sx'];
 };
 
 const CheckboxInput = ({
@@ -33,6 +35,8 @@ const CheckboxInput = ({
   disabled,
   options,
   includeAll,
+  className,
+  labelSx,
 }: Props) => {
   const [value, setValue] = useState<string[]>(defaultValue || []);
 
@@ -75,7 +79,7 @@ const CheckboxInput = ({
   );
 
   return (
-    <FormGroup>
+    <FormGroup className={className}>
       {includeAll && (
         <FormControlLabel
           control={
@@ -89,6 +93,7 @@ const CheckboxInput = ({
             />
           }
           label="Select All"
+          sx={labelSx}
         />
       )}
       {options.map(option =>
@@ -107,7 +112,7 @@ const CheckboxInput = ({
             disabled={option.disabled}
             key={option.key}
             label={option.label}
-            sx={includeAll ? { ml: 2 } : {}}
+            sx={includeAll ? { ml: 2, ...labelSx } : labelSx}
           />
         ),
       )}

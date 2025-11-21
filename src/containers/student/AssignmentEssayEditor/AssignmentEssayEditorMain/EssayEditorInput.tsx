@@ -1,4 +1,4 @@
-import React, { type RefObject, useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { useMutation } from 'react-query';
 
@@ -9,25 +9,18 @@ import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssay
 import { apiSaveTraceData } from 'api/trace-data';
 
 type Props = {
-  isGraded: boolean;
-  essayContent: RefObject<string>;
   updateWordCountStatus: () => void;
   handleSave: (isFinal: boolean, isManual: boolean) => void;
 };
 
-const EssayEditorInput = ({
-  isGraded,
-  essayContent,
-  updateWordCountStatus,
-  handleSave,
-}: Props) => {
-  const { readonly, assignment, currentStage } =
+const EssayEditorInput = ({ updateWordCountStatus, handleSave }: Props) => {
+  const { readonly, assignment, currentStage, essayContent } =
     useAssignmentEssayEditorProvider();
   const { mutateAsync: saveTraceData } = useMutation(apiSaveTraceData);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      essayContent.current = e.target.value;
+      essayContent.current.content = e.target.value;
       updateWordCountStatus();
     },
     [essayContent, updateWordCountStatus],
@@ -81,8 +74,8 @@ const EssayEditorInput = ({
 
   return (
     <TextInput
-      defaultValue={essayContent.current}
-      disabled={isGraded}
+      defaultValue={essayContent.current.content}
+      disabled={readonly}
       multiline
       onBlur={() => handleSave(false, false)}
       onChange={onChange}
