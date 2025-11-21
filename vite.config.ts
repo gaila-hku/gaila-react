@@ -3,10 +3,10 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? '/app/' : '/',
+export default defineConfig({
+  base: '/app',
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   server: {
     port: 3000,
   },
-}));
+});
