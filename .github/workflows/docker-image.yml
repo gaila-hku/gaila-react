@@ -13,7 +13,7 @@ jobs:
       
       - name: Sync repo to production folder
         run: |
-          rsync -av --delete --exclude={'.env.local', '.env.production'} . /root/revamp_app/frontend
+          rsync -av --delete --exclude '.env.local' --exclude '.env.production' . /root/revamp_app/frontend
 
       - name: Deploy frontend
         run: |
