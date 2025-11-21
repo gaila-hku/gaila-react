@@ -1,22 +1,15 @@
-FROM node:20-alpine AS development-dependencies-env
-COPY . /src
-WORKDIR /src
+# 1️⃣ Build stage
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package*.json ./
 RUN npm ci
-
-FROM node:20-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /src/
-WORKDIR /src
-RUN npm ci --omit=dev
-
-FROM node:20-alpine AS build-env
-COPY . /src/
-COPY --from=development-dependencies-env /src/node_modules /src/node_modules
-WORKDIR /src
+COPY . .
 RUN npm run build
 
-FROM node:20-alpine
-COPY ./package.json package-lock.json /src/
-COPY --from=production-dependencies-env /src/node_modules /src/node_modules
-COPY --from=build-env /src/build /src/build
-WORKDIR /src
-CMD ["npm", "run", "start"]
+# 2️⃣ Serve stage
+FROM nginx:alpine
+
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
