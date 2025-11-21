@@ -13,6 +13,11 @@ const redirectToLoginPage = async (optional = false, apiPath?: string) => {
         history.location.search +
         history.location.hash
       : undefined;
+
+    if (url?.startsWith('/app')) {
+      url = url.replace('/app', '');
+    }
+
     url = url === '/' ? undefined : url;
 
     // Clear all auth related cache
