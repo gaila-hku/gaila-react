@@ -6,4 +6,4 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 EXPOSE 3000
-CMD ["pnpm", "start", "--base", "/app/", "--assets", "./build/client/assets"]
+CMD ["pnpm", "start"]
