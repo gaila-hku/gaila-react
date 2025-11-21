@@ -1,0 +1,22 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Sync repo to production folder
+        run: |
+          rsync -av --delete --exclude='.env.local' . /root/revamp_app/frontend
+
+      - name: Deploy backend
+        run: |
+          cd /root/revamp_app
+          docker compose build frontend
+          docker compose up -d frontend
