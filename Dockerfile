@@ -6,4 +6,4 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 EXPOSE 3000
-RUN pnpm start
+CMD ["pnpm", "start"]
