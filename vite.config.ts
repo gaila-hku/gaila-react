@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? './' : '/',
+  base: '/',
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   server: {
     port: 3000,
