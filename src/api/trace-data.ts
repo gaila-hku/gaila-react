@@ -11,7 +11,7 @@ interface SaveTraceDataPayload {
 export const apiSaveTraceData = async (payload: SaveTraceDataPayload) => {
   const res = await callAPIHandler<ClassListingResponse>(
     'post',
-    '/api/trace-data/save',
+    '/trace-data/save',
     payload,
     true,
   );

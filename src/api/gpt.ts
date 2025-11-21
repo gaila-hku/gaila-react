@@ -10,7 +10,7 @@ export interface AskGptRequestData {
 }
 
 export const apiAskGpt = (payload: AskGptRequestData): Promise<GptLog> =>
-  callAPIHandler('post', '/api/gpt/ask', payload, true);
+  callAPIHandler('post', '/gpt/ask', payload, true);
 
 export interface AskGptStructuredRequestData extends AskGptRequestData {
   is_structured: boolean;
@@ -19,17 +19,16 @@ export interface AskGptStructuredRequestData extends AskGptRequestData {
 export const apiAskDictionaryAgent = (
   payload: AskGptStructuredRequestData,
 ): Promise<GptLog> =>
-  callAPIHandler('post', '/api/gpt/ask-dictionary', payload, true);
+  callAPIHandler('post', '/gpt/ask-dictionary', payload, true);
 
 export const apiAskGrammarAgent = (
   payload: PartialBy<AskGptStructuredRequestData, 'question'>,
-): Promise<GptLog> =>
-  callAPIHandler('post', '/api/gpt/ask-grammar', payload, true);
+): Promise<GptLog> => callAPIHandler('post', '/gpt/ask-grammar', payload, true);
 
 export const apiAskAutogradeAgent = (
   payload: PartialBy<AskGptStructuredRequestData, 'question'>,
 ): Promise<GptLog> =>
-  callAPIHandler('post', '/api/gpt/ask-autograde', payload, true);
+  callAPIHandler('post', '/gpt/ask-autograde', payload, true);
 
 interface GetGptLogQueryParam {
   assignment_tool_id: number;
@@ -45,13 +44,13 @@ export const apiGetGptChatLogs = async ({
   const [, queryParam] = queryKey;
   const res = await callAPIHandler<ListingResponse<GptLog>>(
     'get',
-    '/api/gpt/listing-chat',
+    '/gpt/listing-chat',
     queryParam,
     true,
   );
   return res;
 };
-apiGetGptChatLogs.queryKey = '/api/gpt/listing-chat';
+apiGetGptChatLogs.queryKey = '/gpt/listing-chat';
 
 export const apiGetLatestSturcturedGptLog = async ({
   queryKey,
@@ -61,10 +60,10 @@ export const apiGetLatestSturcturedGptLog = async ({
   const [, { assignment_tool_ids }] = queryKey;
   const res = await callAPIHandler<GptLog[]>(
     'get',
-    '/api/gpt/latest-structured',
+    '/gpt/latest-structured',
     { assignment_tool_ids: JSON.stringify(assignment_tool_ids) },
     true,
   );
   return res;
 };
-apiGetLatestSturcturedGptLog.queryKey = '/api/gpt/latest-structured';
+apiGetLatestSturcturedGptLog.queryKey = '/gpt/latest-structured';

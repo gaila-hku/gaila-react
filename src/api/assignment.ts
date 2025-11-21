@@ -36,13 +36,13 @@ export const apiGetAssignments = async ({
   const [, { page, limit, filter, sort, sort_order }] = queryKey;
   const res = await callAPIHandler<AssignmentListingResponse>(
     'get',
-    '/api/assignment/listing',
+    '/assignment/listing',
     { page, limit, filter: JSON.stringify(filter), sort, sort_order },
     true,
   );
   return res;
 };
-apiGetAssignments.queryKey = '/api/assignment/listing';
+apiGetAssignments.queryKey = '/assignment/listing';
 
 export const apiViewAssignment = async ({
   queryKey,
@@ -52,13 +52,13 @@ export const apiViewAssignment = async ({
   const [, assignmentId] = queryKey;
   const res = await callAPIHandler<AssignmentDetails>(
     'get',
-    `/api/assignment/view`,
+    `/assignment/view`,
     { id: assignmentId },
     true,
   );
   return res;
 };
-apiViewAssignment.queryKey = '/api/assignment/view/id';
+apiViewAssignment.queryKey = '/assignment/view/id';
 
 export interface AssignmentCreatePayload {
   title: string;
@@ -84,12 +84,12 @@ export interface AssignmentCreatePayload {
 export const apiCreateAssignment = (
   assignment: AssignmentCreatePayload,
 ): Promise<Assignment> =>
-  callAPIHandler('post', '/api/assignment/create', { assignment }, true);
+  callAPIHandler('post', '/assignment/create', { assignment }, true);
 
 export const apiUpdateAssignment = (
   assignment: { id: number } & Partial<AssignmentCreatePayload>,
 ): Promise<Assignment> =>
-  callAPIHandler('post', '/api/assignment/update', { assignment }, true);
+  callAPIHandler('post', '/assignment/update', { assignment }, true);
 
 export const apiViewAssignmentProgress = async ({
   queryKey,
@@ -99,13 +99,13 @@ export const apiViewAssignmentProgress = async ({
   const [, assignmentId] = queryKey;
   const res = await callAPIHandler<AssignmentProgress>(
     'get',
-    `/api/assignment/view-progress`,
+    `/assignment/view-progress`,
     { id: assignmentId },
     true,
   );
   return res;
 };
-apiViewAssignmentProgress.queryKey = '/api/assignment/view-progress/id';
+apiViewAssignmentProgress.queryKey = '/assignment/view-progress/id';
 
 export type AssignmentSaveSubmissionPayload = {
   assignment_id: number;
@@ -118,7 +118,7 @@ export type AssignmentSaveSubmissionPayload = {
 export const apiSaveAssignmentSubmission = (
   submission: AssignmentSaveSubmissionPayload,
 ): Promise<AssignmentSubmission> =>
-  callAPIHandler('post', '/api/submission/submit', { submission }, true);
+  callAPIHandler('post', '/submission/submit', { submission }, true);
 
 export const apiGetSubmisssionListing = async ({
   queryKey,
@@ -136,10 +136,10 @@ export const apiGetSubmisssionListing = async ({
   const [, queryParams] = queryKey;
   const res = await callAPIHandler<
     ListingResponse<AssignmentSubmissionListingItem>
-  >('get', `/api/submission/listing`, queryParams, true);
+  >('get', `/submission/listing`, queryParams, true);
   return res;
 };
-apiGetSubmisssionListing.queryKey = '/api/submission/listing';
+apiGetSubmisssionListing.queryKey = '/submission/listing';
 
 export const apiGetSubmisssionRecentListing = async ({
   queryKey,
@@ -156,10 +156,10 @@ export const apiGetSubmisssionRecentListing = async ({
   const [, queryParams] = queryKey;
   const res = await callAPIHandler<
     ListingResponse<AssignmentRecentSubmissionListingItem>
-  >('get', `/api/submission/listing-recent`, queryParams, true);
+  >('get', `/submission/listing-recent`, queryParams, true);
   return res;
 };
-apiGetSubmisssionRecentListing.queryKey = '/api/submission/listing-recent';
+apiGetSubmisssionRecentListing.queryKey = '/submission/listing-recent';
 
 export const apiViewAssignmentSubmission = async ({
   queryKey,
@@ -169,13 +169,13 @@ export const apiViewAssignmentSubmission = async ({
   const [, assignmentId, studentId] = queryKey;
   const res = await callAPIHandler<AssignmentSubmissionDetails>(
     'get',
-    `/api/submission/view`,
+    `/submission/view`,
     { assignment_id: assignmentId, student_id: studentId },
     true,
   );
   return res;
 };
-apiViewAssignmentSubmission.queryKey = '/api/submission/view';
+apiViewAssignmentSubmission.queryKey = '/submission/view';
 
 type AssignmentSaveGradingPayload = {
   submission_id: number;
@@ -188,7 +188,7 @@ export const apiSaveAssignmentGrading = (
 ): Promise<AssignmentGrade> =>
   callAPIHandler(
     'post',
-    '/api/submission/grade',
+    '/submission/grade',
     {
       ...payload,
       rubrics_breakdown: JSON.stringify(payload.rubrics_breakdown),
@@ -204,13 +204,13 @@ export const apiGetAssignmentStudentAnalytics = async ({
   const [, assignmentId] = queryKey;
   const res = await callAPIHandler<AssignmentAnalytics>(
     'get',
-    `/api/assignment/analytics-student`,
+    `/assignment/analytics-student`,
     { assignment_id: assignmentId },
     true,
   );
   return res;
 };
-apiGetAssignmentStudentAnalytics.queryKey = '/api/assignment/analytics-student';
+apiGetAssignmentStudentAnalytics.queryKey = '/assignment/analytics-student';
 
 export const apiGetAssignmentTeacherAnalytics = async ({
   queryKey,
@@ -220,23 +220,23 @@ export const apiGetAssignmentTeacherAnalytics = async ({
   const [, assignmentId] = queryKey;
   const res = await callAPIHandler<AssignmentAnalytics>(
     'get',
-    `/api/assignment/analytics-teacher`,
+    `/assignment/analytics-teacher`,
     { assignment_id: assignmentId },
     true,
   );
   return res;
 };
-apiGetAssignmentStudentAnalytics.queryKey = '/api/assignment/analytics-teacher';
+apiGetAssignmentStudentAnalytics.queryKey = '/assignment/analytics-teacher';
 
 export const apiGetAssignmentOptions = async (_: {
   queryKey: [string];
 }): Promise<AssignmentOptions> => {
   const res = await callAPIHandler<AssignmentOptions>(
     'get',
-    `/api/assignment/options`,
+    `/assignment/options`,
     {},
     true,
   );
   return res;
 };
-apiGetAssignmentOptions.queryKey = '/api/assignment/options';
+apiGetAssignmentOptions.queryKey = '/assignment/options';

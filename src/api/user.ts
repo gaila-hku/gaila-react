@@ -9,13 +9,13 @@ export const apiGetClassOptions = async ({
 }) => {
   const res = await callAPIHandler<ClassOptionResponse>(
     'get',
-    '/api/user/class-options',
+    '/user/class-options',
     {},
     true,
   );
   return res;
 };
-apiGetClassOptions.queryKey = '/api/user/class-options';
+apiGetClassOptions.queryKey = '/user/class-options';
 
 export const apiGetStudentOptions = async ({
   queryKey,
@@ -25,10 +25,10 @@ export const apiGetStudentOptions = async ({
   const [, { classId }] = queryKey;
   const res = await callAPIHandler<StudentOptionResponse>(
     'get',
-    '/api/user/student-options',
+    '/user/student-options',
     { classId },
     true,
   );
   return res;
 };
-apiGetStudentOptions.queryKey = '/api/user/student-options';
+apiGetStudentOptions.queryKey = '/user/student-options';

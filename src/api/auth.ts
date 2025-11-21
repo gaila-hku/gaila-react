@@ -18,12 +18,12 @@ export const apiUserLogin = ({
   username: string;
   password: string;
 }): Promise<ServerAuthToken> =>
-  callAPIHandler('post', '/api/auth/login', { username, password }, false);
+  callAPIHandler('post', '/auth/login', { username, password }, false);
 
 export const apiUserRefreshToken = (
   refreshToken: string,
 ): Promise<ServerAuthToken> =>
-  callAPIHandler('post', '/api/auth/refresh', { refreshToken }, false);
+  callAPIHandler('post', '/auth/refresh', { refreshToken }, false);
 
 // export interface CmsUserProfile {
 //   id: string;
@@ -42,11 +42,11 @@ export const apiUserRefreshToken = (
 // }
 
 // export const apiGetProfile = (): Promise<CmsUserProfile> =>
-//   callAPIHandler('get', '/api/user_auth/profile', {}, true, {
+//   callAPIHandler('get', '/user_auth/profile', {}, true, {
 //     redirect: false,
 //     cache: 604800000,
 //   });
-// apiGetProfile.queryKey = 'get,/api/user_auth/profile';
+// apiGetProfile.queryKey = 'get,/user_auth/profile';
 
 // export interface UpdateProfileParam {
 //   new_password?: string;
@@ -58,7 +58,7 @@ export const apiUserRefreshToken = (
 // ): Promise<{ success: true }> => {
 //   return callAPIHandler(
 //     'post',
-//     '/api/user_auth/profile/update',
+//     '/user_auth/profile/update',
 //     newProfileData,
 //     true,
 //   );
@@ -76,7 +76,7 @@ export const apiUserRefreshToken = (
 // }): Promise<ServerAuthToken | MFAResponse> =>
 //   callAPIHandler(
 //     'post',
-//     '/api/user_auth/verify-mfa',
+//     '/user_auth/verify-mfa',
 //     {
 //       salt,
 //       verification_code: verificationCode,
@@ -90,7 +90,7 @@ export const apiUserRefreshToken = (
 // }: {
 //   salt: string;
 // }): Promise<MFAResponse> =>
-//   callAPIHandler('post', '/api/user_auth/request-mfa', { salt }, false);
+//   callAPIHandler('post', '/user_auth/request-mfa', { salt }, false);
 
 // // Forget Password
 // export const apiUserForgetPassword = ({
@@ -98,7 +98,7 @@ export const apiUserRefreshToken = (
 // }: {
 //   email: string;
 // }): Promise<MFAResponse> =>
-//   callAPIHandler('post', '/api/user_auth/forgot-password', { email }, false);
+//   callAPIHandler('post', '/user_auth/forgot-password', { email }, false);
 
 // export const apiUserChangePassword = ({
 //   email,
@@ -111,7 +111,7 @@ export const apiUserRefreshToken = (
 // }): Promise<MFAResponse> =>
 //   callAPIHandler(
 //     'post',
-//     '/api/user_auth/forgot-password',
+//     '/user_auth/forgot-password',
 //     { email, verify, password },
 //     false,
 //   );

@@ -9,13 +9,13 @@ export const apiGetClasses = async ({
   const [, { page, limit, filter }] = queryKey;
   const res = await callAPIHandler<ClassListingResponse>(
     'get',
-    '/api/class/listing',
+    '/class/listing',
     { page, limit, filter },
     true,
   );
   return res;
 };
-apiGetClasses.queryKey = '/api/class/listing';
+apiGetClasses.queryKey = '/class/listing';
 
 export const apiGetClassDetail = async ({
   queryKey,
@@ -23,12 +23,7 @@ export const apiGetClassDetail = async ({
   queryKey: [string, { id: number }];
 }) => {
   const [, { id }] = queryKey;
-  const res = await callAPIHandler<Class>(
-    'get',
-    '/api/class/view',
-    { id },
-    true,
-  );
+  const res = await callAPIHandler<Class>('get', '/class/view', { id }, true);
   return res;
 };
-apiGetClassDetail.queryKey = '/api/class/view';
+apiGetClassDetail.queryKey = '/class/view';
