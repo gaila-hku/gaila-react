@@ -15,7 +15,7 @@ jobs:
         run: |
           rsync -av --delete --exclude='.env.local' . /root/revamp_app/frontend
 
-      - name: Deploy backend
+      - name: Deploy frontend
         run: |
           cd /root/revamp_app
           docker compose build frontend
