@@ -8,11 +8,17 @@ import useAuth from 'containers/auth/AuthProvider/useAuth';
 
 type Props = {
   children: React.ReactNode;
-  isTeacherPage?: boolean;
   isStudentPage?: boolean;
+  isTeacherPage?: boolean;
+  isAdminPage?: boolean;
 };
 
-const AuthPageWrapper = ({ isTeacherPage, isStudentPage, children }: Props) => {
+const AuthPageWrapper = ({
+  isStudentPage,
+  isTeacherPage,
+  isAdminPage,
+  children,
+}: Props) => {
   const { isInitialized, isLoaded, isLoggedIn, role } = useAuth();
   const navigate = useNavigate();
 
@@ -26,12 +32,14 @@ const AuthPageWrapper = ({ isTeacherPage, isStudentPage, children }: Props) => {
     }
     if (
       (isTeacherPage && role === 'student') ||
-      (isStudentPage && ['teacher', 'admin'].includes(role))
+      (isStudentPage && role !== 'student') ||
+      (isAdminPage && role !== 'admin')
     ) {
       navigate(pathnames.home(), { replace: true });
       return;
     }
   }, [
+    isAdminPage,
     isInitialized,
     isLoaded,
     isLoggedIn,

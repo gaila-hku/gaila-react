@@ -17,7 +17,7 @@ export const pathnames = {
   submissionView: (assignmentId: string, studentId: string) =>
     `/submission/${assignmentId}/${studentId}`,
   classDetails: (id: string) => `/class/${id}`,
-  style: () => '/style',
+  adminPortal: () => '/admin',
 };
 
 export default [
@@ -37,5 +37,5 @@ export default [
     'pages/submission.view.tsx',
   ),
   route(pathnames.classDetails(':id'), 'pages/class.tsx'),
-  route(pathnames.style(), 'pages/style.tsx'),
+  route(pathnames.adminPortal(), 'pages/admin.tsx'),
 ] satisfies RouteConfig;

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { BarChart3, FileText, LogOut, User, Users } from 'lucide-react';
+import { BarChart3, FileText, LogOut, User, Users, Wrench } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router';
 import { pathnames } from 'routes';
 
@@ -10,10 +10,10 @@ import DropdownMenu from 'components/navigation/DropdownMenu';
 import useAuth from 'containers/auth/AuthProvider/useAuth';
 import Logo from 'containers/common/Logo';
 
-type TeacherCurrentView = 'home' | 'assignments' | 'dashboard';
+type TeacherCurrentView = 'home' | 'assignments' | 'dashboard' | 'admin';
 
 export function TeacherHeader() {
-  const { logoutAction } = useAuth();
+  const { logoutAction, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,12 +21,21 @@ export function TeacherHeader() {
     null,
   );
   useEffect(() => {
-    if (location.pathname === pathnames.home()) {
-      setCurrentView('home');
-    } else if (location.pathname === pathnames.assignments()) {
-      setCurrentView('assignments');
-    } else if (location.pathname === pathnames.dashboard()) {
-      setCurrentView('dashboard');
+    switch (location.pathname) {
+      case pathnames.home():
+        setCurrentView('home');
+        break;
+      case pathnames.assignments():
+        setCurrentView('assignments');
+        break;
+      case pathnames.dashboard():
+        setCurrentView('dashboard');
+        break;
+      case pathnames.adminPortal():
+        setCurrentView('admin');
+        break;
+      default:
+        setCurrentView(null);
     }
   }, [location.pathname]);
 
@@ -35,17 +44,24 @@ export function TeacherHeader() {
       if (view === currentView) {
         return;
       }
-      if (view === 'assignments') {
-        navigate(pathnames.assignments());
-        return;
+      switch (view) {
+        case 'home':
+          navigate(pathnames.home());
+          return;
+        case 'assignments':
+          navigate(pathnames.assignments());
+          return;
+        case 'dashboard':
+          navigate(pathnames.dashboard());
+          return;
+        case 'admin':
+          if (role === 'admin') {
+            navigate(pathnames.adminPortal());
+          }
+          return;
       }
-      if (view === 'dashboard') {
-        navigate(pathnames.dashboard());
-        return;
-      }
-      navigate(pathnames.home());
     },
-    [currentView, navigate],
+    [currentView, navigate, role],
   );
 
   // TODO: profile edit, profile details in menu
@@ -95,6 +111,17 @@ export function TeacherHeader() {
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
             </Button>
+            {role === 'admin' && (
+              <Button
+                className="gap-2"
+                onClick={() => onViewChange('admin')}
+                size="sm"
+                variant={currentView === 'admin' ? 'default' : 'ghost'}
+              >
+                <Wrench className="h-4 w-4" />
+                <span className="hidden sm:inline">Site Management</span>
+              </Button>
+            )}
           </nav>
 
           {/* User Menu */}
