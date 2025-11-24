@@ -19,7 +19,7 @@ type Props = {
   assignmentId: number;
 };
 
-const AssignmentEssayEditorAnalytics = ({ assignmentId }: Props) => {
+const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
   const { getEssayContent, getEssayWordCount, assignmentProgress, goals } =
     useAssignmentEssayEditorProvider();
 
@@ -67,4 +67,4 @@ const AssignmentEssayEditorAnalytics = ({ assignmentId }: Props) => {
   );
 };
 
-export default AssignmentEssayEditorAnalytics;
+export default AssignmentEssayEditorDashboard;

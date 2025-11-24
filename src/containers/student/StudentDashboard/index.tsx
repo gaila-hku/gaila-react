@@ -6,7 +6,7 @@ import ErrorComponent from 'components/display/ErrorComponent';
 import Loading from 'components/display/Loading';
 import SelectInput from 'components/input/SelectInput';
 
-import AssignmentEssayEditorAnalytics from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorAnalytics';
+import AssignmentEssayEditorDashboard from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorDashboard';
 import AssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider';
 import AssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider';
 
@@ -49,6 +49,7 @@ const StudentDashboard = () => {
         assignment_id: assignmentId,
         stage_id: null,
         action: 'SWITCH_DASHBOARD_ASSIGNMENT',
+        content: JSON.stringify({ assignment_id: assignmentId }),
       });
     }
   }, [assignmentId, saveTraceData]);
@@ -74,7 +75,7 @@ const StudentDashboard = () => {
           {!!assignmentId && (
             <AssignmentSubmissionProvider assignmentId={assignmentId}>
               <AssignmentEssayEditorProvider>
-                <AssignmentEssayEditorAnalytics assignmentId={assignmentId} />
+                <AssignmentEssayEditorDashboard assignmentId={assignmentId} />
               </AssignmentEssayEditorProvider>
             </AssignmentSubmissionProvider>
           )}

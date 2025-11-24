@@ -5,7 +5,7 @@ import { useMutation } from 'react-query';
 
 import Tabs from 'components/navigation/Tabs';
 
-import AssignmentEssayEditorAnalytics from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorAnalytics';
+import AssignmentEssayEditorDashboard from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorDashboard';
 import AssignmentEssayEditorMain from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain';
 import AssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
@@ -56,14 +56,14 @@ const AssignmentEssayEditor = () => {
             content: <AssignmentEssayEditorMain />,
           },
           {
-            key: 'analytics',
+            key: 'dashboard',
             title: (
               <div className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" /> Analytics
+                <BarChart3 className="h-4 w-4" /> Dashboard
               </div>
             ),
             content: (
-              <AssignmentEssayEditorAnalytics
+              <AssignmentEssayEditorDashboard
                 assignmentId={assignmentProgress?.assignment?.id}
               />
             ),
