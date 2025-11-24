@@ -71,7 +71,7 @@ const InfiniteList = <
   return (
     <>
       {data?.map(renderItem)}
-      {isLoading && <Loading />}
+      {isLoading && <Loading className="mx-auto" />}
       {!!data.length && !endReached && <div ref={endDiv} />}
     </>
   );

@@ -9,7 +9,13 @@ import PromptCategoryCharts from 'containers/teacher/SubmissionDetails/Submissio
 import PromptHistory from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/PromptHistory';
 import UseTimeCharts from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/UseTimeCharts';
 
-const SubmissionDetailsAnalytics = () => {
+import type { AssignmentAnalytics } from 'types/assignment';
+
+type Props = {
+  analytics: AssignmentAnalytics;
+};
+
+const SubmissionDetailsAnalytics = ({ analytics }: Props) => {
   return (
     <Card
       description="Tool usage and writing behavior insights"

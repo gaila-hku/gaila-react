@@ -1,14 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import {
-  BarChart3,
-  Bell,
-  FileText,
-  LogOut,
-  Settings,
-  TriangleAlert,
-  User,
-} from 'lucide-react';
+import { BarChart3, FileText, LogOut, Settings, User } from 'lucide-react';
 import { useMutation } from 'react-query';
 import { useLocation, useNavigate } from 'react-router';
 import { pathnames } from 'routes';
@@ -19,18 +11,9 @@ import DropdownMenu from 'components/navigation/DropdownMenu';
 import useAuth from 'containers/auth/AuthProvider/useAuth';
 import Logo from 'containers/common/Logo';
 import AssignmentSubmissionStepper from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionStepper';
+import StudentHeaderNotifications from 'containers/student/StudentHeader/StudentHeaderNotifications';
 
 import { apiSaveTraceData } from 'api/trace-data';
-
-// FIXME: api
-const notifications = [
-  {
-    id: 1,
-    message:
-      'You have a reminder from your teacher: Your "Climate Change Impact Essay" has a high AI usage of 41%.',
-    type: 'alert',
-  },
-];
 
 type StudentCurrentView = 'home' | 'dashboard';
 
@@ -38,6 +21,7 @@ export function StudentHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logoutAction } = useAuth();
+
   const { mutate: saveTraceData } = useMutation(apiSaveTraceData);
 
   const [currentView, setCurrentView] = useState<StudentCurrentView>('home');
@@ -73,15 +57,6 @@ export function StudentHeader() {
     },
     [currentView, navigate, saveTraceData],
   );
-
-  const getNotificationIcon = useCallback((type: string) => {
-    switch (type) {
-      case 'alert':
-        return <TriangleAlert className="h-4 w-4" />;
-      default:
-        return <Bell className="h-4 w-4" />;
-    }
-  }, []);
 
   // TODO: profile edit, profile details in menu
   const onClickProfileMenu = useCallback(
@@ -126,19 +101,7 @@ export function StudentHeader() {
           )}
 
           <div className="flex-shrink-0 w-[250px] flex gap-4 justify-end">
-            <DropdownMenu
-              items={[
-                { type: 'text', label: 'Notifications' },
-                { type: 'divider' },
-                ...notifications.map(notification => ({
-                  key: notification.id,
-                  icon: getNotificationIcon(notification.type),
-                  label: notification.message,
-                })),
-              ]}
-            >
-              <Bell className="h-4 w-4" />
-            </DropdownMenu>
+            <StudentHeaderNotifications />
             <DropdownMenu
               items={[
                 { type: 'text', label: 'My Account' },

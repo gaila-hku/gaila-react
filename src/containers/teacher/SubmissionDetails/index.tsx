@@ -14,6 +14,7 @@ import SubmissionDetailsGrading from 'containers/teacher/SubmissionDetails/Submi
 import SubmissionDetailsReminder from 'containers/teacher/SubmissionDetails/SubmissionDetailsReminder';
 
 import { apiViewAssignmentSubmission } from 'api/assignment';
+import type { AssignmentEssayContent } from 'types/assignment';
 import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
 import getUserName from 'utils/helper/getUserName';
 import tuple from 'utils/types/tuple';
@@ -59,6 +60,39 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
     );
   }, [submissionDetails]);
 
+  const lastSubmittedAt = useMemo(() => {
+    if (!submissionDetails?.submissions.length) {
+      return null;
+    }
+    return Math.max(...submissionDetails.submissions.map(s => s.submitted_at));
+  }, [submissionDetails]);
+
+  const plagiarisedPercentage = useMemo(() => {
+    const writingSubmission = submissionDetails?.submissions.find(
+      s => s.stage_type === 'writing',
+    );
+    const essay = (writingSubmission?.content as AssignmentEssayContent)
+      ?.content;
+
+    if (!essay) {
+      return null;
+    }
+
+    if (!submissionDetails?.analytics.plagiarised_segments.length) {
+      return 0;
+    }
+
+    const plagiarsedLength =
+      submissionDetails.analytics.plagiarised_segments.reduce(
+        (acc, segment) => {
+          return acc + segment.sequence.length;
+        },
+        0,
+      );
+
+    return Math.round((plagiarsedLength / essay.length) * 100);
+  }, [submissionDetails]);
+
   if (isLoading) {
     return <Loading />;
   }
@@ -80,12 +114,7 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
               <span>{getUserName(submissionDetails.student)}</span>
               <span>•</span>
               <span>
-                Last modified:{' '}
-                {dayjs(
-                  Math.max(
-                    ...submissionDetails.submissions.map(s => s.submitted_at),
-                  ),
-                ).format('MMM D, YYYY')}
+                Last modified: {dayjs(lastSubmittedAt).format('MMM D, YYYY')}
               </span>
             </>
           }
@@ -97,13 +126,16 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
           }
         >
           <SubmissionDetailsContent
+            plagiarisedPercentage={plagiarisedPercentage}
+            plagiarisedSegments={
+              submissionDetails.analytics.plagiarised_segments
+            }
             stages={submissionDetails.stages}
             submissions={submissionDetails.submissions}
           />
         </Card>
 
-        {/* Student Analytics Card */}
-        <SubmissionDetailsAnalytics />
+        <SubmissionDetailsAnalytics analytics={submissionDetails.analytics} />
       </div>
 
       <div className="space-y-6">
@@ -112,7 +144,14 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
           rubrics={submissionDetails.assignment.rubrics || []}
           submissions={submissionDetails.submissions}
         />
-        <SubmissionDetailsReminder />
+        <SubmissionDetailsReminder
+          assignmentId={assignmentId}
+          engagement={submissionDetails.engagement}
+          lastReminders={submissionDetails.last_reminders}
+          lastSubmittedAt={lastSubmittedAt}
+          plagiarisedPercentage={plagiarisedPercentage}
+          studentId={studentId}
+        />
       </div>
     </div>
   );

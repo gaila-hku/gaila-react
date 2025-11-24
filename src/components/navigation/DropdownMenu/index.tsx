@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Menu from '@mui/material/Menu';
+import Menu, { type MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 import Divider from 'components/display/Divider';
@@ -21,17 +21,31 @@ type MenuItem<T> =
       label: React.ReactNode;
     };
 
-type Props<T> = {
+type ItemProps<T> = {
   items: MenuItem<T>[];
   onClick?: (key: T) => void;
+};
+
+type MenuChildrenProps = {
+  menuChildren: React.ReactNode[];
+};
+
+type Props<T extends string | number> = (ItemProps<T> | MenuChildrenProps) & {
+  sx?: MenuProps['sx'];
+  keepMounted?: boolean;
   children: React.ReactNode;
 };
 
 function DropdownMenu<T extends string | number>({
-  items,
-  onClick: inputOnClick,
   children,
+  sx,
+  keepMounted,
+  ...props
 }: Props<T>) {
+  const items = 'items' in props ? props.items : [];
+  const inputOnClick = 'onClick' in props ? props.onClick : undefined;
+  const menuChildren = 'menuChildren' in props ? props.menuChildren : undefined;
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -61,7 +75,7 @@ function DropdownMenu<T extends string | number>({
           </MenuItem>
         );
       } else if (item.type === 'divider') {
-        return <Divider key={item.type} />;
+        return <Divider className="!mb-1" key={item.type} />;
       }
       return <div className="px-4">{item.label}</div>;
     },
@@ -74,6 +88,7 @@ function DropdownMenu<T extends string | number>({
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        keepMounted={keepMounted}
         onClick={handleClose}
         onClose={handleClose}
         open={open}
@@ -111,9 +126,10 @@ function DropdownMenu<T extends string | number>({
             },
           },
         }}
+        sx={{ '& .MuiMenuItem-root': { py: 1 }, ...sx }}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
       >
-        {items.map(renderMenuItem)}
+        {menuChildren || items.map(renderMenuItem)}
       </Menu>
     </>
   );

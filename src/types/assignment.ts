@@ -1,4 +1,5 @@
 import type { ClassOption } from 'types/class';
+import type { StudentReminder } from 'types/reminder';
 import type { ListingResponse } from 'types/response';
 import type { UserOption } from 'types/user';
 
@@ -170,6 +171,12 @@ export interface AssignmentSubmissionDetails {
       'overall_score' | 'overall_feedback' | 'graded_at' | 'rubrics_breakdown'
     >;
   }[];
+  analytics: AssignmentAnalytics;
+  engagement: {
+    last_ai_use: number | null;
+    last_dashboard_use: number | null;
+  };
+  last_reminders: { [key: string]: StudentReminder | null };
 }
 
 export interface AssignmentAnalytics {

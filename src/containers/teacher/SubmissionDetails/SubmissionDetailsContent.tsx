@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { type JSX, useCallback, useMemo, useState } from 'react';
 
 import dayjs from 'dayjs';
 import { AlertTriangle, Bot, CheckCircle, Circle } from 'lucide-react';
@@ -17,55 +17,61 @@ import type {
   AssignmentReflectionContent,
   AssignmentStage,
   AssignmentSubmissionDetails,
+  PlagiarisedSegment,
 } from 'types/assignment';
 import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
 
 type Props = {
   stages: AssignmentStage[];
   submissions: AssignmentSubmissionDetails['submissions'];
+  plagiarisedSegments: PlagiarisedSegment[];
+  plagiarisedPercentage: number | null;
 };
 
-const SubmissionDetailsContent = ({ stages, submissions }: Props) => {
+const SubmissionDetailsContent = ({
+  stages,
+  submissions,
+  plagiarisedSegments,
+  plagiarisedPercentage,
+}: Props) => {
   const [highlightChatGPT, setHighlightChatGPT] = useState(false);
 
   const highlightText = useCallback(
     (essay: string) => {
       if (!highlightChatGPT) return essay;
-      return essay;
 
-      //   const highlights = essay.chatGptHighlights;
-      //   let lastIndex = 0;
-      //   const parts: JSX.Element[] = [];
+      let lastIndex = 0;
+      const parts: JSX.Element[] = [];
 
-      //   highlights.forEach((highlight, idx) => {
-      //     // Add non-highlighted text before this highlight
-      //     if (lastIndex < highlight.start) {
-      //       parts.push(
-      //         <span key={`normal-${idx}`}>
-      //           {text.substring(lastIndex, highlight.start)}
-      //         </span>,
-      //       );
-      //     }
-      //     // Add highlighted text
-      //     parts.push(
-      //       <mark
-      //         className="bg-yellow-200 dark:bg-yellow-900/50"
-      //         key={`highlight-${idx}`}
-      //       >
-      //         {text.substring(highlight.start, highlight.end)}
-      //       </mark>,
-      //     );
-      //     lastIndex = highlight.end;
-      //   });
+      plagiarisedSegments.forEach((segment, idx) => {
+        // Add non-highlighted text before this highlight
+        if (lastIndex < segment.offset) {
+          parts.push(
+            <span key={`normal-${idx}`}>
+              {essay.substring(lastIndex, segment.offset)}
+            </span>,
+          );
+        }
+        // Add highlighted text
+        parts.push(
+          <mark
+            className="bg-yellow-200 dark:bg-yellow-900/50"
+            key={`highlight-${idx}`}
+          >
+            {segment.sequence}
+          </mark>,
+        );
+        lastIndex += segment.sequence.length;
+      });
 
-      //   // Add remaining text
-      //   if (lastIndex < text.length) {
-      //     parts.push(<span key="normal-end">{text.substring(lastIndex)}</span>);
-      //   }
+      // Add remaining text
+      if (lastIndex < essay.length) {
+        parts.push(<span key="normal-end">{essay.substring(lastIndex)}</span>);
+      }
 
-      //   return parts;
+      return parts;
     },
-    [highlightChatGPT],
+    [highlightChatGPT, plagiarisedSegments],
   );
 
   const renderSubmissionContent = useCallback(
@@ -156,7 +162,7 @@ const SubmissionDetailsContent = ({ stages, submissions }: Props) => {
                 <AlertTriangle className="h-4 w-4 text-yellow-600" />
                 <span className="text-sm text-yellow-800 dark:text-yellow-200">
                   Highlighted sections show potential ChatGPT-generated content
-                  {/* ({student.aiCopyingPercentage}% of essay) */}
+                  ({plagiarisedPercentage}% of essay)
                 </span>
               </div>
             )}
@@ -194,7 +200,7 @@ const SubmissionDetailsContent = ({ stages, submissions }: Props) => {
         );
       }
     },
-    [highlightChatGPT, highlightText],
+    [highlightChatGPT, highlightText, plagiarisedPercentage],
   );
 
   const tabs = useMemo(() => {
