@@ -256,7 +256,7 @@ const EssayEditorOverview = ({
             </>
           }
         >
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
             {assignment.instructions}
           </p>
         </Card>

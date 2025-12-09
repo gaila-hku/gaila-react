@@ -1,8 +1,7 @@
 import Config from 'config';
 
-// TODO: change storage key
 export const storeConfig = {
-  key: `${Config.apiDomain}|store`,
+  key: `${Config.apiDomain}|gaila|store`,
   version: parseInt(Config.cacheNumber || '0', 10) + 2,
 };
 

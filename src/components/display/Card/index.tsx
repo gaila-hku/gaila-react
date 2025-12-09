@@ -112,7 +112,7 @@ function Card({
           {(!!title || !!action || collapsible) && (
             <div
               className={clsx(
-                'flex gap-4 items-center transition-pb duration-300 ease-in-out',
+                'flex gap-4 items-start transition-pb duration-300 ease-in-out',
                 isCollapsed ? ' -mb-1.5' : 'pb-2',
               )}
             >

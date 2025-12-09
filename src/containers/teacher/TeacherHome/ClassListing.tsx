@@ -46,7 +46,6 @@ const ClassListing = () => {
     return data.value.map(classItem => ({
       ...classItem,
       action: (
-        // TODO: class view page
         <Button
           className="inline-flex gap-1"
           onClick={() => onClickClass(classItem.id)}

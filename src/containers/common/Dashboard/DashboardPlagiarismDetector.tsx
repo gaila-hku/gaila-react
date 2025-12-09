@@ -97,7 +97,7 @@ const DashboardPlagiarismDetector = ({
           </div>
         </div>
       </div>
-      {renderSegments()}
+      <div className="whitespace-pre-wrap">{renderSegments()}</div>
     </Card>
   );
 };
