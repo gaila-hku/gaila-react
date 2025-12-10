@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Bot, School, ScrollText, Users } from 'lucide-react';
+import { useQuery } from 'react-query';
 
 import Button from 'components/input/Button';
 
@@ -8,8 +9,16 @@ import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import TeacherHeader from 'containers/teacher/TeacherHeader';
 
+import { apiGetVersion } from 'api/common';
+import tuple from 'utils/types/tuple';
+
 const AdminPortalPage = () => {
   const { alertMsg } = useAlert();
+
+  const { data: versionData } = useQuery(
+    tuple([apiGetVersion.queryKey]),
+    apiGetVersion,
+  );
 
   return (
     <AuthPageWrapper isAdminPage>
@@ -58,6 +67,9 @@ const AdminPortalPage = () => {
             <ScrollText className="!h-5 !w-5" />
             Full Student Trace Logs
           </Button>
+        </div>
+        <div className="pt-4 text-sm text-muted-foreground">
+          Version: {versionData?.version || '-'}
         </div>
       </div>
     </AuthPageWrapper>
