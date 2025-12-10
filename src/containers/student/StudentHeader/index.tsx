@@ -10,7 +10,7 @@ import DropdownMenu from 'components/navigation/DropdownMenu';
 
 import useAuth from 'containers/auth/AuthProvider/useAuth';
 import Logo from 'containers/common/Logo';
-import AssignmentSubmissionStepper from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionStepper';
+import AssignmentSubmissionStepper from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionStepper';
 import StudentHeaderNotifications from 'containers/student/StudentHeader/StudentHeaderNotifications';
 
 import { apiSaveTraceData } from 'api/trace-data';

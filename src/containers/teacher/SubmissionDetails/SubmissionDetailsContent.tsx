@@ -1,5 +1,6 @@
 import React, { type JSX, useCallback, useMemo, useState } from 'react';
 
+import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { AlertTriangle, Bot, CheckCircle, Circle } from 'lucide-react';
 
@@ -8,12 +9,12 @@ import Label from 'components/display/Label';
 import SwitchInput from 'components/input/SwitchInput';
 import Tabs from 'components/navigation/Tabs';
 
-import GOAL_QUESTIONS from 'containers/student/AssignmentGoalEditor/goalQuestions';
+import GOAL_SECTIONS from 'containers/student/AssignmentGoalEditor/goalSections';
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
 
 import type {
   AssignmentEssayContent,
-  AssignmentGoal,
+  AssignmentGoalContent,
   AssignmentReflectionContent,
   AssignmentStage,
   AssignmentSubmissionDetails,
@@ -86,43 +87,45 @@ const SubmissionDetailsContent = ({
       );
 
       if (stage_type === 'goal_setting') {
-        const goals = submission.content as AssignmentGoal[];
+        const content = submission.content as AssignmentGoalContent;
         return (
           <>
             <div className="text-sm text-muted-foreground pb-2">{header}</div>
             <div className="space-y-3">
-              {GOAL_QUESTIONS.map(question => {
-                const answer = goals.find(
-                  goal => goal.category === question.category,
-                );
+              {GOAL_SECTIONS.map(section => {
+                const goals = content[section.categoryKey];
                 return (
-                  <div key={question.category}>
+                  <div key={section.categoryKey}>
                     <div className="p-3 bg-muted rounded-lg">
-                      {question.question}
+                      {section.question}
                     </div>
-                    {answer ? (
-                      answer.goals.map((goal, index) => (
-                        <div
-                          className="flex items-center gap-2 p-2"
-                          key={`${question.category}-${index}`}
-                        >
-                          {goal.completed ? (
-                            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                          ) : (
-                            <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                          )}
-                          <div className="flex-1">
+                    {goals.map((goal, goalIndex) => (
+                      <div key={`${section.categoryKey}-${goalIndex}`}>
+                        <p className="text-sm">{goal.goalText}</p>
+                        {goal.strategies.map((strategy, strategyIndex) => (
+                          <div
+                            className="flex items-center gap-2 p-2"
+                            key={`${section.categoryKey}-${goalIndex}-${strategyIndex}`}
+                          >
+                            {strategy.completed ? (
+                              <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                            ) : (
+                              <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                            )}
                             <p
-                              className={`text-sm ${goal.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}
+                              className={clsx(
+                                'text-sm',
+                                strategy.completed
+                                  ? 'line-through text-muted-foreground'
+                                  : 'text-foreground',
+                              )}
                             >
-                              {goal.text}
+                              {strategy.text}
                             </p>
                           </div>
-                        </div>
-                      ))
-                    ) : (
-                      <span>-</span>
-                    )}
+                        ))}
+                      </div>
+                    ))}
                   </div>
                 );
               })}
@@ -132,7 +135,7 @@ const SubmissionDetailsContent = ({
       }
       if (stage_type === 'writing') {
         const submissionContent = submission.content as AssignmentEssayContent;
-        const essay = submissionContent.content;
+        const essay = submissionContent.essay;
         const wordCount = essay
           .trim()
           .split(/\s+/)

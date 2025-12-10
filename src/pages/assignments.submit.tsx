@@ -10,8 +10,8 @@ import ErrorComponent from 'components/display/ErrorComponent';
 import Button from 'components/input/Button';
 
 import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
-import AssignmentSubmissionSwitcher from 'containers/student/AssignmentSubmissionSwitcher';
-import AssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider';
+import AssignmentSubmissionEditorSwitcher from 'containers/student/AssignmentSubmissionEditorSwitcher';
+import AssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider';
 import StudentHeader from 'containers/student/StudentHeader';
 
 import { apiGetGptChatLogs } from 'api/gpt';
@@ -43,7 +43,7 @@ const AssignmentSubmitPage = () => {
             Back to Assignments
           </Button>
           {isNumber(assignmentId) ? (
-            <AssignmentSubmissionSwitcher />
+            <AssignmentSubmissionEditorSwitcher />
           ) : (
             <ErrorComponent className="py-10" error="Missing assignment ID" />
           )}

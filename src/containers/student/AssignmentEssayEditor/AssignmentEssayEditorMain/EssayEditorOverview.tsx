@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 
 import dayjs from 'dayjs';
+import { startCase } from 'lodash-es';
 import {
   AlertCircle,
   BookOpen,
@@ -17,17 +18,20 @@ import Card from 'components/display/Card';
 import Divider from 'components/display/Divider';
 import Clickable from 'components/input/Clickable';
 
+import GOAL_SECTIONS from 'containers/student/AssignmentGoalEditor/goalSections';
+
 import type {
   Assignment,
-  AssignmentGoal,
+  AssignmentGoalContent,
   AssignmentGrade,
 } from 'types/assignment';
+import getGoalCounts from 'utils/helper/getGoalCounts';
 
 type Props = {
   grade: AssignmentGrade | null;
   assignment: Assignment;
-  goals: AssignmentGoal[];
-  onChangeGoals: (goals: AssignmentGoal[]) => void;
+  goals: AssignmentGoalContent | null;
+  onChangeGoals: (goals: AssignmentGoalContent | null) => void;
   readonly: boolean;
 };
 
@@ -82,27 +86,43 @@ const EssayEditorOverview = ({
   ]);
 
   const handleGoalToggle = useCallback(
-    async (category: string, index: number) => {
-      const newGoals = goals.map(g => {
-        if (g.category === category) {
-          return {
-            ...g,
-            goals: g.goals.map((g, i) => {
-              if (i === index) {
-                return {
-                  ...g,
-                  completed: !g.completed,
-                };
-              }
-              return g;
-            }),
-          };
-        }
-        return g;
-      });
+    async (
+      category: 'writing_goals' | 'ai_goals',
+      goalIndex: number,
+      strategyIndex: number,
+    ) => {
+      if (!goals) {
+        return;
+      }
+
+      const newGoals = {
+        ...goals,
+        [category]: goals[category].map((g, i) => {
+          if (i === goalIndex) {
+            return {
+              ...g,
+              strategies: g.strategies.map((s, j) => {
+                if (j === strategyIndex) {
+                  return {
+                    ...s,
+                    completed: !s.completed,
+                  };
+                }
+                return s;
+              }),
+            };
+          }
+          return g;
+        }),
+      };
       onChangeGoals(newGoals);
     },
     [goals, onChangeGoals],
+  );
+
+  const [completedGoalCount, totalGoalCount] = useMemo(
+    () => getGoalCounts(goals),
+    [goals],
   );
 
   return (
@@ -183,7 +203,7 @@ const EssayEditorOverview = ({
         </Card>
       )}
 
-      {!!goals.length && (
+      {!!goals && (
         <Card
           classes={{
             title: 'flex items-center gap-2 text-base -mb-2',
@@ -199,43 +219,54 @@ const EssayEditorOverview = ({
             </>
           }
         >
-          {goals.map(group => (
-            <div key={group.category}>
+          {GOAL_SECTIONS.map(section => (
+            <div key={section.categoryKey}>
               <Badge className="mt-1 text-xs" variant="outline">
-                {group.category}
+                {startCase(section.categoryKey)}
               </Badge>
-              {group.goals.map((goal, index) => (
-                <Clickable
-                  className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors"
-                  disabled={readonly}
-                  key={`${group.category}-${index}`}
-                  onClick={() => handleGoalToggle(group.category, index)}
-                >
-                  {goal.completed ? (
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                  )}
-                  <div className="flex-1">
-                    <p
-                      className={`text-sm ${goal.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}
-                    >
-                      {goal.text}
-                    </p>
+              {goals[section.categoryKey].map((goal, goalIndex) => (
+                <div key={`goal-${goalIndex}`}>
+                  <div className="flex gap-2 items-center ml-2">
+                    <div className="bg-black w-1 h-1 rounded-full" />
+                    <p className="text-sm">{goal.goalText}</p>
                   </div>
-                </Clickable>
+                  {goal.strategies.map((strategy, strategyIndex) => (
+                    <Clickable
+                      className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors"
+                      disabled={readonly}
+                      key={`${section.categoryKey}-${goalIndex}-${strategyIndex}`}
+                      onClick={() =>
+                        handleGoalToggle(
+                          section.categoryKey,
+                          goalIndex,
+                          strategyIndex,
+                        )
+                      }
+                    >
+                      {strategy.completed ? (
+                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                      )}
+                      <div className="flex-1">
+                        <p
+                          className={`text-sm ${strategy.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}
+                        >
+                          {strategy.text}
+                        </p>
+                      </div>
+                    </Clickable>
+                  ))}
+                </div>
               ))}
             </div>
           ))}
+
           <Divider />
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Progress</span>
             <span>
-              {goals.reduce(
-                (acc, g) => acc + g.goals.filter(goal => goal.completed).length,
-                0,
-              )}{' '}
-              / {goals.length} completed
+              {completedGoalCount} / {totalGoalCount} completed
             </span>
           </div>
         </Card>

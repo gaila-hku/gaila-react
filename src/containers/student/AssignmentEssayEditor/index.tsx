@@ -8,7 +8,7 @@ import Tabs from 'components/navigation/Tabs';
 import AssignmentEssayEditorDashboard from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorDashboard';
 import AssignmentEssayEditorMain from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain';
 import AssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider';
-import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import { apiSaveTraceData } from 'api/trace-data';
 

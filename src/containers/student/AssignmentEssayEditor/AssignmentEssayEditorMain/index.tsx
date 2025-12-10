@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Stepper from '@mui/material/Stepper';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { ArrowRight, CheckCircle, FileText, Save } from 'lucide-react';
@@ -17,9 +20,12 @@ import EssayEditorInput from 'containers/student/AssignmentEssayEditor/Assignmen
 import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOverview';
 import EssayEditorTools from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
-import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type { AssignmentEssayContent, AssignmentGoal } from 'types/assignment';
+import type {
+  AssignmentEssayContent,
+  AssignmentGoalContent,
+} from 'types/assignment';
 
 type WordCountStatus = {
   color: string;
@@ -34,8 +40,8 @@ function AssignmentEssayEditorMain() {
     teacherGrade,
     essayContent,
     getEssayWordCount,
-    goals,
-    setGoals,
+    goalContent,
+    setGoalContent,
     readonly,
   } = useAssignmentEssayEditorProvider();
 
@@ -70,6 +76,8 @@ function AssignmentEssayEditorMain() {
         wordCountDisplay += ` ${min}+ words`;
       } else if (!min) {
         wordCountDisplay += ` ${max} words`;
+      } else {
+        wordCountDisplay += ` ${min} - ${max} words`;
       }
 
       if (!!min && wordCount < min) {
@@ -97,7 +105,7 @@ function AssignmentEssayEditorMain() {
   );
 
   const updateWordCountStatus = useCallback(() => {
-    setWordCountStatus(getWordCountStatus(essayContent.current.content));
+    setWordCountStatus(getWordCountStatus(essayContent.current.essay));
   }, [essayContent, getWordCountStatus]);
 
   useEffect(() => {
@@ -115,7 +123,7 @@ function AssignmentEssayEditorMain() {
     try {
       const submissionContent = submission.content as AssignmentEssayContent;
       setTitle(submissionContent.title || '');
-      setWordCountStatus(getWordCountStatus(submissionContent.content || ''));
+      setWordCountStatus(getWordCountStatus(submissionContent.essay || ''));
     } catch (e) {
       console.error(e);
     }
@@ -128,11 +136,10 @@ function AssignmentEssayEditorMain() {
       }
 
       if (isFinal) {
-        // Check word count
+        const wordCount = getEssayWordCount(essayContent.current.essay);
         if (
           assignment?.requirements?.min_word_count &&
-          essayContent.current.content.split(/\s+/).length <
-            assignment.requirements.min_word_count
+          wordCount < assignment.requirements.min_word_count
         ) {
           alertMsg(
             'Please write at least ' +
@@ -144,8 +151,7 @@ function AssignmentEssayEditorMain() {
 
         if (
           assignment?.requirements?.max_word_count &&
-          essayContent.current.content.split(/\s+/).length >
-            assignment.requirements.max_word_count
+          wordCount > assignment.requirements.max_word_count
         ) {
           alertMsg(
             'Please write no more than ' +
@@ -159,11 +165,12 @@ function AssignmentEssayEditorMain() {
       saveSubmission({
         assignment_id: assignmentProgress.assignment.id,
         stage_id: currentStage.id,
-        content: JSON.stringify({
+        content: {
           title: title,
-          content: essayContent.current.content,
-          goals,
-        }),
+          outline: essayContent.current.outline,
+          essay: essayContent.current.essay,
+          goals: goalContent,
+        },
         is_final: isFinal,
         is_manual: isManual,
       });
@@ -174,27 +181,29 @@ function AssignmentEssayEditorMain() {
       assignmentProgress,
       currentStage,
       essayContent,
-      goals,
+      getEssayWordCount,
+      goalContent,
       saveSubmission,
       title,
     ],
   );
 
   const onChangeGoals = useCallback(
-    (newGoals: AssignmentGoal[]) => {
+    (newGoals: AssignmentGoalContent | null) => {
       if (!assignmentProgress || !currentStage) {
         return;
       }
 
-      setGoals(newGoals);
+      setGoalContent(newGoals);
       saveSubmission({
         assignment_id: assignmentProgress.assignment.id,
         stage_id: currentStage.id,
-        content: JSON.stringify({
+        content: {
           title: title,
-          content: essayContent.current,
+          outline: essayContent.current.outline,
+          essay: essayContent.current.essay,
           goals: newGoals,
-        }),
+        },
         is_final: false,
         is_manual: false,
       });
@@ -204,7 +213,7 @@ function AssignmentEssayEditorMain() {
       currentStage,
       essayContent,
       saveSubmission,
-      setGoals,
+      setGoalContent,
       title,
     ],
   );
@@ -256,6 +265,35 @@ function AssignmentEssayEditorMain() {
       <ResizableSidebar>
         {/* Main Editor */}
         <div className="space-y-6">
+          <div className="w-full py-4 px-4 bg-secondary/30 rounded-lg border">
+            <Stepper activeStep={0} alternativeLabel className="basis-[400px]">
+              <Step>
+                <StepLabel>
+                  <div className="-mt-2">Outline</div>
+                  <div className="text-xs text-muted-foreground/70 hidden sm:block font-normal">
+                    Plan your essay structure
+                  </div>
+                </StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>
+                  <div className="-mt-2">Drafting</div>
+                  <div className="text-xs text-muted-foreground/70 hidden sm:block font-normal">
+                    Write your first draft
+                  </div>
+                </StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>
+                  <div className="-mt-2">Revising</div>
+                  <div className="text-xs text-muted-foreground/70 hidden sm:block font-normal">
+                    Refine and polish
+                  </div>
+                </StepLabel>
+              </Step>
+            </Stepper>
+          </div>
+
           <Card
             action={
               <div className="flex gap-2">
@@ -278,14 +316,15 @@ function AssignmentEssayEditorMain() {
                 </Button>
               </div>
             }
-            classes={{
-              title: 'flex gap-4 mb-0',
-            }}
-            description={assignment.description}
             title={
               <>
-                <FileText className="h-5 w-5" />
-                {assignment.title}
+                <div className="flex gap-4 mb-2">
+                  <FileText className="h-5 w-5" />
+                  {assignment.title}
+                </div>
+                <div className="font-normal text-base text-muted-foreground">
+                  {assignment.description}
+                </div>
               </>
             }
           >
@@ -320,6 +359,29 @@ function AssignmentEssayEditorMain() {
 
           <Card
             classes={{
+              description: '-mt-2 mb-2',
+            }}
+            description="Create a structured outline for your essay. This will help guide your writing in the next stage."
+            title="Outline Your Essay"
+          >
+            {teacherGrade ? (
+              <div className="text-xs text-purple-600">
+                This essay has been graded and can no longer be edited.
+              </div>
+            ) : readonly ? (
+              <div className="text-xs text-green-600">
+                You have submitted your essay.
+              </div>
+            ) : null}
+            <EssayEditorInput
+              handleSave={handleSave}
+              type="outline"
+              updateWordCountStatus={updateWordCountStatus}
+            />
+          </Card>
+
+          <Card
+            classes={{
               description: clsx(
                 'text-xs',
                 teacherGrade ? '!text-purple-600' : '!text-green-600',
@@ -336,6 +398,7 @@ function AssignmentEssayEditorMain() {
           >
             <EssayEditorInput
               handleSave={handleSave}
+              type="essay"
               updateWordCountStatus={updateWordCountStatus}
             />
           </Card>
@@ -350,7 +413,7 @@ function AssignmentEssayEditorMain() {
               content: (
                 <EssayEditorOverview
                   assignment={assignment}
-                  goals={goals}
+                  goals={goalContent}
                   grade={teacherGrade}
                   onChangeGoals={onChangeGoals}
                   readonly={readonly}

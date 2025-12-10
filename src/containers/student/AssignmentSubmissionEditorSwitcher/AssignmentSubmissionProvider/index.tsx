@@ -4,7 +4,7 @@ import { isNumber } from 'lodash-es';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import useAlert from 'containers/common/AlertProvider/useAlert';
-import { Provider } from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/context';
+import { Provider } from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/context';
 
 import {
   apiSaveAssignmentSubmission,
@@ -79,7 +79,7 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
           successMsg(`${currentContent} draft saved.`);
         }
       },
-      onError: errorMsg,
+      onError: e => errorMsg(e),
     },
   );
 

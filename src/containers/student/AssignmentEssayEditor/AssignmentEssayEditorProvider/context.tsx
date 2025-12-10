@@ -3,7 +3,7 @@ import React, { type RefObject } from 'react';
 import type {
   Assignment,
   AssignmentEssayContent,
-  AssignmentGoal,
+  AssignmentGoalContent,
   AssignmentGrade,
   AssignmentProgress,
   AssignmentStage,
@@ -19,8 +19,8 @@ export interface AssignmentEssayEditorProviderType {
   essayContent: RefObject<Omit<AssignmentEssayContent, 'goals' | 'title'>>;
   getEssayContent: () => string;
   getEssayWordCount: (essay?: string) => number;
-  goals: AssignmentGoal[];
-  setGoals: (goals: AssignmentGoal[]) => void;
+  goalContent: AssignmentGoalContent | null;
+  setGoalContent: (goals: AssignmentGoalContent | null) => void;
   readonly: boolean;
 }
 
@@ -32,11 +32,11 @@ const AssignmentEssayEditorProviderContext =
     currentStage: null,
     assignment: null,
     teacherGrade: null,
-    essayContent: { current: { content: '' } },
+    essayContent: { current: { outline: '', essay: '' } },
     getEssayContent: () => '',
     getEssayWordCount: () => 0,
-    goals: [],
-    setGoals: () => {},
+    goalContent: null,
+    setGoalContent: () => {},
     readonly: false,
   });
 

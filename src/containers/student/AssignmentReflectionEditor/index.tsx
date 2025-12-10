@@ -18,7 +18,7 @@ import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
 import AssignmentReflectionStatistics from 'containers/student/AssignmentReflectionEditor/AssignmentReflectionStatistics';
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
-import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import type { AssignmentReflectionContent } from 'types/assignment';
 
@@ -62,7 +62,7 @@ const AssignmentReflectionEditor = () => {
       saveSubmission({
         assignment_id: assignmentProgress.assignment.id,
         stage_id: currentStage.id,
-        content: JSON.stringify(reflections),
+        content: { reflections },
         is_final: isFinal,
         is_manual: isManual,
       });
@@ -77,7 +77,8 @@ const AssignmentReflectionEditor = () => {
   useEffect(() => {
     if (currentStage?.submission?.content) {
       setReflections(
-        currentStage.submission.content as AssignmentReflectionContent,
+        (currentStage.submission.content as AssignmentReflectionContent)
+          .reflections,
       );
     }
   }, [currentStage]);

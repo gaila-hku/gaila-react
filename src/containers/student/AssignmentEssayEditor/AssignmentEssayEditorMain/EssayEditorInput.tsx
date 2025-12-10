@@ -11,19 +11,24 @@ import { apiSaveTraceData } from 'api/trace-data';
 type Props = {
   updateWordCountStatus: () => void;
   handleSave: (isFinal: boolean, isManual: boolean) => void;
+  type: 'outline' | 'essay';
 };
 
-const EssayEditorInput = ({ updateWordCountStatus, handleSave }: Props) => {
+const EssayEditorInput = ({
+  updateWordCountStatus,
+  handleSave,
+  type,
+}: Props) => {
   const { readonly, assignment, currentStage, essayContent } =
     useAssignmentEssayEditorProvider();
   const { mutateAsync: saveTraceData } = useMutation(apiSaveTraceData);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      essayContent.current.content = e.target.value;
+      essayContent.current[type] = e.target.value;
       updateWordCountStatus();
     },
-    [essayContent, updateWordCountStatus],
+    [essayContent, type, updateWordCountStatus],
   );
 
   const onPaste = useCallback(
@@ -74,7 +79,7 @@ const EssayEditorInput = ({ updateWordCountStatus, handleSave }: Props) => {
 
   return (
     <TextInput
-      defaultValue={essayContent.current.content}
+      defaultValue={essayContent.current[type]}
       disabled={readonly}
       multiline
       onBlur={() => handleSave(false, false)}
@@ -85,7 +90,7 @@ const EssayEditorInput = ({ updateWordCountStatus, handleSave }: Props) => {
         '& .MuiInputBase-root': {
           padding: 1.5,
           borderRadius: 2,
-          minHeight: 600,
+          minHeight: type === 'outline' ? 300 : 600,
           maxHeight: 'calc(100vh - 300px)',
           overflow: 'auto',
           alignItems: 'flex-start',

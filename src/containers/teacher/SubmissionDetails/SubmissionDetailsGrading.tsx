@@ -63,7 +63,7 @@ const SubmissionDetailsGrading = ({
     if (!writingSubmission) return [null, '', null];
     return [
       writingSubmission.id,
-      (writingSubmission.content as AssignmentEssayContent).content || '',
+      (writingSubmission.content as AssignmentEssayContent).essay || '',
       writingSubmission.grade,
     ];
   }, [submissions]);

@@ -71,8 +71,7 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
     const writingSubmission = submissionDetails?.submissions.find(
       s => s.stage_type === 'writing',
     );
-    const essay = (writingSubmission?.content as AssignmentEssayContent)
-      ?.content;
+    const essay = (writingSubmission?.content as AssignmentEssayContent)?.essay;
 
     if (!essay) {
       return null;

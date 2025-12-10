@@ -7,9 +7,12 @@ import React, {
 } from 'react';
 
 import { Provider } from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/context';
-import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type { AssignmentEssayContent, AssignmentGoal } from 'types/assignment';
+import type {
+  AssignmentEssayContent,
+  AssignmentGoalContent,
+} from 'types/assignment';
 
 type Props = {
   children: React.ReactNode;
@@ -27,12 +30,15 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
   } = useAssignmentSubmissionProvider();
 
   const essayContent = useRef<Omit<AssignmentEssayContent, 'goals' | 'title'>>({
-    content: '',
+    outline: '',
+    essay: '',
   });
-  const [goals, setGoals] = useState<AssignmentGoal[]>([]);
+  const [goalContent, setGoalContent] = useState<AssignmentGoalContent | null>(
+    null,
+  );
 
   const getEssayContent = useCallback(() => {
-    return essayContent.current.content;
+    return essayContent.current.essay;
   }, []);
 
   const getEssayWordCount = useCallback((essay?: string) => {
@@ -42,7 +48,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
         .split(/\s+/)
         .filter(word => word.length > 0).length;
     }
-    return essayContent.current.content
+    return essayContent.current.essay
       .trim()
       .split(/\s+/)
       .filter(word => word.length > 0).length;
@@ -60,7 +66,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
         return stage.stage_type === 'goal_setting';
       });
       if (goalStage?.submission) {
-        setGoals(goalStage.submission.content as AssignmentGoal[]);
+        setGoalContent(goalStage.submission.content as AssignmentGoalContent);
       }
       return;
     }
@@ -68,11 +74,11 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
     try {
       const submissionContent = submission.content as AssignmentEssayContent;
       essayContent.current = submissionContent;
-      setGoals(submissionContent.goals || []);
+      setGoalContent(submissionContent.goals || null);
     } catch (e) {
       console.error(e);
     }
-  }, [assignmentProgress, currentStage, essayContent, setGoals]);
+  }, [assignmentProgress, currentStage, essayContent, setGoalContent]);
 
   const value = useMemo(
     () => ({
@@ -85,8 +91,8 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       essayContent,
       getEssayContent,
       getEssayWordCount,
-      goals,
-      setGoals,
+      goalContent,
+      setGoalContent,
       readonly,
     }),
     [
@@ -96,7 +102,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       error,
       getEssayContent,
       getEssayWordCount,
-      goals,
+      goalContent,
       isLoading,
       readonly,
       teacherGrade,

@@ -6,14 +6,14 @@ import Loading from 'components/display/Loading';
 import AssignmentEssayEditor from 'containers/student/AssignmentEssayEditor';
 import AssignmentGoalEditor from 'containers/student/AssignmentGoalEditor';
 import AssignmentReflectionEditor from 'containers/student/AssignmentReflectionEditor';
-import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
-import usePageTracking from 'containers/student/AssignmentSubmissionSwitcher/usePageTracking';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
+import usePageTracking from 'containers/student/AssignmentSubmissionEditorSwitcher/usePageTracking';
 
-const AssignmentSubmissionSwitcher = () => {
+const AssignmentSubmissionEditorSwitcher = () => {
   const { assignmentProgress, isLoading, error, currentStage } =
     useAssignmentSubmissionProvider();
 
-  usePageTracking(assignmentProgress);
+  // usePageTracking(assignmentProgress);
 
   const ele = useMemo(() => {
     if (!assignmentProgress) {
@@ -62,4 +62,4 @@ const AssignmentSubmissionSwitcher = () => {
   return <>{ele}</>;
 };
 
-export default AssignmentSubmissionSwitcher;
+export default AssignmentSubmissionEditorSwitcher;

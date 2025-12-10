@@ -64,9 +64,15 @@ export interface AssignmentProgress {
   is_finished: boolean;
 }
 
+export interface AssignmentGoalContent {
+  writing_goals: AssignmentGoal[];
+  ai_goals: AssignmentGoal[];
+  isGoalConfirmed: boolean;
+}
+
 export interface AssignmentGoal {
-  category: string;
-  goals: {
+  goalText: string;
+  strategies: {
     text: string;
     completed?: boolean;
   }[];
@@ -74,12 +80,13 @@ export interface AssignmentGoal {
 
 export interface AssignmentEssayContent {
   title: string;
-  content: string;
-  goals: AssignmentGoal[];
+  outline: string;
+  essay: string;
+  goals: AssignmentGoalContent | null;
 }
 
 export interface AssignmentReflectionContent {
-  [key: number]: string;
+  reflections: { [key: string]: string };
 }
 
 export interface AssignmentSubmission {
@@ -88,7 +95,7 @@ export interface AssignmentSubmission {
   stage_id: number;
   student_id: number;
   content:
-    | AssignmentGoal[]
+    | AssignmentGoalContent
     | AssignmentEssayContent
     | AssignmentReflectionContent;
   submitted_at?: number;
@@ -107,7 +114,6 @@ export interface AssignmentSubmissionListingItem {
     id: number;
     stage_id: number;
     stage_type: string;
-    // content: string | null;
     submitted_at: number | null;
     is_final: boolean | null;
     score: number | null;
@@ -161,7 +167,7 @@ export interface AssignmentSubmissionDetails {
     stage_id: number;
     stage_type: string;
     content:
-      | AssignmentGoal[]
+      | AssignmentGoalContent
       | AssignmentEssayContent
       | AssignmentReflectionContent;
     submitted_at: number;

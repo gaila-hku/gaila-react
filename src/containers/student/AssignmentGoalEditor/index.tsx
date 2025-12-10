@@ -1,6 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { ArrowRight, Lightbulb, Plus, Save, Target, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Lightbulb,
+  Plus,
+  Save,
+  Target,
+  X,
+} from 'lucide-react';
 
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
@@ -9,16 +18,18 @@ import TextInput from 'components/input/TextInput';
 import AIChatBox from 'containers/common/AIChatBox';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
-import GOAL_QUESTIONS from 'containers/student/AssignmentGoalEditor/goalQuestions';
-import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
+import GOAL_SECTIONS from 'containers/student/AssignmentGoalEditor/goalSections';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type { AssignmentGoal } from 'types/assignment';
-import isObjEmpty from 'utils/helper/isObjEmpty';
+import type { AssignmentGoal, AssignmentGoalContent } from 'types/assignment';
 
-const defaultResponses = GOAL_QUESTIONS.reduce(
-  (acc, q) => ({ ...acc, [q.category]: [''] }),
-  {},
-);
+const defaultGoals = {
+  writing_goals: [
+    { goalText: '', strategies: [{ text: '' }] },
+  ] as AssignmentGoal[],
+  ai_goals: [{ goalText: '', strategies: [{ text: '' }] }] as AssignmentGoal[],
+  isGoalConfirmed: false,
+};
 
 const AssignmentGoalEditor = () => {
   const {
@@ -35,57 +46,202 @@ const AssignmentGoalEditor = () => {
     tool => tool.key === 'goal_general',
   );
 
-  const [responses, setResponses] = useState<{ [category: string]: string[] }>(
-    defaultResponses,
-  );
+  const [goalValue, setGoalValue] = useState(defaultGoals);
 
-  const handleAddGoal = useCallback((category: string) => {
-    setResponses(prev => ({
-      ...prev,
-      [category]: (prev[category] || []).concat(''),
-    }));
-  }, []);
-
-  const handleRemoveGoal = useCallback((category: string, index: number) => {
-    setResponses(prev => ({
-      ...prev,
-      [category]: prev[category].filter((_, i) => i !== index),
-    }));
-  }, []);
-
-  const handleChangeText = useCallback(
-    (category: string, index: number, value: string) => {
-      setResponses(prev => ({
+  const handleAddGoal = useCallback(
+    (category: 'writing_goals' | 'ai_goals') => {
+      setGoalValue(prev => ({
         ...prev,
-        [category]: prev[category].map((s, i) => (i === index ? value : s)),
+        [category]: [
+          ...prev[category],
+          { goalText: '', strategies: [{ text: '' }] },
+        ],
       }));
     },
     [],
   );
+
+  const handleRemoveGoal = useCallback(
+    (category: 'writing_goals' | 'ai_goals', index: number) => {
+      if (goalValue[category].length <= 1) {
+        return;
+      }
+      setGoalValue({
+        ...goalValue,
+        [category]: goalValue[category].filter((_, i) => i !== index),
+      });
+    },
+    [goalValue],
+  );
+
+  const handleChangeGoalText = useCallback(
+    (category: 'writing_goals' | 'ai_goals', index: number, value: string) => {
+      setGoalValue(prev => ({
+        ...prev,
+        [category]: prev[category].map((g, i) =>
+          i === index ? { ...g, goalText: value } : g,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const handleAddStrategy = useCallback(
+    (category: 'writing_goals' | 'ai_goals', goalIndex: number) => {
+      setGoalValue(prev => ({
+        ...prev,
+        [category]: prev[category].map((g, i) =>
+          i === goalIndex
+            ? { ...g, strategies: [...g.strategies, { text: '' }] }
+            : g,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const handleRemoveStrategy = useCallback(
+    (
+      category: 'writing_goals' | 'ai_goals',
+      goalIndex: number,
+      strategyIndex: number,
+    ) => {
+      if (goalValue[category][goalIndex].strategies.length <= 1) {
+        return;
+      }
+      setGoalValue({
+        ...goalValue,
+        [category]: goalValue[category].map((g, i) =>
+          i === goalIndex
+            ? {
+                ...g,
+                strategies: g.strategies.filter((_, j) => j !== strategyIndex),
+              }
+            : g,
+        ),
+      });
+    },
+    [goalValue],
+  );
+
+  const handleChangeStrategyText = useCallback(
+    (
+      category: 'writing_goals' | 'ai_goals',
+      goalIndex: number,
+      strategyIndex: number,
+      value: string,
+    ) => {
+      setGoalValue(prev => ({
+        ...prev,
+        [category]: prev[category].map((g, i) =>
+          i === goalIndex
+            ? {
+                ...g,
+                strategies: g.strategies.map((s, j) =>
+                  j === strategyIndex ? { ...s, text: value } : s,
+                ),
+              }
+            : g,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const handleConfirmGoals = useCallback(() => {
+    if (!assignmentProgress || !currentStage || readonly) {
+      return;
+    }
+
+    const isGoalsEmpty = [
+      ...goalValue.writing_goals,
+      ...goalValue.ai_goals,
+    ].every(goal => !goal.goalText.trim());
+    if (isGoalsEmpty) {
+      alertMsg('Please set at least one goal for this assignment.');
+      return;
+    }
+
+    const newGoalValue = {
+      writing_goals: goalValue.writing_goals
+        .filter(goal => goal.goalText.trim())
+        .map(goal => ({
+          ...goal,
+          strategies: [{ text: '' }],
+        })),
+      ai_goals: goalValue.ai_goals
+        .filter(goal => goal.goalText.trim())
+        .map(goal => ({
+          ...goal,
+          strategies: [{ text: '' }],
+        })),
+      isGoalConfirmed: true,
+    };
+    setGoalValue(newGoalValue);
+
+    saveSubmission({
+      assignment_id: assignmentProgress.assignment.id,
+      stage_id: currentStage.id,
+      content: newGoalValue,
+      is_final: false,
+      is_manual: false,
+    });
+  }, [
+    alertMsg,
+    assignmentProgress,
+    currentStage,
+    goalValue,
+    readonly,
+    saveSubmission,
+  ]);
+
+  const handleCancelGoals = useCallback(() => {
+    if (!assignmentProgress || !currentStage || readonly) {
+      return;
+    }
+    const newGoalValue = {
+      ...goalValue,
+      isGoalConfirmed: false,
+    };
+    setGoalValue(newGoalValue);
+
+    saveSubmission({
+      assignment_id: assignmentProgress.assignment.id,
+      stage_id: currentStage.id,
+      content: newGoalValue,
+      is_final: false,
+      is_manual: false,
+    });
+  }, [assignmentProgress, currentStage, goalValue, readonly, saveSubmission]);
 
   const handleSubmit = useCallback(
     (isFinal: boolean, isManual: boolean) => {
       if (!assignmentProgress || !currentStage || readonly) {
         return;
       }
-      const goals: AssignmentGoal[] = GOAL_QUESTIONS.filter(
-        q => !isObjEmpty(responses[q.category]),
-      ).map(q => ({
-        category: q.category,
-        goals: responses[q.category].filter(Boolean).map(goal => ({
-          text: goal,
-        })),
-      }));
 
-      if (isFinal && goals.length === 0) {
-        alertMsg('Please answer at least one question to set your goals.');
+      const isGoalsEmpty = [
+        ...goalValue.writing_goals,
+        ...goalValue.ai_goals,
+      ].every(goal => !goal.goalText.trim());
+      const isStrategiesEmpty = [
+        ...goalValue.writing_goals,
+        ...goalValue.ai_goals,
+      ].some(goal => goal.strategies.every(strategy => !strategy.text.trim()));
+
+      if (isFinal && isGoalsEmpty) {
+        alertMsg('Please set at least one goal for this assignment.');
+        return;
+      }
+      if (isFinal && isStrategiesEmpty) {
+        alertMsg('Please set at least one strategy for each goal.');
         return;
       }
 
       saveSubmission({
         assignment_id: assignmentProgress.assignment.id,
         stage_id: currentStage.id,
-        content: JSON.stringify(goals),
+        content: goalValue,
         is_final: isFinal,
         is_manual: isManual,
       });
@@ -94,26 +250,18 @@ const AssignmentGoalEditor = () => {
       alertMsg,
       assignmentProgress,
       currentStage,
+      goalValue,
       readonly,
-      responses,
       saveSubmission,
     ],
   );
 
   useEffect(() => {
-    if (currentStage?.submission?.content) {
-      const goals = currentStage.submission.content as AssignmentGoal[];
-      setResponses({
-        ...defaultResponses,
-        ...goals.reduce(
-          (acc, goal) => ({
-            ...acc,
-            [goal.category]: goal.goals.map(g => g.text),
-          }),
-          {},
-        ),
-      });
+    if (!currentStage?.submission?.content) {
+      return;
     }
+    const goals = currentStage.submission.content as AssignmentGoalContent;
+    setGoalValue(goals);
   }, [currentStage]);
 
   if (!assignmentProgress || !currentStage) {
@@ -151,61 +299,125 @@ const AssignmentGoalEditor = () => {
               </>
             }
           >
-            {GOAL_QUESTIONS.map((question, questionIndex) => (
-              <div className="space-y-2" key={question.category}>
+            {GOAL_SECTIONS.map((section, categoryIndex) => (
+              <div className="space-y-2" key={section.categoryKey}>
                 <div className="flex items-center justify-between">
                   <label className="flex items-start gap-2">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex-shrink-0 mt-0.5">
-                      {questionIndex + 1}
+                      {categoryIndex + 1}
                     </span>
-                    <span>{question.question}</span>
+                    <span>{section.question}</span>
                   </label>
-                  <Button
-                    className="gap-2"
-                    disabled={readonly}
-                    onClick={() => handleAddGoal(question.category)}
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Goal
-                  </Button>
-                </div>
-                <div className="space-y-4">
-                  {responses[question.category].map((s, goalIndex) => (
-                    <div
-                      className="flex gap-2 items-start"
-                      key={`${question.category}-${goalIndex}`}
+                  {!goalValue.isGoalConfirmed && (
+                    <Button
+                      className="gap-2"
+                      disabled={readonly}
+                      onClick={() => handleAddGoal(section.categoryKey)}
+                      size="sm"
+                      variant="outline"
                     >
-                      <TextInput
-                        className="resize-none"
-                        disabled={readonly}
-                        onBlur={() => handleSubmit(false, false)}
-                        onChange={e =>
-                          handleChangeText(
-                            question.category,
-                            goalIndex,
-                            e.target.value,
-                          )
-                        }
-                        placeholder={
-                          goalIndex === 0 ? question.placeholder : ''
-                        }
-                        rows={3}
-                        value={s}
-                      />
-                      <Button
-                        disabled={
-                          readonly || responses[question.category].length === 1
-                        }
-                        onClick={() =>
-                          handleRemoveGoal(question.category, goalIndex)
-                        }
-                        size="icon"
-                        variant="ghost"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                      <Plus className="h-4 w-4" />
+                      Add Goal
+                    </Button>
+                  )}
+                </div>
+                <div className="space-y-4 pl-8">
+                  {goalValue[section.categoryKey].map((goal, goalIndex) => (
+                    <div key={`${section.categoryKey}-${goalIndex}`}>
+                      <div className="flex gap-2 items-start">
+                        <TextInput
+                          className="resize-none"
+                          disabled={readonly || goalValue.isGoalConfirmed}
+                          onBlur={() => handleSubmit(false, false)}
+                          onChange={e =>
+                            handleChangeGoalText(
+                              section.categoryKey,
+                              goalIndex,
+                              e.target.value,
+                            )
+                          }
+                          placeholder={section.goalPlaceholder}
+                          rows={3}
+                          value={goal.goalText}
+                        />
+                        {!goalValue.isGoalConfirmed && (
+                          <Button
+                            disabled={readonly}
+                            onClick={() =>
+                              handleRemoveGoal(section.categoryKey, goalIndex)
+                            }
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      {!!goalValue.isGoalConfirmed && (
+                        <div className="mt-2 p-2 border rounded-xl space-y-3">
+                          <div className="flex items-center justify-between">
+                            <label>
+                              What are your strategies to achieve this goal?
+                            </label>
+                            <Button
+                              className="gap-2"
+                              disabled={readonly}
+                              onClick={() =>
+                                handleAddStrategy(
+                                  section.categoryKey,
+                                  goalIndex,
+                                )
+                              }
+                              size="sm"
+                              variant="outline"
+                            >
+                              <Plus className="h-4 w-4" />
+                              Add Strategy
+                            </Button>
+                          </div>
+                          {goal.strategies.map((strategy, strategyIndex) => (
+                            <div
+                              className="flex gap-2 items-start"
+                              key={`${section.categoryKey}-${strategyIndex}`}
+                            >
+                              <TextInput
+                                className="resize-none"
+                                disabled={readonly}
+                                onBlur={() => handleSubmit(false, false)}
+                                onChange={e =>
+                                  handleChangeStrategyText(
+                                    section.categoryKey,
+                                    goalIndex,
+                                    strategyIndex,
+                                    e.target.value,
+                                  )
+                                }
+                                placeholder={
+                                  strategyIndex === 0
+                                    ? section.strategyPlaceholder
+                                    : ''
+                                }
+                                rows={3}
+                                value={strategy.text}
+                              />
+                              <Button
+                                disabled={readonly}
+                                onClick={() =>
+                                  handleRemoveStrategy(
+                                    section.categoryKey,
+                                    goalIndex,
+                                    strategyIndex,
+                                  )
+                                }
+                                size="icon"
+                                variant="ghost"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -225,15 +437,39 @@ const AssignmentGoalEditor = () => {
               <Save className="h-4 w-4" />
               Save Draft
             </Button>
-            <Button
-              className="gap-2"
-              disabled={readonly || isSaving}
-              onClick={() => handleSubmit(true, true)}
-              size="lg"
-            >
-              Submit and Continue
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+            {goalValue.isGoalConfirmed ? (
+              <>
+                <Button
+                  className="gap-2"
+                  disabled={readonly || isSaving}
+                  onClick={handleCancelGoals}
+                  size="lg"
+                  variant="secondary"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Goal Setting
+                </Button>
+                <Button
+                  className="gap-2"
+                  disabled={readonly || isSaving}
+                  onClick={() => handleSubmit(true, true)}
+                  size="lg"
+                >
+                  Submit and Continue
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                className="gap-2"
+                disabled={readonly || isSaving}
+                onClick={handleConfirmGoals}
+                size="lg"
+              >
+                <Check className="h-4 w-4" />
+                Confirm Goals
+              </Button>
+            )}
           </div>
         </div>
 

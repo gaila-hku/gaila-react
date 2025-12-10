@@ -110,7 +110,7 @@ apiViewAssignmentProgress.queryKey = '/assignment/view-progress/id';
 export type AssignmentSaveSubmissionPayload = {
   assignment_id: number;
   stage_id: number;
-  content: string;
+  content: AssignmentSubmission['content'];
   is_final: boolean;
   is_manual: boolean;
 };
@@ -118,7 +118,17 @@ export type AssignmentSaveSubmissionPayload = {
 export const apiSaveAssignmentSubmission = (
   submission: AssignmentSaveSubmissionPayload,
 ): Promise<AssignmentSubmission> =>
-  callAPIHandler('post', '/submission/submit', { submission }, true);
+  callAPIHandler(
+    'post',
+    '/submission/submit',
+    {
+      submission: {
+        ...submission,
+        content: JSON.stringify(submission.content),
+      },
+    },
+    true,
+  );
 
 export const apiGetSubmisssionListing = async ({
   queryKey,

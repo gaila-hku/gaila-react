@@ -20,8 +20,12 @@ type Props = {
 };
 
 const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
-  const { getEssayContent, getEssayWordCount, assignmentProgress, goals } =
-    useAssignmentEssayEditorProvider();
+  const {
+    getEssayContent,
+    getEssayWordCount,
+    assignmentProgress,
+    goalContent,
+  } = useAssignmentEssayEditorProvider();
 
   const {
     data: analytics,
@@ -40,12 +44,13 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
     return <ErrorComponent error={error || 'Failed to get analytics'} />;
   }
 
+  // TODO: switch to sidebar menu layout
   return (
     <div className="space-y-6">
       <DashboardAnalyticsSummary
         assignment={assignmentProgress.assignment}
         getEssayWordCount={getEssayWordCount}
-        goals={goals}
+        goalContent={goalContent}
         promptAnalytics={analytics.prompt_data}
       />
 
@@ -60,7 +65,7 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
           analytics={analytics}
           assignmentProgress={assignmentProgress}
           getEssayWordCount={getEssayWordCount}
-          goals={goals}
+          goalContent={goalContent}
         />
       </div>
     </div>

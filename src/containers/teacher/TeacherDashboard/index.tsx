@@ -8,7 +8,7 @@ import SelectInput from 'components/input/SelectInput';
 
 import AssignmentEssayEditorDashboard from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorDashboard';
 import AssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider';
-import AssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionSwitcher/AssignmentSubmissionProvider';
+import AssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider';
 
 import { apiGetAssignmentOptions } from 'api/assignment';
 import tuple from 'utils/types/tuple';
