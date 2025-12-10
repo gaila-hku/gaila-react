@@ -5,7 +5,7 @@ import { useQuery } from 'react-query';
 import ErrorComponent from 'components/display/ErrorComponent';
 import Loading from 'components/display/Loading';
 
-import DashboardActivity from 'containers/common/Dashboard/DashboardActivity';
+import DashboardAgentUsage from 'containers/common/Dashboard/DashboardAgentUsage';
 import DashboardAnalyticsSummary from 'containers/common/Dashboard/DashboardAnalyticsSummary';
 import DashboardInsights from 'containers/common/Dashboard/DashboardInsights';
 import DashboardPlagiarismDetector from 'containers/common/Dashboard/DashboardPlagiarismDetector';
@@ -59,8 +59,8 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
           getEssayContent={getEssayContent}
           plagiarisedSegments={analytics.plagiarised_segments}
         />
-        <DashboardPromptChart promptAnalytics={analytics.prompt_data} />
-        <DashboardActivity analytics={analytics} />
+        <DashboardPromptChart promptData={analytics.prompt_data} />
+        <DashboardAgentUsage promptData={analytics.prompt_data} />
         <DashboardInsights
           analytics={analytics}
           assignmentProgress={assignmentProgress}

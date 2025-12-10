@@ -5,9 +5,9 @@ import { PieChartIcon } from 'lucide-react';
 import Card from 'components/display/Card';
 import Tabs from 'components/navigation/Tabs';
 
-import PromptCategoryCharts from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/PromptCategoryCharts';
+import DashboardAgentUsage from 'containers/common/Dashboard/DashboardAgentUsage';
+import DashboardPromptChart from 'containers/common/Dashboard/DashboardPromptChart';
 import PromptHistory from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/PromptHistory';
-import UseTimeCharts from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/UseTimeCharts';
 
 import type { AssignmentAnalytics } from 'types/assignment';
 
@@ -31,17 +31,20 @@ const SubmissionDetailsAnalytics = ({ analytics }: Props) => {
         tabs={[
           {
             key: 'time',
-            title: 'Time Distribution',
-            content: <UseTimeCharts />,
+            title: 'Agent Usage',
+            content: <DashboardAgentUsage promptData={analytics.prompt_data} />,
           },
           {
             key: 'prompts',
             title: 'Prompt Types',
-            content: <PromptCategoryCharts />,
+            content: (
+              <DashboardPromptChart promptData={analytics.prompt_data} />
+            ),
           },
           {
             key: 'history',
             title: 'Prompt History',
+            // FIXME: add prompt history
             content: <PromptHistory />,
           },
         ]}

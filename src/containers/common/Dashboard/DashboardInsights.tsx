@@ -7,22 +7,23 @@ import Card from 'components/display/Card';
 
 import type {
   AssignmentAnalytics,
-  AssignmentGoal,
+  AssignmentGoalContent,
   AssignmentProgress,
 } from 'types/assignment';
+import getGoalCounts from 'utils/helper/getGoalCounts';
 
 type Props = {
   analytics: AssignmentAnalytics;
   assignmentProgress: AssignmentProgress;
   getEssayWordCount: () => number;
-  goals: AssignmentGoal[];
+  goalContent: AssignmentGoalContent | null;
 };
 
 const DashboardInsights = ({
   analytics,
   getEssayWordCount,
   assignmentProgress,
-  goals,
+  goalContent,
 }: Props) => {
   const assignment = assignmentProgress.assignment;
 
@@ -52,10 +53,9 @@ const DashboardInsights = ({
     return `Great! You've met the maximum word requirement of ${assignment.requirements.max_word_count} words.`;
   }, [assignment, getEssayWordCount]);
 
-  const totalGoals = useMemo(() => goals.flatMap(g => g.goals).length, [goals]);
-  const completedGoals = useMemo(
-    () => goals.flatMap(g => g.goals).filter(g => g.completed).length,
-    [goals],
+  const [completeGoalCount, totalGoalCount] = useMemo(
+    () => getGoalCounts(goalContent),
+    [goalContent],
   );
 
   const learningPrompts = useMemo(
@@ -128,15 +128,15 @@ const DashboardInsights = ({
           </div>
         )}
 
-        {goals.length > 0 && (
+        {totalGoalCount > 0 && (
           <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
             <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
             <div>
               <p className="text-sm font-medium">Goal Achievement</p>
               <p className="text-xs text-muted-foreground mt-1">
-                You&apos;ve completed {completedGoals} out of {totalGoals}{' '}
-                goals.
-                {completedGoals === totalGoals
+                You&apos;ve completed {completeGoalCount} out of{' '}
+                {totalGoalCount} goals.
+                {completeGoalCount >= totalGoalCount
                   ? ' Excellent work!'
                   : ' Keep working towards your remaining goals!'}
               </p>

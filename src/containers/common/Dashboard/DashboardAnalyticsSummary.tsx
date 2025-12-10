@@ -1,27 +1,27 @@
 import React, { useMemo } from 'react';
 
-import { FileText, Sparkles, Target, Wrench } from 'lucide-react';
+import { Brain, FileText, Goal, Target } from 'lucide-react';
 
 import Card from 'components/display/Card';
 
 import type {
   Assignment,
-  AssignmentGoal,
+  AssignmentGoalContent,
   PromptAnalytics,
 } from 'types/assignment';
+import getGoalCounts from 'utils/helper/getGoalCounts';
 
 type Props = {
   promptAnalytics: PromptAnalytics;
   assignment: Assignment;
   getEssayWordCount: () => number;
-  goals: AssignmentGoal[];
+  goalContent: AssignmentGoalContent | null;
 };
 
 const DashboardAnalyticsSummary = ({
-  promptAnalytics,
   assignment,
   getEssayWordCount,
-  goals,
+  goalContent,
 }: Props) => {
   const wordCountRequirement = useMemo(() => {
     if (!assignment) {
@@ -42,12 +42,10 @@ const DashboardAnalyticsSummary = ({
     return 'No word requirement';
   }, [assignment]);
 
-  const toolUseCount = useMemo(() => {
-    return Object.values(promptAnalytics.tool_counts).reduce(
-      (acc, t) => acc + (t.count || 0),
-      0,
-    );
-  }, [promptAnalytics.tool_counts]);
+  const [completeGoalCount, totalGoalCount] = useMemo(
+    () => getGoalCounts(goalContent),
+    [goalContent],
+  );
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -65,39 +63,39 @@ const DashboardAnalyticsSummary = ({
         </p>
       </Card>
 
-      <Card
-        title={
-          <div className="text-sm flex items-center gap-2">
-            <Sparkles className="h-4 w-4" />
-            AI Prompts
-          </div>
-        }
-      >
-        <p className="text-2xl font-bold">
-          {promptAnalytics.total_prompt_count}
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          {promptAnalytics.nature_counts.reduce(
-            (acc, n) => acc + (n.key === 'learning' ? n.count || 0 : 0),
-            0,
-          )}{' '}
-          learning-focused
-        </p>
-      </Card>
+      {!!goalContent && (
+        <Card
+          title={
+            <div className="text-sm flex items-center gap-2">
+              <Goal className="h-4 w-4" />
+              Goals Progress
+            </div>
+          }
+        >
+          <p className="text-2xl font-bold">
+            {completeGoalCount}/{totalGoalCount}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">Goals completed</p>
+        </Card>
+      )}
 
+      {/* FIXME: demo data */}
       <Card
         title={
           <div className="text-sm flex items-center gap-2">
-            <Wrench className="h-4 w-4" />
-            Tools Used
+            <Brain className="h-4 w-4" />
+            Complexity Score
           </div>
         }
       >
-        <p className="text-2xl font-bold">{toolUseCount}</p>
+        <div className="flex items-end gap-2">
+          <p className="text-2xl font-bold">54%</p>
+          <p className="text-xs text-muted-foreground">(lexical)</p>
+          <p className="pl-4 text-2xl font-bold">60%</p>
+          <p className="text-xs text-muted-foreground">(syntatic)</p>
+        </div>
         <p className="text-xs text-muted-foreground mt-1">
-          {toolUseCount
-            ? `${Object.values(promptAnalytics.tool_counts).filter(t => !!t.count).length} different tools`
-            : 'No tools used yet'}
+          Indicates the variety of literary devices used
         </p>
       </Card>
 
@@ -105,18 +103,19 @@ const DashboardAnalyticsSummary = ({
         title={
           <div className="text-sm flex items-center gap-2">
             <Target className="h-4 w-4" />
-            Goals Progress
+            Accuracy Score
           </div>
         }
       >
-        <p className="text-2xl font-bold">
-          {goals.reduce(
-            (acc, g) => acc + g.goals.filter(g => g.completed).length,
-            0,
-          )}
-          /{goals.reduce((acc, g) => acc + g.goals.length, 0)}
+        <div className="flex items-end gap-2">
+          <p className="text-2xl font-bold">86%</p>
+          <p className="text-xs text-muted-foreground">(lexical)</p>
+          <p className="text-2xl font-bold">82%</p>
+          <p className="text-xs text-muted-foreground">(syntatic)</p>
+        </div>
+        <p className="text-xs text-muted-foreground mt-1">
+          Indicates if your essay is error free
         </p>
-        <p className="text-xs text-muted-foreground mt-1">Goals completed</p>
       </Card>
     </div>
   );

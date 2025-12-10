@@ -8,10 +8,10 @@ const PromptHistory = () => {
   const promptCategories = [
     {
       name: 'Performance-Oriented',
-      value: 24,
+      value: 3,
       color: '#ef4444',
     },
-    { name: 'Learning-Oriented', value: 38, color: '#22c55e' },
+    { name: 'Learning-Oriented', value: 5, color: '#22c55e' },
   ];
 
   // Prompt history

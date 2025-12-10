@@ -19,7 +19,7 @@ import Tabs from 'components/navigation/Tabs';
 import type { PromptAnalytics } from 'types/assignment';
 
 type Props = {
-  promptAnalytics: PromptAnalytics;
+  promptData: PromptAnalytics;
 };
 
 const natureKeyMap = {
@@ -36,9 +36,9 @@ const aspectKeyMap = {
   error_correction: 'Error Correction',
 };
 
-const DashboardPromptChart = ({ promptAnalytics }: Props) => {
+const DashboardPromptChart = ({ promptData }: Props) => {
   const promptNatureData = useMemo(() => {
-    const structuredData = promptAnalytics.nature_counts.reduce((acc, item) => {
+    const structuredData = promptData.nature_counts.reduce((acc, item) => {
       const natureName = natureKeyMap[item.key];
       const current = acc[item.key] || {
         name: natureName,
@@ -64,10 +64,10 @@ const DashboardPromptChart = ({ promptAnalytics }: Props) => {
       selfColor: '#aac5f2',
       classColor: '#f2b1bc',
     }));
-  }, [promptAnalytics]);
+  }, [promptData]);
 
   const promptAspectData = useMemo(() => {
-    const structuredData = promptAnalytics.aspect_counts.reduce((acc, item) => {
+    const structuredData = promptData.aspect_counts.reduce((acc, item) => {
       const aspectName = aspectKeyMap[item.key];
       const current = acc[item.key] || {
         name: aspectName,
@@ -93,7 +93,7 @@ const DashboardPromptChart = ({ promptAnalytics }: Props) => {
       selfColor: '#aac5f2',
       classColor: '#f2b1bc',
     }));
-  }, [promptAnalytics]);
+  }, [promptData]);
 
   return (
     <Card
@@ -117,10 +117,18 @@ const DashboardPromptChart = ({ promptAnalytics }: Props) => {
             title: 'Perform vs Learning',
             content: (
               <>
-                <ResponsiveContainer height={300} width="100%">
+                <ResponsiveContainer
+                  className="max-w-[600px] mx-auto"
+                  height={300}
+                  width="100%"
+                >
                   <BarChart data={promptNatureData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <XAxis
+                      dataKey="name"
+                      interval={0}
+                      tick={{ fontSize: 12 }}
+                    />
                     <YAxis tick={{ fontSize: 12 }} />
                     <RechartsTooltip />
                     <Bar dataKey="Your Prompts" fill="#8b5cf6">
@@ -225,5 +233,6 @@ const DashboardPromptChart = ({ promptAnalytics }: Props) => {
     </Card>
   );
 };
+// TODO: add this text?: Performance-oriented prompts focus on getting answers, while learning-oriented prompts focus on understanding concepts.
 
 export default DashboardPromptChart;
