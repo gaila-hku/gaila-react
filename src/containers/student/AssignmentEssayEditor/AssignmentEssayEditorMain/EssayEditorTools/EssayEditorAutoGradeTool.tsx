@@ -15,14 +15,10 @@ import type { AutoGradeResult, GptLog } from 'types/gpt';
 type Props = {
   toolId: number;
   latestResult: GptLog | null;
-  getEssayContent: () => string;
+  essay: string;
 };
 
-const EssayEditorAutoGradeTool = ({
-  toolId,
-  latestResult,
-  getEssayContent,
-}: Props) => {
+const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
   const { mutateAsync: askAutogradeAgent, isLoading: isAgentLoading } =
     useMutation(apiAskAutogradeAgent);
 
@@ -34,11 +30,11 @@ const EssayEditorAutoGradeTool = ({
     const res = await askAutogradeAgent({
       assignment_tool_id: toolId,
       is_structured: true,
-      essay: getEssayContent(),
+      essay,
     });
     const result = JSON.parse(res.gpt_answer) as AutoGradeResult;
     setAutogradeResult(result);
-  }, [askAutogradeAgent, getEssayContent, toolId]);
+  }, [askAutogradeAgent, essay, toolId]);
 
   useEffect(() => {
     if (!latestResult) {
@@ -150,8 +146,8 @@ const EssayEditorAutoGradeTool = ({
         <AIChatBoxMini
           chatMutateFn={apiAskAutogradeAgent}
           chatName="Ask Autograde Agent"
+          essay={essay}
           firstMessage="Ask me about your scores, how to improve specific criteria, or clarify feedback!"
-          getEssayContent={getEssayContent}
           toolId={toolId}
         />
       )}

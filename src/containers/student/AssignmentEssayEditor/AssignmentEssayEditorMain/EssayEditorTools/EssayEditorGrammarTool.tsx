@@ -16,14 +16,10 @@ import type { GptLog, GrammarResult } from 'types/gpt';
 type Props = {
   toolId: number;
   latestResult: GptLog | null;
-  getEssayContent: () => string;
+  essay: string;
 };
 
-const EssayEditorGrammarTool = ({
-  toolId,
-  latestResult,
-  getEssayContent,
-}: Props) => {
+const EssayEditorGrammarTool = ({ toolId, latestResult, essay }: Props) => {
   const { mutateAsync: askGrammarAgent, isLoading: isAgentLoading } =
     useMutation(apiAskGrammarAgent);
 
@@ -36,11 +32,11 @@ const EssayEditorGrammarTool = ({
     const res = await askGrammarAgent({
       assignment_tool_id: toolId,
       is_structured: true,
-      essay: getEssayContent(),
+      essay,
     });
     const result = JSON.parse(res.gpt_answer) as GrammarResult;
     setGrammarResult(result);
-  }, [askGrammarAgent, getEssayContent, toolId]);
+  }, [askGrammarAgent, essay, toolId]);
 
   useEffect(() => {
     if (!latestResult) {
@@ -139,8 +135,8 @@ const EssayEditorGrammarTool = ({
         <AIChatBoxMini
           chatMutateFn={apiAskGrammarAgent}
           chatName="Ask Grammar Agent"
+          essay={essay}
           firstMessage="Ask me about specific issues, how to fix them, or how to improve your scores!"
-          getEssayContent={getEssayContent}
           toolId={toolId}
         />
       )}

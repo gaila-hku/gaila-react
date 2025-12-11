@@ -1,7 +1,9 @@
 import React from 'react';
 
+import { BarChart3, Lightbulb } from 'lucide-react';
 import { useQuery } from 'react-query';
 
+import Card from 'components/display/Card';
 import ErrorComponent from 'components/display/ErrorComponent';
 import Loading from 'components/display/Loading';
 
@@ -20,12 +22,8 @@ type Props = {
 };
 
 const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
-  const {
-    getEssayContent,
-    getEssayWordCount,
-    assignmentProgress,
-    goalContent,
-  } = useAssignmentEssayEditorProvider();
+  const { essay, assignmentProgress, goalContent } =
+    useAssignmentEssayEditorProvider();
 
   const {
     data: analytics,
@@ -47,24 +45,52 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
   // TODO: switch to sidebar menu layout
   return (
     <div className="space-y-6">
-      <DashboardAnalyticsSummary
-        assignment={assignmentProgress.assignment}
-        getEssayWordCount={getEssayWordCount}
-        goalContent={goalContent}
-        promptAnalytics={analytics.prompt_data}
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <DashboardAnalyticsSummary
+          assignment={assignmentProgress.assignment}
+          essay={essay}
+          goalContent={goalContent}
+          promptAnalytics={analytics.prompt_data}
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DashboardPlagiarismDetector
-          getEssayContent={getEssayContent}
+          essay={essay}
           plagiarisedSegments={analytics.plagiarised_segments}
         />
-        <DashboardPromptChart promptData={analytics.prompt_data} />
-        <DashboardAgentUsage promptData={analytics.prompt_data} />
+        <Card
+          classes={{
+            title: 'flex items-center gap-2',
+            description: '-mt-2 mb-4',
+            root: 'h-fit',
+          }}
+          description="Analysis of your AI interaction patterns"
+          title={
+            <>
+              <Lightbulb className="h-5 w-5" />
+              Prompt Categories
+            </>
+          }
+        >
+          <DashboardPromptChart promptData={analytics.prompt_data} />
+        </Card>
+        <Card
+          classes={{ description: '-mt-2 mb-4', root: 'h-fit' }}
+          description="How you spend your time in this assignment"
+          title={
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Agent Usage
+            </div>
+          }
+        >
+          <DashboardAgentUsage promptData={analytics.prompt_data} />
+        </Card>
         <DashboardInsights
           analytics={analytics}
           assignmentProgress={assignmentProgress}
-          getEssayWordCount={getEssayWordCount}
+          essay={essay}
           goalContent={goalContent}
         />
       </div>

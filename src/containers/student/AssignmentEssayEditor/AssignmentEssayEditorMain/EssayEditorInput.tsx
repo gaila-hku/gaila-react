@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 
 import { useMutation } from 'react-query';
 
@@ -10,25 +10,31 @@ import { apiSaveTraceData } from 'api/trace-data';
 
 type Props = {
   updateWordCountStatus: () => void;
-  handleSave: (isFinal: boolean, isManual: boolean) => void;
-  type: 'outline' | 'essay';
+  handleAutoSave: (isFinal: boolean, isManual: boolean) => void;
+  value: string;
+  onChange: (x: string) => void;
+  minHeight?: number;
+  disabled?: boolean;
 };
 
 const EssayEditorInput = ({
   updateWordCountStatus,
-  handleSave,
-  type,
+  handleAutoSave,
+  value,
+  onChange: inputOnChange,
+  minHeight,
+  disabled: inputDisabled,
 }: Props) => {
-  const { readonly, assignment, currentStage, essayContent } =
+  const { readonly, assignment, currentStage } =
     useAssignmentEssayEditorProvider();
   const { mutateAsync: saveTraceData } = useMutation(apiSaveTraceData);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      essayContent.current[type] = e.target.value;
+      inputOnChange(e.target.value);
       updateWordCountStatus();
     },
-    [essayContent, type, updateWordCountStatus],
+    [inputOnChange, updateWordCountStatus],
   );
 
   const onPaste = useCallback(
@@ -49,40 +55,40 @@ const EssayEditorInput = ({
   );
 
   const isUnload = useRef(false);
+  // FIXME: recover this
   // Save before quitting page
-  useEffect(() => {
-    if (readonly) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (readonly) {
+  //     return;
+  //   }
 
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      isUnload.current = true;
-      handleSave(false, false);
-    };
+  //   const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  //     e.preventDefault();
+  //     isUnload.current = true;
+  //     handleSave(false, false);
+  //   };
 
-    const handleVisibilityChange = () => {
-      if (isUnload.current) {
-        return;
-      }
-      handleSave(false, false);
-    };
+  //   const handleVisibilityChange = () => {
+  //     if (isUnload.current) {
+  //       return;
+  //     }
+  //     handleSave(false, false);
+  //   };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+  //   window.addEventListener('beforeunload', handleBeforeUnload);
+  //   document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [handleSave, readonly]);
+  //   return () => {
+  //     window.removeEventListener('beforeunload', handleBeforeUnload);
+  //     document.removeEventListener('visibilitychange', handleVisibilityChange);
+  //   };
+  // }, [handleSave, readonly]);
 
   return (
     <TextInput
-      defaultValue={essayContent.current[type]}
-      disabled={readonly}
+      disabled={readonly || inputDisabled}
       multiline
-      onBlur={() => handleSave(false, false)}
+      onBlur={() => handleAutoSave(false, false)}
       onChange={onChange}
       onPaste={onPaste}
       placeholder="Start writing your essay here..."
@@ -90,7 +96,7 @@ const EssayEditorInput = ({
         '& .MuiInputBase-root': {
           padding: 1.5,
           borderRadius: 2,
-          minHeight: type === 'outline' ? 300 : 600,
+          minHeight: minHeight,
           maxHeight: 'calc(100vh - 300px)',
           overflow: 'auto',
           alignItems: 'flex-start',
@@ -98,6 +104,7 @@ const EssayEditorInput = ({
           resize: 'none',
         },
       }}
+      value={value}
     />
   );
 };

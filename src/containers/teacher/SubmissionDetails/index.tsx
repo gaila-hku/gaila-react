@@ -14,7 +14,10 @@ import SubmissionDetailsGrading from 'containers/teacher/SubmissionDetails/Submi
 import SubmissionDetailsReminder from 'containers/teacher/SubmissionDetails/SubmissionDetailsReminder';
 
 import { apiViewAssignmentSubmission } from 'api/assignment';
-import type { AssignmentEssayContent } from 'types/assignment';
+import type {
+  AssignmentEssayContent,
+  AssignmentGoalContent,
+} from 'types/assignment';
 import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
 import getUserName from 'utils/helper/getUserName';
 import tuple from 'utils/types/tuple';
@@ -67,13 +70,22 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
     return Math.max(...submissionDetails.submissions.map(s => s.submitted_at));
   }, [submissionDetails]);
 
-  const plagiarisedPercentage = useMemo(() => {
+  const submittedGoalContent = useMemo(() => {
+    const writingSubmission = submissionDetails?.submissions.find(
+      s => s.stage_type === 'goal_setting',
+    );
+    return writingSubmission?.content as AssignmentGoalContent;
+  }, [submissionDetails]);
+
+  const submittedEssay = useMemo(() => {
     const writingSubmission = submissionDetails?.submissions.find(
       s => s.stage_type === 'writing',
     );
-    const essay = (writingSubmission?.content as AssignmentEssayContent)?.essay;
+    return (writingSubmission?.content as AssignmentEssayContent)?.essay;
+  }, [submissionDetails]);
 
-    if (!essay) {
+  const plagiarisedPercentage = useMemo(() => {
+    if (!submittedEssay) {
       return null;
     }
 
@@ -89,8 +101,8 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
         0,
       );
 
-    return Math.round((plagiarsedLength / essay.length) * 100);
-  }, [submissionDetails]);
+    return Math.round((plagiarsedLength / submittedEssay.length) * 100);
+  }, [submissionDetails?.analytics.plagiarised_segments, submittedEssay]);
 
   if (isLoading) {
     return <Loading />;
@@ -134,7 +146,12 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
           />
         </Card>
 
-        <SubmissionDetailsAnalytics analytics={submissionDetails.analytics} />
+        <SubmissionDetailsAnalytics
+          analytics={submissionDetails.analytics}
+          assignment={submissionDetails.assignment}
+          essay={submittedEssay}
+          goalContent={submittedGoalContent}
+        />
       </div>
 
       <div className="space-y-6">

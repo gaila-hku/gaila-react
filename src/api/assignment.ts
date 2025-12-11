@@ -112,7 +112,7 @@ export type AssignmentSaveSubmissionPayload = {
   stage_id: number;
   content: AssignmentSubmission['content'];
   is_final: boolean;
-  is_manual: boolean;
+  alertMsg?: string;
 };
 
 export const apiSaveAssignmentSubmission = (

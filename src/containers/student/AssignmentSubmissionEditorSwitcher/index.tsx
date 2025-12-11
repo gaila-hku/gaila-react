@@ -13,6 +13,7 @@ const AssignmentSubmissionEditorSwitcher = () => {
   const { assignmentProgress, isLoading, error, currentStage } =
     useAssignmentSubmissionProvider();
 
+  // FIXME: recover this
   // usePageTracking(assignmentProgress);
 
   const ele = useMemo(() => {

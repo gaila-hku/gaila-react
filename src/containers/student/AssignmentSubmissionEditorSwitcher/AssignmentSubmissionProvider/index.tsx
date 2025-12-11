@@ -75,8 +75,8 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
           ]);
           return;
         }
-        if (req.is_manual) {
-          successMsg(`${currentContent} draft saved.`);
+        if (req.alertMsg) {
+          successMsg(req.alertMsg);
         }
       },
       onError: e => errorMsg(e),

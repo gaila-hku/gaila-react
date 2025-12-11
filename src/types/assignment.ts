@@ -67,7 +67,7 @@ export interface AssignmentProgress {
 export interface AssignmentGoalContent {
   writing_goals: AssignmentGoal[];
   ai_goals: AssignmentGoal[];
-  isGoalConfirmed: boolean;
+  goal_confirmed: boolean;
 }
 
 export interface AssignmentGoal {
@@ -83,6 +83,8 @@ export interface AssignmentEssayContent {
   outline: string;
   essay: string;
   goals: AssignmentGoalContent | null;
+  outline_confirmed: boolean;
+  draft_confirmed: boolean;
 }
 
 export interface AssignmentReflectionContent {

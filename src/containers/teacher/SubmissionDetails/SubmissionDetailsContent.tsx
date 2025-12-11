@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { AlertTriangle, Bot, CheckCircle, Circle } from 'lucide-react';
 
+import Divider from 'components/display/Divider';
 import Empty from 'components/display/Empty';
 import Label from 'components/display/Label';
 import SwitchInput from 'components/input/SwitchInput';
@@ -101,7 +102,10 @@ const SubmissionDetailsContent = ({
                     </div>
                     {goals.map((goal, goalIndex) => (
                       <div key={`${section.categoryKey}-${goalIndex}`}>
-                        <p className="text-sm">{goal.goalText}</p>
+                        <div className="flex gap-2 items-center ml-2 mt-2">
+                          <div className="bg-black w-1 h-1 rounded-full" />
+                          <p className="text-sm">{goal.goalText}</p>
+                        </div>
                         {goal.strategies.map((strategy, strategyIndex) => (
                           <div
                             className="flex items-center gap-2 p-2"
@@ -135,6 +139,7 @@ const SubmissionDetailsContent = ({
       }
       if (stage_type === 'writing') {
         const submissionContent = submission.content as AssignmentEssayContent;
+        const outline = submissionContent.outline;
         const essay = submissionContent.essay;
         const wordCount = essay
           .trim()
@@ -147,6 +152,12 @@ const SubmissionDetailsContent = ({
               <span>•</span>
               <span>{wordCount} words</span>
             </div>
+
+            <Divider />
+            <div className="flex font-medium text-md">Outline</div>
+            <p className="whitespace-pre-wrap">{outline}</p>
+            <Divider />
+            <div className="flex font-medium text-md">Essay</div>
             <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div className="flex items-center gap-2">
                 <Bot className="h-4 w-4 text-muted-foreground" />

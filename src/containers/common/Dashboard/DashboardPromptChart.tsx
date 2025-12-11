@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 
-import { Lightbulb } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -13,7 +12,6 @@ import {
 } from 'recharts';
 
 import Badge from 'components/display/Badge';
-import Card from 'components/display/Card';
 import Tabs from 'components/navigation/Tabs';
 
 import type { PromptAnalytics } from 'types/assignment';
@@ -96,141 +94,118 @@ const DashboardPromptChart = ({ promptData }: Props) => {
   }, [promptData]);
 
   return (
-    <Card
-      classes={{
-        title: 'flex items-center gap-2',
-        description: '-mt-2 mb-4',
-        root: 'h-fit',
-      }}
-      description="Analysis of your AI interaction patterns"
-      title={
-        <>
-          <Lightbulb className="h-5 w-5" />
-          Prompt Categories
-        </>
-      }
-    >
-      <Tabs
-        tabs={[
-          {
-            key: 'nature',
-            title: 'Perform vs Learning',
-            content: (
-              <>
-                <ResponsiveContainer
-                  className="max-w-[600px] mx-auto"
-                  height={300}
-                  width="100%"
-                >
-                  <BarChart data={promptNatureData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="name"
-                      interval={0}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <RechartsTooltip />
-                    <Bar dataKey="Your Prompts" fill="#8b5cf6">
-                      {promptNatureData.map((entry, index) => (
-                        <Cell
-                          fill={entry.selfColor}
-                          key={`selfCount-cell-${index}`}
-                        />
-                      ))}
-                    </Bar>
-                    <Bar dataKey="Class Avg" fill="#8b5cf6">
-                      {promptNatureData.map((entry, index) => (
-                        <Cell
-                          fill={entry.classColor}
-                          key={`classCount-cell-${index}`}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-                <div className="mt-4 space-y-2">
-                  {promptNatureData.map((entry, index) => (
-                    <div
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
-                      key={`nature-${index}`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
-                          {entry.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className="!bg-[#aac5f2a0]" variant="secondary">
-                          You: {entry['Your Prompts']} prompts
-                        </Badge>
-                        <Badge className="!bg-[#f2b1bca0]" variant="secondary">
-                          Class Avg: {entry['Class Avg']} prompts
-                        </Badge>
-                      </div>
+    <Tabs
+      tabs={[
+        {
+          key: 'nature',
+          title: 'Perform vs Learning',
+          content: (
+            <>
+              <ResponsiveContainer
+                className="max-w-[600px] mx-auto"
+                height={300}
+                width="100%"
+              >
+                <BarChart data={promptNatureData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" interval={0} tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <RechartsTooltip />
+                  <Bar dataKey="Your Prompts" fill="#8b5cf6">
+                    {promptNatureData.map((entry, index) => (
+                      <Cell
+                        fill={entry.selfColor}
+                        key={`selfCount-cell-${index}`}
+                      />
+                    ))}
+                  </Bar>
+                  <Bar dataKey="Class Avg" fill="#8b5cf6">
+                    {promptNatureData.map((entry, index) => (
+                      <Cell
+                        fill={entry.classColor}
+                        key={`classCount-cell-${index}`}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-4 space-y-2">
+                {promptNatureData.map((entry, index) => (
+                  <div
+                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                    key={`nature-${index}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{entry.name}</span>
                     </div>
-                  ))}
-                </div>
-              </>
-            ),
-          },
-          {
-            key: 'aspect',
-            title: 'Aspects of writing',
-            content: (
-              <>
-                <ResponsiveContainer height={300} width="100%">
-                  <BarChart data={promptAspectData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <RechartsTooltip />
-                    <Bar dataKey="Your Prompts" fill="#8b5cf6">
-                      {promptAspectData.map((entry, index) => (
-                        <Cell
-                          fill={entry.selfColor}
-                          key={`selfCount-cell-${index}`}
-                        />
-                      ))}
-                    </Bar>
-                    <Bar dataKey="Class Avg" fill="#8b5cf6">
-                      {promptAspectData.map((entry, index) => (
-                        <Cell
-                          fill={entry.classColor}
-                          key={`classCount-cell-${index}`}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-                <div className="mt-4 space-y-2">
-                  {promptAspectData.map((entry, index) => (
-                    <div
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
-                      key={`nature-${index}`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
-                          {entry.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className="!bg-[#aac5f2a0]" variant="secondary">
-                          You: {entry['Your Prompts']} prompts
-                        </Badge>
-                        <Badge className="!bg-[#f2b1bca0]" variant="secondary">
-                          Class Avg: {entry['Class Avg']} prompts
-                        </Badge>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="!bg-[#aac5f2a0]" variant="secondary">
+                        You: {entry['Your Prompts']} prompts
+                      </Badge>
+                      <Badge className="!bg-[#f2b1bca0]" variant="secondary">
+                        Class Avg: {entry['Class Avg']} prompts
+                      </Badge>
                     </div>
-                  ))}
-                </div>
-              </>
-            ),
-          },
-        ]}
-      />
-    </Card>
+                  </div>
+                ))}
+              </div>
+            </>
+          ),
+        },
+        {
+          key: 'aspect',
+          title: 'Aspects of writing',
+          content: (
+            <>
+              <ResponsiveContainer height={300} width="100%">
+                <BarChart data={promptAspectData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <RechartsTooltip />
+                  <Bar dataKey="Your Prompts" fill="#8b5cf6">
+                    {promptAspectData.map((entry, index) => (
+                      <Cell
+                        fill={entry.selfColor}
+                        key={`selfCount-cell-${index}`}
+                      />
+                    ))}
+                  </Bar>
+                  <Bar dataKey="Class Avg" fill="#8b5cf6">
+                    {promptAspectData.map((entry, index) => (
+                      <Cell
+                        fill={entry.classColor}
+                        key={`classCount-cell-${index}`}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-4 space-y-2">
+                {promptAspectData.map((entry, index) => (
+                  <div
+                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                    key={`nature-${index}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{entry.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="!bg-[#aac5f2a0]" variant="secondary">
+                        You: {entry['Your Prompts']} prompts
+                      </Badge>
+                      <Badge className="!bg-[#f2b1bca0]" variant="secondary">
+                        Class Avg: {entry['Class Avg']} prompts
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 };
 // TODO: add this text?: Performance-oriented prompts focus on getting answers, while learning-oriented prompts focus on understanding concepts.

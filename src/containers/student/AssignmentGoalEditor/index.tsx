@@ -28,7 +28,7 @@ const defaultGoals = {
     { goalText: '', strategies: [{ text: '' }] },
   ] as AssignmentGoal[],
   ai_goals: [{ goalText: '', strategies: [{ text: '' }] }] as AssignmentGoal[],
-  isGoalConfirmed: false,
+  goal_confirmed: false,
 };
 
 const AssignmentGoalEditor = () => {
@@ -175,7 +175,7 @@ const AssignmentGoalEditor = () => {
           ...goal,
           strategies: [{ text: '' }],
         })),
-      isGoalConfirmed: true,
+      goal_confirmed: true,
     };
     setGoalValue(newGoalValue);
 
@@ -184,7 +184,8 @@ const AssignmentGoalEditor = () => {
       stage_id: currentStage.id,
       content: newGoalValue,
       is_final: false,
-      is_manual: false,
+      alertMsg:
+        'Good job on setting your goals! Now, think about your strategies for each goal.',
     });
   }, [
     alertMsg,
@@ -210,12 +211,11 @@ const AssignmentGoalEditor = () => {
       stage_id: currentStage.id,
       content: newGoalValue,
       is_final: false,
-      is_manual: false,
     });
   }, [assignmentProgress, currentStage, goalValue, readonly, saveSubmission]);
 
   const handleSubmit = useCallback(
-    (isFinal: boolean, isManual: boolean) => {
+    (isFinal: boolean, isManual?: boolean) => {
       if (!assignmentProgress || !currentStage || readonly) {
         return;
       }
@@ -243,7 +243,7 @@ const AssignmentGoalEditor = () => {
         stage_id: currentStage.id,
         content: goalValue,
         is_final: isFinal,
-        is_manual: isManual,
+        alertMsg: isManual ? 'Goals draft saved.' : undefined,
       });
     },
     [
@@ -308,7 +308,7 @@ const AssignmentGoalEditor = () => {
                     </span>
                     <span>{section.question}</span>
                   </label>
-                  {!goalValue.isGoalConfirmed && (
+                  {!goalValue.goal_confirmed && (
                     <Button
                       className="gap-2"
                       disabled={readonly}
@@ -327,7 +327,7 @@ const AssignmentGoalEditor = () => {
                       <div className="flex gap-2 items-start">
                         <TextInput
                           className="resize-none"
-                          disabled={readonly || goalValue.isGoalConfirmed}
+                          disabled={readonly || goalValue.goal_confirmed}
                           onBlur={() => handleSubmit(false, false)}
                           onChange={e =>
                             handleChangeGoalText(
@@ -340,7 +340,7 @@ const AssignmentGoalEditor = () => {
                           rows={3}
                           value={goal.goalText}
                         />
-                        {!goalValue.isGoalConfirmed && (
+                        {!goalValue.goal_confirmed && (
                           <Button
                             disabled={readonly}
                             onClick={() =>
@@ -353,7 +353,7 @@ const AssignmentGoalEditor = () => {
                           </Button>
                         )}
                       </div>
-                      {!!goalValue.isGoalConfirmed && (
+                      {!!goalValue.goal_confirmed && (
                         <div className="mt-2 p-2 border rounded-xl space-y-3">
                           <div className="flex items-center justify-between">
                             <label>
@@ -437,7 +437,7 @@ const AssignmentGoalEditor = () => {
               <Save className="h-4 w-4" />
               Save Draft
             </Button>
-            {goalValue.isGoalConfirmed ? (
+            {goalValue.goal_confirmed ? (
               <>
                 <Button
                   className="gap-2"

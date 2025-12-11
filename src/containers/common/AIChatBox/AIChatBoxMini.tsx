@@ -33,7 +33,7 @@ type Props = {
     AskGptStructuredRequestData,
     unknown
   >;
-  getEssayContent?: () => string;
+  essay?: string;
 };
 
 const AIChatBoxMini = ({
@@ -42,7 +42,7 @@ const AIChatBoxMini = ({
   firstMessage,
   placeholder,
   chatMutateFn,
-  getEssayContent,
+  essay,
 }: Props) => {
   const { mutateAsync: sendQuestion, isLoading: isAgentTyping } =
     useMutation(chatMutateFn);
@@ -111,13 +111,13 @@ const AIChatBoxMini = ({
       question: chatInput,
       assignment_tool_id: toolId,
       is_structured: false,
-      essay: getEssayContent?.(),
+      essay,
     });
     setNewChatMessages(prev => [
       ...prev,
       gptResponseToChatMessage(gptResponse),
     ]);
-  }, [chatInput, getEssayContent, sendQuestion, toolId]);
+  }, [chatInput, essay, sendQuestion, toolId]);
 
   return (
     <div className="space-y-3 border-t pt-4">

@@ -11,17 +11,18 @@ import type {
   AssignmentProgress,
 } from 'types/assignment';
 import getGoalCounts from 'utils/helper/getGoalCounts';
+import getWordCount from 'utils/helper/getWordCount';
 
 type Props = {
   analytics: AssignmentAnalytics;
   assignmentProgress: AssignmentProgress;
-  getEssayWordCount: () => number;
+  essay: string;
   goalContent: AssignmentGoalContent | null;
 };
 
 const DashboardInsights = ({
   analytics,
-  getEssayWordCount,
+  essay,
   assignmentProgress,
   goalContent,
 }: Props) => {
@@ -34,7 +35,7 @@ const DashboardInsights = ({
     ) {
       return '';
     }
-    const wordCount = getEssayWordCount();
+    const wordCount = getWordCount(essay);
     if (
       assignment.requirements.min_word_count &&
       wordCount < assignment.requirements.min_word_count
@@ -51,7 +52,7 @@ const DashboardInsights = ({
       return `Great! You've met the minimum word requirement of ${assignment.requirements.min_word_count} words.`;
     }
     return `Great! You've met the maximum word requirement of ${assignment.requirements.max_word_count} words.`;
-  }, [assignment, getEssayWordCount]);
+  }, [assignment, essay]);
 
   const [completeGoalCount, totalGoalCount] = useMemo(
     () => getGoalCounts(goalContent),

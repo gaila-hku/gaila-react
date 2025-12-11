@@ -1,8 +1,7 @@
-import React, { type RefObject } from 'react';
+import React from 'react';
 
 import type {
   Assignment,
-  AssignmentEssayContent,
   AssignmentGoalContent,
   AssignmentGrade,
   AssignmentProgress,
@@ -16,9 +15,12 @@ export interface AssignmentEssayEditorProviderType {
   currentStage: AssignmentStage | null;
   assignment: Assignment | null;
   teacherGrade: AssignmentGrade | null;
-  essayContent: RefObject<Omit<AssignmentEssayContent, 'goals' | 'title'>>;
-  getEssayContent: () => string;
-  getEssayWordCount: (essay?: string) => number;
+  essay: string;
+  setEssay: (essay: string) => void;
+  outlineConfirmed: boolean;
+  setOutlineConfirmed: (confirmed: boolean) => void;
+  draftConfirmed: boolean;
+  setDraftConfirmed: (confirmed: boolean) => void;
   goalContent: AssignmentGoalContent | null;
   setGoalContent: (goals: AssignmentGoalContent | null) => void;
   readonly: boolean;
@@ -32,9 +34,12 @@ const AssignmentEssayEditorProviderContext =
     currentStage: null,
     assignment: null,
     teacherGrade: null,
-    essayContent: { current: { outline: '', essay: '' } },
-    getEssayContent: () => '',
-    getEssayWordCount: () => 0,
+    essay: '',
+    setEssay: () => {},
+    outlineConfirmed: false,
+    setOutlineConfirmed: () => {},
+    draftConfirmed: false,
+    setDraftConfirmed: () => {},
     goalContent: null,
     setGoalContent: () => {},
     readonly: false,

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BarChart3, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -11,8 +11,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-
-import Card from 'components/display/Card';
 
 import type { PromptAnalytics } from 'types/assignment';
 
@@ -50,16 +48,7 @@ const DashboardAgentUsage = ({ promptData }: Props) => {
   ];
 
   return (
-    <Card
-      classes={{ description: '-mt-2 mb-4', root: 'h-fit' }}
-      description="How you spend your time in this assignment"
-      title={
-        <div className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5" />
-          Agent Usage
-        </div>
-      }
-    >
+    <>
       <div className="space-y-3">
         <h4 className="text-sm font-semibold">Writing Stage Timeline</h4>
         <ResponsiveContainer height={200} width="100%">
@@ -90,7 +79,7 @@ const DashboardAgentUsage = ({ promptData }: Props) => {
           Utilize follow-up prompts you don&apos;t understand AI&apos;s output
         </p>
       </div>
-    </Card>
+    </>
   );
 };
 

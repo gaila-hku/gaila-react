@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import Stepper from '@mui/material/Stepper';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { ArrowRight, CheckCircle, FileText, Save } from 'lucide-react';
+import { defaultsDeep } from 'lodash-es';
+import { CheckCircle, FileText, Save } from 'lucide-react';
 
 import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
@@ -18,6 +16,7 @@ import ResizableSidebar from 'containers/common/ResizableSidebar';
 import EssayEditorAIChat from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorAIChat';
 import EssayEditorInput from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorInput';
 import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOverview';
+import EssayEditorStageStepper from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorStageStepper';
 import EssayEditorTools from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
@@ -26,6 +25,7 @@ import type {
   AssignmentEssayContent,
   AssignmentGoalContent,
 } from 'types/assignment';
+import getWordCount from 'utils/helper/getWordCount';
 
 type WordCountStatus = {
   color: string;
@@ -38,8 +38,12 @@ function AssignmentEssayEditorMain() {
   const {
     assignment,
     teacherGrade,
-    essayContent,
-    getEssayWordCount,
+    essay,
+    setEssay,
+    outlineConfirmed,
+    setOutlineConfirmed,
+    draftConfirmed,
+    setDraftConfirmed,
     goalContent,
     setGoalContent,
     readonly,
@@ -52,14 +56,15 @@ function AssignmentEssayEditorMain() {
   );
 
   const [title, setTitle] = useState('');
+  const [outline, setOutline] = useState('');
   const [wordCountStatus, setWordCountStatus] = useState<WordCountStatus>({
     color: '',
     text: '',
   });
 
   const getWordCountStatus = useCallback(
-    (essayContent: string) => {
-      const wordCount = getEssayWordCount(essayContent);
+    (essay: string) => {
+      const wordCount = getWordCount(essay);
 
       const min = assignment?.requirements?.min_word_count || 0;
       const max = assignment?.requirements?.max_word_count || 0;
@@ -100,123 +105,213 @@ function AssignmentEssayEditorMain() {
     [
       assignment?.requirements?.max_word_count,
       assignment?.requirements?.min_word_count,
-      getEssayWordCount,
     ],
   );
 
   const updateWordCountStatus = useCallback(() => {
-    setWordCountStatus(getWordCountStatus(essayContent.current.essay));
-  }, [essayContent, getWordCountStatus]);
+    setWordCountStatus(getWordCountStatus(essay));
+  }, [essay, getWordCountStatus]);
 
+  // Init title, outline, word count
   useEffect(() => {
-    if (!assignmentProgress || !currentStage) {
-      return;
-    }
-
-    const submission = currentStage.submission;
-
-    if (!submission) {
-      setWordCountStatus(getWordCountStatus(''));
+    if (!assignmentProgress || !currentStage?.submission) {
       return;
     }
 
     try {
-      const submissionContent = submission.content as AssignmentEssayContent;
+      const submissionContent = currentStage.submission
+        .content as AssignmentEssayContent;
       setTitle(submissionContent.title || '');
-      setWordCountStatus(getWordCountStatus(submissionContent.essay || ''));
+      setOutline(submissionContent.outline);
+      setWordCountStatus(getWordCountStatus(submissionContent.essay));
     } catch (e) {
       console.error(e);
     }
-  }, [assignmentProgress, currentStage, getWordCountStatus]);
+  }, [
+    assignmentProgress,
+    currentStage,
+    getWordCountStatus,
+    updateWordCountStatus,
+  ]);
 
-  const handleSave = useCallback(
-    (isFinal: boolean, isManual: boolean) => {
+  const saveSubmissionContent = useCallback(
+    (
+      newContent: Partial<AssignmentEssayContent>,
+      isFinal: boolean,
+      alertMsg?: string,
+    ) => {
       if (!assignmentProgress || !currentStage) {
         return;
       }
 
-      if (isFinal) {
-        const wordCount = getEssayWordCount(essayContent.current.essay);
-        if (
-          assignment?.requirements?.min_word_count &&
-          wordCount < assignment.requirements.min_word_count
-        ) {
-          alertMsg(
-            'Please write at least ' +
-              assignment.requirements.min_word_count +
-              ' words.',
-          );
-          return;
-        }
-
-        if (
-          assignment?.requirements?.max_word_count &&
-          wordCount > assignment.requirements.max_word_count
-        ) {
-          alertMsg(
-            'Please write no more than ' +
-              assignment.requirements.max_word_count +
-              ' words.',
-          );
-          return;
-        }
-      }
+      const content = defaultsDeep(newContent, {
+        title: title,
+        outline: outline,
+        essay: essay,
+        goals: goalContent,
+        outline_confirmed: outlineConfirmed,
+        draft_confirmed: draftConfirmed,
+      });
 
       saveSubmission({
         assignment_id: assignmentProgress.assignment.id,
         stage_id: currentStage.id,
-        content: {
-          title: title,
-          outline: essayContent.current.outline,
-          essay: essayContent.current.essay,
-          goals: goalContent,
-        },
+        content: content,
         is_final: isFinal,
-        is_manual: isManual,
+        alertMsg,
       });
     },
     [
-      alertMsg,
-      assignment?.requirements,
       assignmentProgress,
       currentStage,
-      essayContent,
-      getEssayWordCount,
+      draftConfirmed,
+      essay,
       goalContent,
+      outline,
+      outlineConfirmed,
       saveSubmission,
       title,
     ],
+  );
+
+  const handleAutoSave = useCallback(
+    (isManual: boolean) => {
+      saveSubmissionContent(
+        {},
+        false,
+        isManual ? 'Essay draft saved.' : undefined,
+      );
+    },
+    [saveSubmissionContent],
   );
 
   const onChangeGoals = useCallback(
     (newGoals: AssignmentGoalContent | null) => {
-      if (!assignmentProgress || !currentStage) {
-        return;
-      }
-
       setGoalContent(newGoals);
-      saveSubmission({
-        assignment_id: assignmentProgress.assignment.id,
-        stage_id: currentStage.id,
-        content: {
-          title: title,
-          outline: essayContent.current.outline,
-          essay: essayContent.current.essay,
-          goals: newGoals,
-        },
-        is_final: false,
-        is_manual: false,
-      });
+      saveSubmissionContent({ goals: newGoals }, false);
     },
-    [
-      assignmentProgress,
-      currentStage,
-      essayContent,
-      saveSubmission,
-      setGoalContent,
-      title,
-    ],
+    [saveSubmissionContent, setGoalContent],
   );
+
+  const handleConfirmOutline = useCallback(() => {
+    if (!assignmentProgress || !currentStage) {
+      return;
+    }
+    setOutlineConfirmed(true);
+    saveSubmissionContent(
+      { outline_confirmed: true },
+      false,
+      'You have saved your outline. You can now draft your essay.',
+    );
+  }, [
+    assignmentProgress,
+    currentStage,
+    saveSubmissionContent,
+    setOutlineConfirmed,
+  ]);
+
+  const handleConfirmDraft = useCallback(() => {
+    if (!assignmentProgress || !currentStage) {
+      return;
+    }
+    setDraftConfirmed(true);
+    saveSubmissionContent(
+      { draft_confirmed: true },
+      false,
+      'You are now at the revision stage. Use various tools to aid your revision.',
+    );
+  }, [
+    assignmentProgress,
+    currentStage,
+    saveSubmissionContent,
+    setDraftConfirmed,
+  ]);
+
+  const handleFinalSave = useCallback(() => {
+    const wordCount = getWordCount(essay);
+    if (
+      assignment?.requirements?.min_word_count &&
+      wordCount < assignment.requirements.min_word_count
+    ) {
+      alertMsg(
+        'Please write at least ' +
+          assignment.requirements.min_word_count +
+          ' words.',
+      );
+      return;
+    }
+
+    if (
+      assignment?.requirements?.max_word_count &&
+      wordCount > assignment.requirements.max_word_count
+    ) {
+      alertMsg(
+        'Please write no more than ' +
+          assignment.requirements.max_word_count +
+          ' words.',
+      );
+      return;
+    }
+    saveSubmissionContent({}, true);
+  }, [alertMsg, assignment?.requirements, essay, saveSubmissionContent]);
+
+  const activeWritingStep = useMemo(() => {
+    if (!outlineConfirmed) {
+      return 0;
+    }
+    if (!draftConfirmed) {
+      return 1;
+    }
+    return 2;
+  }, [draftConfirmed, outlineConfirmed]);
+
+  const bottomButton = useMemo(() => {
+    const buttonClass = 'w-full gap-2';
+    switch (activeWritingStep) {
+      case 0:
+        return (
+          <Button
+            className={buttonClass}
+            disabled={readonly || isSaving}
+            onClick={handleConfirmOutline}
+            size="lg"
+          >
+            <CheckCircle className="h-4 w-4" />
+            Lock Outline & Start Drafting
+          </Button>
+        );
+      case 1:
+        return (
+          <Button
+            className={buttonClass}
+            disabled={readonly || isSaving}
+            onClick={handleConfirmDraft}
+            size="lg"
+          >
+            <CheckCircle className="h-4 w-4" />
+            Confirm Draft & Start Revising
+          </Button>
+        );
+      case 2:
+        return (
+          <Button
+            className={buttonClass}
+            disabled={readonly || isSaving}
+            onClick={() => handleFinalSave()}
+          >
+            <CheckCircle className="h-4 w-4" />
+            Finish Revising & Submit Essay
+          </Button>
+        );
+    }
+  }, [
+    activeWritingStep,
+    handleConfirmDraft,
+    handleConfirmOutline,
+    handleFinalSave,
+    isSaving,
+    readonly,
+  ]);
 
   if (!assignmentProgress || !currentStage || !assignment) {
     return <></>;
@@ -265,54 +360,20 @@ function AssignmentEssayEditorMain() {
       <ResizableSidebar>
         {/* Main Editor */}
         <div className="space-y-6">
-          <div className="w-full py-4 px-4 bg-secondary/30 rounded-lg border">
-            <Stepper activeStep={0} alternativeLabel className="basis-[400px]">
-              <Step>
-                <StepLabel>
-                  <div className="-mt-2">Outline</div>
-                  <div className="text-xs text-muted-foreground/70 hidden sm:block font-normal">
-                    Plan your essay structure
-                  </div>
-                </StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>
-                  <div className="-mt-2">Drafting</div>
-                  <div className="text-xs text-muted-foreground/70 hidden sm:block font-normal">
-                    Write your first draft
-                  </div>
-                </StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>
-                  <div className="-mt-2">Revising</div>
-                  <div className="text-xs text-muted-foreground/70 hidden sm:block font-normal">
-                    Refine and polish
-                  </div>
-                </StepLabel>
-              </Step>
-            </Stepper>
-          </div>
+          <EssayEditorStageStepper activeWritingStep={activeWritingStep} />
 
+          {/* Header with save buttons */}
           <Card
             action={
               <div className="flex gap-2">
                 <Button
                   className="gap-2 w-full sm:w-auto"
                   disabled={readonly || isSaving}
-                  onClick={() => handleSave(false, true)}
+                  onClick={() => handleAutoSave(true)}
                   variant="secondary"
                 >
                   <Save className="h-4 w-4" />
                   Save Draft
-                </Button>
-                <Button
-                  className="gap-2 w-full sm:w-auto"
-                  disabled={readonly || isSaving}
-                  onClick={() => handleSave(true, true)}
-                >
-                  Submit
-                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             }
@@ -333,7 +394,7 @@ function AssignmentEssayEditorMain() {
                 className="text-base sm:text-lg font-semibold"
                 disabled={readonly}
                 label="Essay Title"
-                onBlur={() => handleSave(false, false)}
+                onBlur={() => handleAutoSave(false)}
                 onChange={e => setTitle(e.target.value)}
                 value={title}
               />
@@ -357,6 +418,7 @@ function AssignmentEssayEditorMain() {
             </div>
           </Card>
 
+          {/* Outline editor */}
           <Card
             classes={{
               description: '-mt-2 mb-2',
@@ -374,34 +436,38 @@ function AssignmentEssayEditorMain() {
               </div>
             ) : null}
             <EssayEditorInput
-              handleSave={handleSave}
-              type="outline"
+              disabled={outlineConfirmed}
+              handleAutoSave={handleAutoSave}
+              minHeight={outlineConfirmed ? 0 : 400}
+              onChange={setOutline}
               updateWordCountStatus={updateWordCountStatus}
+              value={outline}
             />
           </Card>
 
-          <Card
-            classes={{
-              description: clsx(
-                'text-xs',
-                teacherGrade ? '!text-purple-600' : '!text-green-600',
-              ),
-            }}
-            description={
-              teacherGrade
-                ? 'This essay has been graded and can no longer be edited.'
-                : readonly
-                  ? 'You have submitted your essay.'
-                  : null
-            }
-            title="Essay Content"
-          >
-            <EssayEditorInput
-              handleSave={handleSave}
-              type="essay"
-              updateWordCountStatus={updateWordCountStatus}
-            />
-          </Card>
+          {/* Essay Editor */}
+          {outlineConfirmed && (
+            <Card title="Essay Content">
+              {teacherGrade ? (
+                <div className="text-xs text-purple-600">
+                  This essay has been graded and can no longer be edited.
+                </div>
+              ) : readonly ? (
+                <div className="text-xs text-green-600">
+                  You have submitted your essay.
+                </div>
+              ) : null}
+              <EssayEditorInput
+                handleAutoSave={handleAutoSave}
+                minHeight={600}
+                onChange={setEssay}
+                updateWordCountStatus={updateWordCountStatus}
+                value={essay}
+              />
+            </Card>
+          )}
+
+          {bottomButton}
         </div>
 
         {/* Sidebar with Tabs */}

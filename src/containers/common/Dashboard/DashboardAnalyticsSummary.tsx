@@ -10,17 +10,18 @@ import type {
   PromptAnalytics,
 } from 'types/assignment';
 import getGoalCounts from 'utils/helper/getGoalCounts';
+import getWordCount from 'utils/helper/getWordCount';
 
 type Props = {
   promptAnalytics: PromptAnalytics;
   assignment: Assignment;
-  getEssayWordCount: () => number;
+  essay: string;
   goalContent: AssignmentGoalContent | null;
 };
 
 const DashboardAnalyticsSummary = ({
   assignment,
-  getEssayWordCount,
+  essay,
   goalContent,
 }: Props) => {
   const wordCountRequirement = useMemo(() => {
@@ -48,7 +49,7 @@ const DashboardAnalyticsSummary = ({
   );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <>
       <Card
         title={
           <div className="text-sm flex items-center gap-2">
@@ -57,7 +58,7 @@ const DashboardAnalyticsSummary = ({
           </div>
         }
       >
-        <p className="text-2xl font-bold">{getEssayWordCount()}</p>
+        <p className="text-2xl font-bold">{getWordCount(essay)}</p>
         <p className="text-xs text-muted-foreground mt-1">
           {wordCountRequirement}
         </p>
@@ -117,7 +118,7 @@ const DashboardAnalyticsSummary = ({
           Indicates if your essay is error free
         </p>
       </Card>
-    </div>
+    </>
   );
 };
 

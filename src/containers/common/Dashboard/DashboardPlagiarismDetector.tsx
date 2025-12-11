@@ -9,15 +9,12 @@ import type { AssignmentAnalytics } from 'types/assignment';
 
 type Props = {
   plagiarisedSegments: AssignmentAnalytics['plagiarised_segments'];
-  getEssayContent: () => string;
+  essay: string;
 };
 
-const DashboardPlagiarismDetector = ({
-  plagiarisedSegments,
-  getEssayContent,
-}: Props) => {
+const DashboardPlagiarismDetector = ({ plagiarisedSegments, essay }: Props) => {
   const getCopyingPercentage = useCallback(() => {
-    const essayLength = getEssayContent().length;
+    const essayLength = essay.length;
 
     if (essayLength === 0) {
       return 0;
@@ -28,11 +25,9 @@ const DashboardPlagiarismDetector = ({
     );
 
     return (plagiarisedLength / essayLength) * 100;
-  }, [getEssayContent, plagiarisedSegments]);
+  }, [essay, plagiarisedSegments]);
 
   const renderSegments = useCallback(() => {
-    const essay = getEssayContent();
-
     let lastIndex = 0;
     const segments = plagiarisedSegments.flatMap(segment => {
       const normalSegment = {
@@ -61,7 +56,7 @@ const DashboardPlagiarismDetector = ({
         ))}
       </>
     );
-  }, [getEssayContent, plagiarisedSegments]);
+  }, [essay, plagiarisedSegments]);
 
   return (
     <Card

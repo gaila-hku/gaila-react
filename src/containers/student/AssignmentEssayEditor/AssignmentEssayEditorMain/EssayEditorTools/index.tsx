@@ -19,7 +19,7 @@ type Props = {
 };
 
 const EssayEditorTools = ({ tools }: Props) => {
-  const { getEssayContent } = useAssignmentEssayEditorProvider();
+  const { essay } = useAssignmentEssayEditorProvider();
 
   const dictionaryTool = tools.find(tool => tool.key === 'dictionary');
   const grammarTool = tools.find(tool => tool.key === 'grammar');
@@ -62,14 +62,14 @@ const EssayEditorTools = ({ tools }: Props) => {
       )}
       {!!grammarTool && (
         <EssayEditorGrammarTool
-          getEssayContent={getEssayContent}
+          essay={essay}
           latestResult={getLatestResult(grammarTool.id)}
           toolId={grammarTool.id}
         />
       )}
       {!!autoGradeTool && (
         <EssayEditorAutoGradeTool
-          getEssayContent={getEssayContent}
+          essay={essay}
           latestResult={getLatestResult(autoGradeTool.id)}
           toolId={autoGradeTool.id}
         />

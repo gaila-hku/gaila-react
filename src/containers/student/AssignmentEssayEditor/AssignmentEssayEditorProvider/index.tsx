@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { Provider } from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/context';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
@@ -29,30 +23,13 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
     readonly,
   } = useAssignmentSubmissionProvider();
 
-  const essayContent = useRef<Omit<AssignmentEssayContent, 'goals' | 'title'>>({
-    outline: '',
-    essay: '',
-  });
+  const [essay, setEssay] = useState('');
+  const [outlineConfirmed, setOutlineConfirmed] = useState(false);
+  const [draftConfirmed, setDraftConfirmed] = useState(false);
+
   const [goalContent, setGoalContent] = useState<AssignmentGoalContent | null>(
     null,
   );
-
-  const getEssayContent = useCallback(() => {
-    return essayContent.current.essay;
-  }, []);
-
-  const getEssayWordCount = useCallback((essay?: string) => {
-    if (essay) {
-      return essay
-        .trim()
-        .split(/\s+/)
-        .filter(word => word.length > 0).length;
-    }
-    return essayContent.current.essay
-      .trim()
-      .split(/\s+/)
-      .filter(word => word.length > 0).length;
-  }, []);
 
   useEffect(() => {
     if (!assignmentProgress || !currentStage) {
@@ -73,12 +50,14 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
 
     try {
       const submissionContent = submission.content as AssignmentEssayContent;
-      essayContent.current = submissionContent;
+      setEssay(submissionContent.essay);
+      setOutlineConfirmed(submissionContent.outline_confirmed);
+      setDraftConfirmed(submissionContent.draft_confirmed);
       setGoalContent(submissionContent.goals || null);
     } catch (e) {
       console.error(e);
     }
-  }, [assignmentProgress, currentStage, essayContent, setGoalContent]);
+  }, [assignmentProgress, currentStage, setGoalContent]);
 
   const value = useMemo(
     () => ({
@@ -88,9 +67,12 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       currentStage,
       assignment,
       teacherGrade,
-      essayContent,
-      getEssayContent,
-      getEssayWordCount,
+      essay,
+      setEssay,
+      outlineConfirmed,
+      setOutlineConfirmed,
+      draftConfirmed,
+      setDraftConfirmed,
       goalContent,
       setGoalContent,
       readonly,
@@ -99,11 +81,12 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       assignment,
       assignmentProgress,
       currentStage,
+      draftConfirmed,
       error,
-      getEssayContent,
-      getEssayWordCount,
+      essay,
       goalContent,
       isLoading,
+      outlineConfirmed,
       readonly,
       teacherGrade,
     ],

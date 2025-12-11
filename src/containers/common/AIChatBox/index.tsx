@@ -41,7 +41,7 @@ const AIChatBox = ({
   suggestedPrompts,
   placeholder,
 }: Props) => {
-  const { getEssayContent } = useAssignmentEssayEditorProvider();
+  const { essay } = useAssignmentEssayEditorProvider();
 
   const { mutateAsync: sendQuestion, isLoading: isAgentTyping } =
     useMutation(apiAskGpt);
@@ -128,13 +128,13 @@ const AIChatBox = ({
     const gptResponse = await sendQuestion({
       question: chatInput,
       assignment_tool_id: toolId,
-      essay: getEssayContent?.(),
+      essay,
     });
     setNewChatMessages(prev => [
       ...prev,
       gptResponseToChatMessage(gptResponse),
     ]);
-  }, [chatInput, getEssayContent, sendQuestion, toolId]);
+  }, [chatInput, essay, sendQuestion, toolId]);
 
   const handlePromptClick = (promptText: string) => {
     setChatInput(promptText);

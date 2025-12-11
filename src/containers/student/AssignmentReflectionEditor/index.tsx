@@ -64,7 +64,7 @@ const AssignmentReflectionEditor = () => {
         stage_id: currentStage.id,
         content: { reflections },
         is_final: isFinal,
-        is_manual: isManual,
+        alertMsg: isManual ? 'Reflections draft saved.' : undefined,
       });
     },
     [alertMsg, assignmentProgress, currentStage, reflections, saveSubmission],

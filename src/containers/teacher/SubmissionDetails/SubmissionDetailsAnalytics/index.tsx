@@ -6,18 +6,32 @@ import Card from 'components/display/Card';
 import Tabs from 'components/navigation/Tabs';
 
 import DashboardAgentUsage from 'containers/common/Dashboard/DashboardAgentUsage';
+import DashboardAnalyticsSummary from 'containers/common/Dashboard/DashboardAnalyticsSummary';
 import DashboardPromptChart from 'containers/common/Dashboard/DashboardPromptChart';
 import PromptHistory from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/PromptHistory';
 
-import type { AssignmentAnalytics } from 'types/assignment';
+import type {
+  Assignment,
+  AssignmentAnalytics,
+  AssignmentGoalContent,
+} from 'types/assignment';
 
 type Props = {
   analytics: AssignmentAnalytics;
+  assignment: Assignment;
+  essay: string;
+  goalContent: AssignmentGoalContent;
 };
 
-const SubmissionDetailsAnalytics = ({ analytics }: Props) => {
+const SubmissionDetailsAnalytics = ({
+  analytics,
+  assignment,
+  essay,
+  goalContent,
+}: Props) => {
   return (
     <Card
+      classes={{ description: '-mt-2 mb-2' }}
       description="Tool usage and writing behavior insights"
       title={
         <div className="flex items-center gap-2">
@@ -29,6 +43,20 @@ const SubmissionDetailsAnalytics = ({ analytics }: Props) => {
       <Tabs
         className="w-full"
         tabs={[
+          {
+            key: 'metrics',
+            title: 'Writing Metrics',
+            content: (
+              <div className="grid grid-cols-2 gap-4">
+                <DashboardAnalyticsSummary
+                  assignment={assignment}
+                  essay={essay}
+                  goalContent={goalContent}
+                  promptAnalytics={analytics.prompt_data}
+                />
+              </div>
+            ),
+          },
           {
             key: 'time',
             title: 'Agent Usage',
