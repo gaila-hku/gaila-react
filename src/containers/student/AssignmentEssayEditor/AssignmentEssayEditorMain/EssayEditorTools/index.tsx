@@ -7,20 +7,19 @@ import Loading from 'components/display/Loading';
 
 import EssayEditorAutoGradeTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorAutoGradeTool';
 import EssayEditorDictionaryTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorDictionaryTool';
-import EssayEditorGrammarTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorGrammarTool';
+import EssayEditorIdeationTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorIdeationTool';
+import EssayEditorRevisionTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorRevisionTool';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
 import { apiGetLatestSturcturedGptLog } from 'api/gpt';
-import type { AssignmentProgress } from 'types/assignment';
 import tuple from 'utils/types/tuple';
 
-type Props = {
-  tools: AssignmentProgress['stages'][number]['tools'];
-};
+const EssayEditorTools = () => {
+  const { essay, currentStage, outlineConfirmed, draftConfirmed } =
+    useAssignmentEssayEditorProvider();
 
-const EssayEditorTools = ({ tools }: Props) => {
-  const { essay } = useAssignmentEssayEditorProvider();
-
+  const tools = currentStage?.tools ?? [];
+  const ideationTool = tools.find(tool => tool.key === 'ideation');
   const dictionaryTool = tools.find(tool => tool.key === 'dictionary');
   const grammarTool = tools.find(tool => tool.key === 'grammar');
   const autoGradeTool = tools.find(tool => tool.key === 'autograde');
@@ -54,24 +53,30 @@ const EssayEditorTools = ({ tools }: Props) => {
 
   return (
     <div className="space-y-4">
+      {!!ideationTool && !outlineConfirmed && (
+        <EssayEditorIdeationTool
+          latestResult={getLatestResult(ideationTool.id)}
+          toolId={ideationTool.id}
+        />
+      )}
       {!!dictionaryTool && (
         <EssayEditorDictionaryTool
           latestResult={getLatestResult(dictionaryTool.id)}
           toolId={dictionaryTool.id}
         />
       )}
-      {!!grammarTool && (
-        <EssayEditorGrammarTool
-          essay={essay}
-          latestResult={getLatestResult(grammarTool.id)}
-          toolId={grammarTool.id}
-        />
-      )}
-      {!!autoGradeTool && (
+      {!!autoGradeTool && outlineConfirmed && (
         <EssayEditorAutoGradeTool
           essay={essay}
           latestResult={getLatestResult(autoGradeTool.id)}
           toolId={autoGradeTool.id}
+        />
+      )}
+      {!!grammarTool && draftConfirmed && (
+        <EssayEditorRevisionTool
+          essay={essay}
+          latestResult={getLatestResult(grammarTool.id)}
+          toolId={grammarTool.id}
         />
       )}
     </div>

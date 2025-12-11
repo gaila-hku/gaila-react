@@ -15,6 +15,18 @@ export interface Assignment {
   config?: {
     outline_enabled?: boolean;
     revision_enabled?: boolean;
+    dashboard?: {
+      enabled?: boolean;
+      word_count?: boolean;
+      goal_progress?: boolean;
+      complexity_scores?: boolean;
+      accuracy_scores?: boolean;
+      copying_detector?: boolean;
+      prompt_category_nature?: boolean;
+      prompt_category_aspect?: boolean;
+      agent_usage?: boolean;
+      writing_insights?: boolean;
+    };
   };
   requirements?: {
     min_word_count?: number | null;

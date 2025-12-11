@@ -400,12 +400,14 @@ function AssignmentEssayEditorMain() {
               />
             )}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4">
-              <Badge
-                className={`px-2 py-1 text-xs sm:text-sm ${wordCountStatus.color}`}
-                variant="outline"
-              >
-                {wordCountStatus.text}
-              </Badge>
+              {outlineConfirmed && (
+                <Badge
+                  className={`px-2 py-1 text-xs sm:text-sm ${wordCountStatus.color}`}
+                  variant="outline"
+                >
+                  {wordCountStatus.text}
+                </Badge>
+              )}
 
               {!!assignment.due_date && (
                 <Badge
@@ -440,7 +442,6 @@ function AssignmentEssayEditorMain() {
               handleAutoSave={handleAutoSave}
               minHeight={outlineConfirmed ? 0 : 400}
               onChange={setOutline}
-              updateWordCountStatus={updateWordCountStatus}
               value={outline}
             />
           </Card>
@@ -489,7 +490,7 @@ function AssignmentEssayEditorMain() {
             {
               key: 'tools',
               title: 'Tools',
-              content: <EssayEditorTools tools={currentStage.tools} />,
+              content: <EssayEditorTools />,
             },
             ...(generalChatTool
               ? [

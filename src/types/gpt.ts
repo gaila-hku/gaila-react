@@ -11,7 +11,7 @@ export interface GptLog {
   is_structured?: boolean;
 }
 
-export interface GrammarResult {
+export interface RevisionResult {
   score: number;
   mistakes: {
     severity: any;

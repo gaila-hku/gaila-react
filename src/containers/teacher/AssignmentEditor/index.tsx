@@ -49,6 +49,22 @@ const defaultData: AssignmentFormData = {
     { criteria: 'Organization', description: '', max_points: 7 },
   ],
   tips: [''],
+  config: {
+    outline_enabled: true,
+    revision_enabled: true,
+    dashboard: {
+      enabled: true,
+      word_count: true,
+      goal_progress: true,
+      complexity_scores: true,
+      accuracy_scores: true,
+      copying_detector: true,
+      prompt_category_nature: true,
+      prompt_category_aspect: true,
+      agent_usage: true,
+      writing_insights: true,
+    },
+  },
   enrolled_classes: [],
   enrolled_students: [],
   stages: [],
@@ -112,7 +128,6 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
     }
 
     formData.current = {
-      ...defaultData,
       ...assignmentData,
       tips: assignmentData.tips || defaultData.tips,
       rubrics: assignmentData.rubrics || defaultData.rubrics,

@@ -9,6 +9,7 @@ import SwitchInput from 'components/input/SwitchInput';
 import TextInput from 'components/input/TextInput';
 
 import type { AssignmentFormData } from 'containers/teacher/AssignmentEditor';
+import AssignmentEditorFormDashboardInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormDashboardInput';
 import AssignmentEditorFormRubricsInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormRubricsInput';
 import AssignmentEditorFormStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput';
 import AssignmentEditorFormTipsInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormTipsInput';
@@ -190,6 +191,13 @@ const AssignmentEditorForm = ({
         formDataConfigValue={formData.current.config}
         formDataStageValue={formData.current.stages}
         isEditing={isEditing}
+        onFormDataChange={onFormDataChange}
+      />
+
+      <Divider />
+
+      <AssignmentEditorFormDashboardInput
+        formDataValue={formData.current.config?.dashboard}
         onFormDataChange={onFormDataChange}
       />
 

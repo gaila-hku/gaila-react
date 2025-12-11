@@ -10,8 +10,8 @@ import Button from 'components/input/Button';
 
 import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 
-import { apiAskGrammarAgent } from 'api/gpt';
-import type { GptLog, GrammarResult } from 'types/gpt';
+import { apiAskRevisionAgent } from 'api/gpt';
+import type { GptLog, RevisionResult } from 'types/gpt';
 
 type Props = {
   toolId: number;
@@ -19,31 +19,30 @@ type Props = {
   essay: string;
 };
 
-const EssayEditorGrammarTool = ({ toolId, latestResult, essay }: Props) => {
-  const { mutateAsync: askGrammarAgent, isLoading: isAgentLoading } =
-    useMutation(apiAskGrammarAgent);
+const EssayEditorRevisionTool = ({ toolId, latestResult, essay }: Props) => {
+  const { mutateAsync: askRevisionAgent, isLoading: isAgentLoading } =
+    useMutation(apiAskRevisionAgent);
 
-  // Dictionary state
-  const [grammarResult, setGrammarResult] = useState<GrammarResult | null>(
+  const [revisionResult, setRevisionResult] = useState<RevisionResult | null>(
     null,
   );
 
-  const handleGrammarCheck = useCallback(async () => {
-    const res = await askGrammarAgent({
+  const handleRevisionCheck = useCallback(async () => {
+    const res = await askRevisionAgent({
       assignment_tool_id: toolId,
       is_structured: true,
       essay,
     });
-    const result = JSON.parse(res.gpt_answer) as GrammarResult;
-    setGrammarResult(result);
-  }, [askGrammarAgent, essay, toolId]);
+    const result = JSON.parse(res.gpt_answer) as RevisionResult;
+    setRevisionResult(result);
+  }, [askRevisionAgent, essay, toolId]);
 
   useEffect(() => {
     if (!latestResult) {
       return;
     }
-    const result = JSON.parse(latestResult.gpt_answer) as GrammarResult;
-    setGrammarResult(result);
+    const result = JSON.parse(latestResult.gpt_answer) as RevisionResult;
+    setRevisionResult(result);
   }, [latestResult]);
 
   return (
@@ -57,51 +56,39 @@ const EssayEditorGrammarTool = ({ toolId, latestResult, essay }: Props) => {
       defaultCollapsed
       title={
         <>
-          <ClipboardList className="h-4 w-4" /> Grammar checker
+          <ClipboardList className="h-4 w-4" /> AI Revision
         </>
       }
     >
       <Button
         className="w-full gap-1 h-auto py-2 text-xs"
         disabled={isAgentLoading}
-        onClick={handleGrammarCheck}
+        onClick={handleRevisionCheck}
         size="sm"
       >
         <CheckCircle className="h-3 w-3" />
-        {isAgentLoading ? 'Checking...' : 'Check my grammar'}
+        {isAgentLoading ? 'Revising...' : 'Revise my essay'}
       </Button>
-      {/* <div className="grid grid-cols-2 gap-2">
-        <Button
-          className="w-full gap-1 h-auto py-2 flex-col text-xs"
-          disabled={isCheckingGrammar}
-          onClick={handleCheckGrammar}
-          size="sm"
-          variant="outline"
-        >
-          <CheckCircle className="h-3 w-3" />
-          Grammar
-        </Button>
-      </div> */}
 
-      {!!grammarResult && (
+      {!!revisionResult && (
         <div className="p-2 border rounded text-xs space-y-1.5">
           <div className="flex items-center justify-between">
             <h4 className="font-medium capitalize">Results</h4>
             <Badge
               className="text-xs"
               variant={
-                grammarResult.score >= 80
+                revisionResult.score >= 80
                   ? 'primary'
-                  : grammarResult.score >= 60
+                  : revisionResult.score >= 60
                     ? 'secondary'
                     : 'destructive'
               }
             >
-              {grammarResult.score}%
+              {revisionResult.score}%
             </Badge>
           </div>
           <div className="space-y-1">
-            {grammarResult.mistakes.map((mistake, idx) => (
+            {revisionResult.mistakes.map((mistake, idx) => (
               <div
                 className={clsx(
                   'border rounded-lg p-2',
@@ -131,12 +118,12 @@ const EssayEditorGrammarTool = ({ toolId, latestResult, essay }: Props) => {
         </div>
       )}
 
-      {!!grammarResult && (
+      {!!revisionResult && (
         <AIChatBoxMini
-          chatMutateFn={apiAskGrammarAgent}
-          chatName="Ask Grammar Agent"
+          chatMutateFn={apiAskRevisionAgent}
+          chatName="Ask Revision Agent"
           essay={essay}
-          firstMessage="Ask me about specific issues, how to fix them, or how to improve your scores!"
+          firstMessage="Ask me about specific issues, how to fix them, or how to improve your essay!"
           toolId={toolId}
         />
       )}
@@ -144,4 +131,4 @@ const EssayEditorGrammarTool = ({ toolId, latestResult, essay }: Props) => {
   );
 };
 
-export default EssayEditorGrammarTool;
+export default EssayEditorRevisionTool;
