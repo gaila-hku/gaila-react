@@ -15,6 +15,10 @@ export interface AssignmentEssayEditorProviderType {
   currentStage: AssignmentStage | null;
   assignment: Assignment | null;
   teacherGrade: AssignmentGrade | null;
+  title: string;
+  setTitle: (title: string) => void;
+  outline: string;
+  setOutline: (outline: string) => void;
   essay: string;
   setEssay: (essay: string) => void;
   outlineConfirmed: boolean;
@@ -34,6 +38,10 @@ const AssignmentEssayEditorProviderContext =
     currentStage: null,
     assignment: null,
     teacherGrade: null,
+    title: '',
+    setTitle: () => {},
+    outline: '',
+    setOutline: () => {},
     essay: '',
     setEssay: () => {},
     outlineConfirmed: false,

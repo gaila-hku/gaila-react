@@ -9,7 +9,7 @@ import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssay
 import { apiSaveTraceData } from 'api/trace-data';
 
 type Props = {
-  updateWordCountStatus?: () => void;
+  updateWordCountStatus?: (essay: string) => void;
   handleAutoSave: (isFinal: boolean, isManual: boolean) => void;
   value: string;
   onChange: (x: string) => void;
@@ -32,7 +32,7 @@ const EssayEditorInput = ({
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       inputOnChange(e.target.value);
-      updateWordCountStatus?.();
+      updateWordCountStatus?.(e.target.value);
     },
     [inputOnChange, updateWordCountStatus],
   );

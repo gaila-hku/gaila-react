@@ -23,6 +23,8 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
     readonly,
   } = useAssignmentSubmissionProvider();
 
+  const [title, setTitle] = useState('');
+  const [outline, setOutline] = useState('');
   const [essay, setEssay] = useState('');
   const [outlineConfirmed, setOutlineConfirmed] = useState(false);
   const [draftConfirmed, setDraftConfirmed] = useState(false);
@@ -67,6 +69,10 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       currentStage,
       assignment,
       teacherGrade,
+      title,
+      setTitle,
+      outline,
+      setOutline,
       essay,
       setEssay,
       outlineConfirmed,
@@ -86,9 +92,11 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       essay,
       goalContent,
       isLoading,
+      outline,
       outlineConfirmed,
       readonly,
       teacherGrade,
+      title,
     ],
   );
 

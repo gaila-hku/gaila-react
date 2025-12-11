@@ -3,20 +3,20 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { defaultsDeep } from 'lodash-es';
-import { CheckCircle, FileText, Save } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
-import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
-import TextInput from 'components/input/TextInput';
 import Tabs from 'components/navigation/Tabs';
 
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
 import EssayEditorAIChat from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorAIChat';
+import EssayEditorHeader from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorHeader';
 import EssayEditorInput from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorInput';
 import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOverview';
 import EssayEditorStageStepper from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorStageStepper';
+import EssayEditorSubmitModal from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorSubmitModal';
 import EssayEditorTools from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
@@ -38,6 +38,9 @@ function AssignmentEssayEditorMain() {
   const {
     assignment,
     teacherGrade,
+    title,
+    outline,
+    setOutline,
     essay,
     setEssay,
     outlineConfirmed,
@@ -55,14 +58,13 @@ function AssignmentEssayEditorMain() {
     tool => tool.key === 'writing_general',
   );
 
-  const [title, setTitle] = useState('');
-  const [outline, setOutline] = useState('');
   const [wordCountStatus, setWordCountStatus] = useState<WordCountStatus>({
     color: '',
     text: '',
   });
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
 
-  const getWordCountStatus = useCallback(
+  const updateWordCountStatus = useCallback(
     (essay: string) => {
       const wordCount = getWordCount(essay);
 
@@ -70,10 +72,11 @@ function AssignmentEssayEditorMain() {
       const max = assignment?.requirements?.max_word_count || 0;
 
       if (!min && !max) {
-        return {
+        setWordCountStatus({
           color: 'text-gray-600',
           text: `${wordCount} word${wordCount === 1 ? '' : 's'}`,
-        };
+        });
+        return;
       }
 
       let wordCountDisplay = `${wordCount} /`;
@@ -86,20 +89,20 @@ function AssignmentEssayEditorMain() {
       }
 
       if (!!min && wordCount < min) {
-        return {
+        setWordCountStatus({
           color: 'text-orange-600',
           text: `${wordCountDisplay} (${min - wordCount} more needed)`,
-        };
+        });
       } else if (!!max && wordCount > max) {
-        return {
+        setWordCountStatus({
           color: 'text-red-600',
           text: `${wordCountDisplay} (${wordCount - max} over limit)`,
-        };
+        });
       } else {
-        return {
+        setWordCountStatus({
           color: 'text-green-600',
           text: `${wordCountDisplay} (good!)`,
-        };
+        });
       }
     },
     [
@@ -107,10 +110,6 @@ function AssignmentEssayEditorMain() {
       assignment?.requirements?.min_word_count,
     ],
   );
-
-  const updateWordCountStatus = useCallback(() => {
-    setWordCountStatus(getWordCountStatus(essay));
-  }, [essay, getWordCountStatus]);
 
   // Init title, outline, word count
   useEffect(() => {
@@ -121,18 +120,12 @@ function AssignmentEssayEditorMain() {
     try {
       const submissionContent = currentStage.submission
         .content as AssignmentEssayContent;
-      setTitle(submissionContent.title || '');
       setOutline(submissionContent.outline);
-      setWordCountStatus(getWordCountStatus(submissionContent.essay));
+      updateWordCountStatus(submissionContent.essay);
     } catch (e) {
       console.error(e);
     }
-  }, [
-    assignmentProgress,
-    currentStage,
-    getWordCountStatus,
-    updateWordCountStatus,
-  ]);
+  }, [assignmentProgress, currentStage, setOutline, updateWordCountStatus]);
 
   const saveSubmissionContent = useCallback(
     (
@@ -174,16 +167,9 @@ function AssignmentEssayEditorMain() {
     ],
   );
 
-  const handleAutoSave = useCallback(
-    (isManual: boolean) => {
-      saveSubmissionContent(
-        {},
-        false,
-        isManual ? 'Essay draft saved.' : undefined,
-      );
-    },
-    [saveSubmissionContent],
-  );
+  const handleAutoSave = useCallback(() => {
+    saveSubmissionContent({}, false);
+  }, [saveSubmissionContent]);
 
   const onChangeGoals = useCallback(
     (newGoals: AssignmentGoalContent | null) => {
@@ -252,8 +238,8 @@ function AssignmentEssayEditorMain() {
       );
       return;
     }
-    saveSubmissionContent({}, true);
-  }, [alertMsg, assignment?.requirements, essay, saveSubmissionContent]);
+    setSubmitModalOpen(true);
+  }, [alertMsg, assignment?.requirements, essay]);
 
   const activeWritingStep = useMemo(() => {
     if (!outlineConfirmed) {
@@ -363,62 +349,10 @@ function AssignmentEssayEditorMain() {
           <EssayEditorStageStepper activeWritingStep={activeWritingStep} />
 
           {/* Header with save buttons */}
-          <Card
-            action={
-              <div className="flex gap-2">
-                <Button
-                  className="gap-2 w-full sm:w-auto"
-                  disabled={readonly || isSaving}
-                  onClick={() => handleAutoSave(true)}
-                  variant="secondary"
-                >
-                  <Save className="h-4 w-4" />
-                  Save Draft
-                </Button>
-              </div>
-            }
-            title={
-              <>
-                <div className="flex gap-4 mb-2">
-                  <FileText className="h-5 w-5" />
-                  {assignment.title}
-                </div>
-                <div className="font-normal text-base text-muted-foreground">
-                  {assignment.description}
-                </div>
-              </>
-            }
-          >
-            {!!assignment.requirements?.title && (
-              <TextInput
-                className="text-base sm:text-lg font-semibold"
-                disabled={readonly}
-                label="Essay Title"
-                onBlur={() => handleAutoSave(false)}
-                onChange={e => setTitle(e.target.value)}
-                value={title}
-              />
-            )}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4">
-              {outlineConfirmed && (
-                <Badge
-                  className={`px-2 py-1 text-xs sm:text-sm ${wordCountStatus.color}`}
-                  variant="outline"
-                >
-                  {wordCountStatus.text}
-                </Badge>
-              )}
-
-              {!!assignment.due_date && (
-                <Badge
-                  className="px-2 py-1 text-xs sm:text-sm"
-                  variant="outline"
-                >
-                  Due: {dayjs(assignment.due_date).format('MMM D, YYYY')}
-                </Badge>
-              )}
-            </div>
-          </Card>
+          <EssayEditorHeader
+            saveSubmissionContent={saveSubmissionContent}
+            wordCountStatus={wordCountStatus}
+          />
 
           {/* Outline editor */}
           <Card
@@ -480,7 +414,6 @@ function AssignmentEssayEditorMain() {
               content: (
                 <EssayEditorOverview
                   assignment={assignment}
-                  goals={goalContent}
                   grade={teacherGrade}
                   onChangeGoals={onChangeGoals}
                   readonly={readonly}
@@ -504,6 +437,13 @@ function AssignmentEssayEditorMain() {
           ]}
         />
       </ResizableSidebar>
+
+      <EssayEditorSubmitModal
+        onChangeGoals={onChangeGoals}
+        open={submitModalOpen}
+        saveSubmissionContent={saveSubmissionContent}
+        setOpen={setSubmitModalOpen}
+      />
     </div>
   );
 }
