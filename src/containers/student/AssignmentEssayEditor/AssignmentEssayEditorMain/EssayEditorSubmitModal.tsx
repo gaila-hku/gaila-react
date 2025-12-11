@@ -7,7 +7,8 @@ import { X } from 'lucide-react';
 import Button from 'components/input/Button';
 import Clickable from 'components/input/Clickable';
 
-import EssayEditorGoalChecker from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorGoalChecker';
+import EssayEditorGoalChecker from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/AssignmentGoalChecker';
+import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
 import type {
   AssignmentEssayContent,
@@ -31,6 +32,8 @@ const EssayEditorSubmitModal = ({
   onChangeGoals,
   saveSubmissionContent,
 }: Props) => {
+  const { goalContent } = useAssignmentEssayEditorProvider();
+
   const handleClose = useCallback(() => {
     setOpen(false);
   }, [setOpen]);
@@ -59,7 +62,10 @@ const EssayEditorSubmitModal = ({
             <X />
           </Clickable>
         </div>
-        <EssayEditorGoalChecker onChangeGoals={onChangeGoals} />
+        <EssayEditorGoalChecker
+          goals={goalContent}
+          onChangeGoals={onChangeGoals}
+        />
         <Button onClick={handleConfirm}>Submit</Button>
       </div>
     </Modal>

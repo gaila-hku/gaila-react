@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { isEmpty } from 'lodash-es';
+import { Plus, X } from 'lucide-react';
 
 import Divider from 'components/display/Divider';
 import CheckboxInput from 'components/input/CheckboxInput';
+import Clickable from 'components/input/Clickable';
 import SwitchInput from 'components/input/SwitchInput';
+import TextInput from 'components/input/TextInput';
+
+import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
 
 import type { AssignmentCreatePayload } from 'api/assignment';
 import type { Assignment } from 'types/assignment';
@@ -66,6 +71,8 @@ const defaultStages: AssignmentStageEditType[] = [
   },
 ];
 
+const defaultReflectionQuestions = REFLECTION_QUESTIONS.map(s => s.question);
+
 const AssignmentEditorFormStageInput = ({
   formDataStageValue,
   formDataConfigValue,
@@ -74,6 +81,10 @@ const AssignmentEditorFormStageInput = ({
 }: Props) => {
   const [stages, setStages] =
     useState<AssignmentStageEditType[]>(defaultStages);
+  const [reflectionQuestions, setReflectionQuestions] = useState(
+    defaultReflectionQuestions,
+  );
+  const [reflectionQuestionInput, setReflectionQuestionInput] = useState('');
 
   useEffect(() => {
     if (isEmpty(formDataStageValue)) {
@@ -84,7 +95,15 @@ const AssignmentEditorFormStageInput = ({
     } else {
       setStages(formDataStageValue);
     }
-  }, [formDataStageValue, isEditing, onFormDataChange]);
+    setReflectionQuestions(
+      formDataConfigValue?.reflection_questions || defaultReflectionQuestions,
+    );
+  }, [
+    formDataConfigValue?.reflection_questions,
+    formDataStageValue,
+    isEditing,
+    onFormDataChange,
+  ]);
 
   const onStageToggleEnable = useCallback(
     (index: number, value: boolean) => {
@@ -111,6 +130,24 @@ const AssignmentEditorFormStageInput = ({
       onFormDataChange('stages', newStages);
     },
     [onFormDataChange, stages],
+  );
+
+  const onAddReflectionQuestion = useCallback(() => {
+    const newReflectionQuestions = [...reflectionQuestions];
+    newReflectionQuestions.push(reflectionQuestionInput.trim());
+    setReflectionQuestions(newReflectionQuestions);
+    onFormDataChange('config.reflection_questions', newReflectionQuestions);
+    setReflectionQuestionInput('');
+  }, [onFormDataChange, reflectionQuestionInput, reflectionQuestions]);
+
+  const onRemoveReflectionQuestion = useCallback(
+    (index: number) => {
+      const newReflectionQuestions = [...reflectionQuestions];
+      newReflectionQuestions.splice(index, 1);
+      setReflectionQuestions(newReflectionQuestions);
+      onFormDataChange('config.reflection_questions', newReflectionQuestions);
+    },
+    [onFormDataChange, reflectionQuestions],
   );
 
   return (
@@ -169,6 +206,38 @@ const AssignmentEditorFormStageInput = ({
                 .filter(tool => tool.enabled)
                 .map(tool => tool.key)}
             />
+            {stage.stage_type === 'reflection' && (
+              <>
+                <Divider />
+                <div className="text-sm">Customize Questions</div>
+                {reflectionQuestions.map((question, index) => (
+                  <div className="flex gap-2 items-start pb-2" key={index}>
+                    <p className="text-sm">{index + 1}. </p>
+                    <p className="text-sm">{question}</p>
+                    <Clickable
+                      onClick={() => onRemoveReflectionQuestion(index)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Clickable>
+                  </div>
+                ))}
+                <div className="flex gap-2">
+                  <TextInput
+                    className="flex-1"
+                    label="Reflection Question"
+                    onChange={e => setReflectionQuestionInput(e.target.value)}
+                    size="small"
+                    value={reflectionQuestionInput}
+                  />
+                  <Clickable
+                    className="basis-[32px] flex items-center justify-center !bg-primary rounded"
+                    onClick={onAddReflectionQuestion}
+                  >
+                    <Plus className="w-4 h-4 text-white" />
+                  </Clickable>
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>

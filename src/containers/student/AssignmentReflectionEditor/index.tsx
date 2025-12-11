@@ -16,7 +16,8 @@ import Tabs from 'components/navigation/Tabs';
 import AIChatBox from 'containers/common/AIChatBox';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
-import AssignmentReflectionStatistics from 'containers/student/AssignmentReflectionEditor/AssignmentReflectionStatistics';
+import AssignmentReflectionEditorDashboard from 'containers/student/AssignmentReflectionEditor/AssignmentReflectionEditorDashboard';
+import AssignmentReflectionGoals from 'containers/student/AssignmentReflectionEditor/AssignmentReflectionGoals';
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
@@ -87,6 +88,16 @@ const AssignmentReflectionEditor = () => {
     return <></>;
   }
 
+  const reflectionQuestions =
+    assignmentProgress.assignment.config?.reflection_questions?.map(
+      question => ({
+        question,
+        placeholder:
+          REFLECTION_QUESTIONS.find(q => q.question === question)
+            ?.placeholder || '',
+      }),
+    ) || REFLECTION_QUESTIONS;
+
   return (
     <>
       {/* Header */}
@@ -118,8 +129,8 @@ const AssignmentReflectionEditor = () => {
               </>
             }
           >
-            {REFLECTION_QUESTIONS.map((question, index) => (
-              <div className="space-y-2" key={question.id}>
+            {reflectionQuestions.map((question, index) => (
+              <div className="space-y-2" key={index}>
                 <label className="flex items-start gap-2">
                   <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex-shrink-0 mt-0.5">
                     {index + 1}
@@ -131,12 +142,10 @@ const AssignmentReflectionEditor = () => {
                   disabled={readonly}
                   multiline
                   onBlur={() => handleSubmit(false, false)}
-                  onChange={e =>
-                    handleReflectionChange(question.id, e.target.value)
-                  }
+                  onChange={e => handleReflectionChange(index, e.target.value)}
                   placeholder={question.placeholder}
                   rows={3}
-                  value={reflections[question.id] || ''}
+                  value={reflections[index] || ''}
                 />
               </div>
             ))}
@@ -169,14 +178,27 @@ const AssignmentReflectionEditor = () => {
         <Tabs
           tabs={[
             {
-              key: 'statistics',
-              title: 'Statistics',
+              key: 'goals',
+              title: 'Goals',
               content: (
-                <AssignmentReflectionStatistics
+                <AssignmentReflectionGoals
                   assignmentProgress={assignmentProgress}
                 />
               ),
             },
+            ...(assignmentProgress.assignment?.config?.dashboard?.enabled
+              ? [
+                  {
+                    key: 'dashboard',
+                    title: 'Dashboard',
+                    content: (
+                      <AssignmentReflectionEditorDashboard
+                        assignmentId={assignmentProgress.assignment.id}
+                      />
+                    ),
+                  },
+                ]
+              : []),
             ...(generalChatTool
               ? [
                   {

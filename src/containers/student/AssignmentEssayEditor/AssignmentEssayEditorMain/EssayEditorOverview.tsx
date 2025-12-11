@@ -15,7 +15,7 @@ import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Divider from 'components/display/Divider';
 
-import EssayEditorGoalChecker from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorGoalChecker';
+import AssignmentGoalChecker from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/AssignmentGoalChecker';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
 import type {
@@ -33,7 +33,7 @@ type Props = {
 };
 
 const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
-  const { goalContent } = useAssignmentEssayEditorProvider();
+  const { goalContent, readonly } = useAssignmentEssayEditorProvider();
 
   const wordCountDisplay = useMemo(() => {
     let display = '';
@@ -177,7 +177,11 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
             </>
           }
         >
-          <EssayEditorGoalChecker onChangeGoals={onChangeGoals} />
+          <AssignmentGoalChecker
+            goals={goalContent}
+            onChangeGoals={onChangeGoals}
+            readonly={readonly}
+          />
 
           <Divider />
           <div className="flex items-center justify-between text-xs text-muted-foreground">

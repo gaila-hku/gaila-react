@@ -13,7 +13,7 @@ import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmis
 import { apiSaveTraceData } from 'api/trace-data';
 
 const AssignmentEssayEditor = () => {
-  const { assignmentProgress, currentStage } =
+  const { assignmentProgress, currentStage, assignment } =
     useAssignmentSubmissionProvider();
   const { mutateAsync: saveTraceData } = useMutation(apiSaveTraceData);
 
@@ -34,6 +34,14 @@ const AssignmentEssayEditor = () => {
 
   if (!assignmentProgress) {
     return <></>;
+  }
+
+  if (!assignment?.config?.dashboard?.enabled) {
+    return (
+      <AssignmentEssayEditorProvider>
+        <AssignmentEssayEditorMain />
+      </AssignmentEssayEditorProvider>
+    );
   }
 
   return (

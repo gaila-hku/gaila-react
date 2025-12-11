@@ -1,23 +1,23 @@
 import React, { useCallback } from 'react';
 
+import clsx from 'clsx';
 import { startCase } from 'lodash-es';
 import { CheckCircle, Circle } from 'lucide-react';
 
 import Badge from 'components/display/Badge';
 import Clickable from 'components/input/Clickable';
 
-import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 import GOAL_SECTIONS from 'containers/student/AssignmentGoalEditor/goalSections';
 
 import type { AssignmentGoalContent } from 'types/assignment';
 
 type Props = {
-  onChangeGoals: (goals: AssignmentGoalContent | null) => void;
+  goals: AssignmentGoalContent | null;
+  onChangeGoals?: (goals: AssignmentGoalContent | null) => void;
+  readonly?: boolean;
 };
 
-const EssayEditorGoalChecker = ({ onChangeGoals }: Props) => {
-  const { goalContent: goals, readonly } = useAssignmentEssayEditorProvider();
-
+const AssignmentGoalChecker = ({ goals, onChangeGoals, readonly }: Props) => {
   const handleGoalToggle = useCallback(
     async (
       category: 'writing_goals' | 'ai_goals',
@@ -48,7 +48,7 @@ const EssayEditorGoalChecker = ({ onChangeGoals }: Props) => {
           return g;
         }),
       };
-      onChangeGoals(newGoals);
+      onChangeGoals?.(newGoals);
     },
     [goals, onChangeGoals],
   );
@@ -72,7 +72,10 @@ const EssayEditorGoalChecker = ({ onChangeGoals }: Props) => {
               </div>
               {goal.strategies.map((strategy, strategyIndex) => (
                 <Clickable
-                  className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors"
+                  className={clsx(
+                    'flex items-center gap-2 p-2 rounded transition-colors',
+                    readonly ? '' : 'hover:bg-muted/50 ',
+                  )}
                   disabled={readonly}
                   key={`${section.categoryKey}-${goalIndex}-${strategyIndex}`}
                   onClick={() =>
@@ -105,4 +108,4 @@ const EssayEditorGoalChecker = ({ onChangeGoals }: Props) => {
   );
 };
 
-export default EssayEditorGoalChecker;
+export default AssignmentGoalChecker;

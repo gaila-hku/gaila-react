@@ -192,10 +192,10 @@ const SubmissionDetailsContent = ({
           <>
             <div className="text-sm text-muted-foreground pb-2">{header}</div>
             <div className="space-y-3">
-              {REFLECTION_QUESTIONS.map(question => {
-                const answer = reflections[question.id];
+              {REFLECTION_QUESTIONS.map((question, index) => {
+                const answer = reflections[index];
                 return (
-                  <div key={question.id}>
+                  <div key={index}>
                     <div className="p-3 bg-muted rounded-lg">
                       {question.question}
                     </div>

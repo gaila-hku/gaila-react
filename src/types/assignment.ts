@@ -27,6 +27,7 @@ export interface Assignment {
       agent_usage?: boolean;
       writing_insights?: boolean;
     };
+    reflection_questions?: string[];
   };
   requirements?: {
     min_word_count?: number | null;
