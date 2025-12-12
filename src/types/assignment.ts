@@ -201,9 +201,15 @@ export interface AssignmentSubmissionDetails {
 }
 
 export interface AssignmentAnalytics {
+  agent_usage: AgentUsageDataItem[];
   prompt_data: PromptAnalytics;
-  timeline_data: TimelineDataItem[];
   plagiarised_segments: PlagiarisedSegment[];
+}
+
+export interface AgentUsageDataItem {
+  agent_type: string;
+  agent_uses: number;
+  prompts: number;
 }
 
 export interface PromptAnalytics {
@@ -220,11 +226,11 @@ export interface PromptAnalyticsCountItem {
   class_average: number;
 }
 
-export interface TimelineDataItem {
-  stage_type: string;
-  start_time: number | null;
-  end_time: number | null;
-}
+// export interface TimelineDataItem {
+//   stage_type: string;
+//   start_time: number | null;
+//   end_time: number | null;
+// }
 
 export type PlagiarisedSegment = {
   offset: number;

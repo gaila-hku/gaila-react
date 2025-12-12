@@ -69,7 +69,7 @@ const AssignmentReflectionEditorDashboard = ({ assignmentId }: Props) => {
             </div>
           }
         >
-          <DashboardAgentUsage promptData={analytics.prompt_data} />
+          <DashboardAgentUsage usageData={analytics.agent_usage} />
         </Card>
       )}
       {dashboardConfig?.copying_detector && (

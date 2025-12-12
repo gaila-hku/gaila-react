@@ -129,7 +129,7 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
               </div>
             }
           >
-            <DashboardAgentUsage promptData={analytics.prompt_data} />
+            <DashboardAgentUsage usageData={analytics.agent_usage} />
           </Card>
         );
       case 'copying_detector':
