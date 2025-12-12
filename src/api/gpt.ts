@@ -1,5 +1,5 @@
 import { callAPIHandler } from 'api/_base';
-import type { GptLog } from 'types/gpt';
+import type { GptLog, PromptHistoryItem } from 'types/gpt';
 import type { ListingResponse } from 'types/response';
 import type { PartialBy } from 'utils/types/partialBy';
 
@@ -75,3 +75,24 @@ export const apiGetLatestSturcturedGptLog = async ({
   return res;
 };
 apiGetLatestSturcturedGptLog.queryKey = '/gpt/latest-structured';
+
+interface GetAllGptPromptsQueryParam {
+  user_id: number;
+  page: number;
+  limit: number;
+}
+export const apiGetAllGptPrompts = async ({
+  queryKey,
+}: {
+  queryKey: [string, GetAllGptPromptsQueryParam];
+}) => {
+  const [, queryParam] = queryKey;
+  const res = await callAPIHandler<ListingResponse<PromptHistoryItem>>(
+    'get',
+    '/gpt/listing-all-prompt',
+    queryParam,
+    true,
+  );
+  return res;
+};
+apiGetAllGptPrompts.queryKey = '/gpt/listing-all-prompt';

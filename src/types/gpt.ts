@@ -7,7 +7,8 @@ export interface GptLog {
   whole_prompt: string;
   user_ask_time: number;
   gpt_response_time?: number;
-  prompt_category?: string;
+  prompt_nature_category?: number;
+  prompt_aspect_category?: number;
   is_structured?: boolean;
 }
 
@@ -70,4 +71,8 @@ export interface RevisionResult {
     }[];
     explanation: string;
   }[];
+}
+
+export interface PromptHistoryItem extends GptLog {
+  tool_key: string;
 }

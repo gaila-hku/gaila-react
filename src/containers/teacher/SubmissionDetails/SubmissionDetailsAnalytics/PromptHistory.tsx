@@ -1,95 +1,86 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+
+import dayjs from 'dayjs';
+import { isNumber, startCase } from 'lodash-es';
+import { useQuery } from 'react-query';
 
 import Badge from 'components/display/Badge';
+import ErrorComponent from 'components/display/ErrorComponent';
+import Loading from 'components/display/Loading';
 import Table from 'components/display/Table';
 
-const PromptHistory = () => {
-  // Prompt category distribution
-  const promptCategories = [
-    {
-      name: 'Performance-Oriented',
-      value: 3,
-      color: '#ef4444',
-    },
-    { name: 'Learning-Oriented', value: 5, color: '#22c55e' },
-  ];
+import { apiGetAllGptPrompts } from 'api/gpt';
+import tuple from 'utils/types/tuple';
 
-  // Prompt history
-  const promptHistory = useMemo(
-    () => [
-      {
-        id: 1,
-        timestamp: 'Oct 12, 2025 3:45 PM',
-        category: 'Learning-Oriented',
-        prompt: 'Can you explain the greenhouse effect in simple terms?',
-      },
-      {
-        id: 2,
-        timestamp: 'Oct 12, 2025 3:30 PM',
-        category: 'Performance-Oriented',
-        prompt: 'Write a paragraph about ocean acidification',
-      },
-      {
-        id: 3,
-        timestamp: 'Oct 12, 2025 2:15 PM',
-        category: 'Learning-Oriented',
-        prompt: 'What are the main causes of climate change?',
-      },
-      {
-        id: 4,
-        timestamp: 'Oct 12, 2025 1:50 PM',
-        category: 'Performance-Oriented',
-        prompt: 'Give me a thesis statement for my essay',
-      },
-      {
-        id: 5,
-        timestamp: 'Oct 11, 2025 4:20 PM',
-        category: 'Learning-Oriented',
-        prompt: 'How do renewable energy sources work?',
-      },
-      {
-        id: 6,
-        timestamp: 'Oct 11, 2025 3:45 PM',
-        category: 'Learning-Oriented',
-        prompt: 'What is the Paris Climate Accord?',
-      },
-      {
-        id: 7,
-        timestamp: 'Oct 11, 2025 2:30 PM',
-        category: 'Performance-Oriented',
-        prompt: 'Suggest improvements to this paragraph',
-      },
-      {
-        id: 8,
-        timestamp: 'Oct 10, 2025 5:10 PM',
-        category: 'Learning-Oriented',
-        prompt: 'What are the effects of deforestation?',
-      },
-    ],
-    [],
-  );
+const PROMPT_HISTORY_PAGE_LIMIT = 10;
 
-  const totalPrompts = promptCategories.reduce(
-    (sum, cat) => sum + cat.value,
-    0,
+const getPromptAspectLabel = (code: number) => {
+  switch (code) {
+    case 1:
+      return 'Content Idea';
+    case 2:
+      return 'Structure Help';
+    case 3:
+      return 'Revision';
+    case 4:
+      return 'Langugae Help';
+    case 5:
+      return 'Rhetoric Help';
+    case 6:
+      return 'Error Correction';
+    default:
+      return '-';
+  }
+};
+
+type Props = { studentId: number };
+
+const PromptHistory = ({ studentId }: Props) => {
+  const [page, setPage] = useState(1);
+
+  const { data, isLoading, error } = useQuery(
+    tuple([
+      apiGetAllGptPrompts.queryKey,
+      { page, limit: PROMPT_HISTORY_PAGE_LIMIT, user_id: studentId },
+    ]),
+    apiGetAllGptPrompts,
   );
 
   const promptHistoryRows = useMemo(() => {
-    return promptHistory.map(item => ({
-      time: item.timestamp,
-      category: (
+    if (!data?.value) {
+      return [];
+    }
+    return data.value.map(item => ({
+      time: dayjs(item.user_ask_time).format('MMM D, YYYY'),
+      agent: startCase(item.tool_key),
+      prompt: item.user_question,
+      nature: isNumber(item.prompt_nature_category) ? (
         <Badge
           className="text-xs"
-          variant={
-            item.category === 'Learning-Oriented' ? 'primary' : 'secondary'
-          }
+          variant={item.prompt_nature_category === 2 ? 'primary' : 'secondary'}
         >
-          {item.category === 'Learning-Oriented' ? 'Learning' : 'Performance'}
+          {item.prompt_nature_category === 2 ? 'Learning' : 'Performance'}
         </Badge>
+      ) : (
+        '-'
       ),
-      prompt: item.prompt,
+      aspect: isNumber(item.prompt_aspect_category) ? (
+        <Badge className="text-xs" variant="secondary">
+          {getPromptAspectLabel(item.prompt_aspect_category)}
+        </Badge>
+      ) : (
+        '-'
+      ),
     }));
-  }, [promptHistory]);
+  }, [data]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (error || !data) {
+    return <ErrorComponent error={error || 'No data'} />;
+  }
 
   return (
     <>
@@ -97,13 +88,14 @@ const PromptHistory = () => {
         <Table
           columns={[
             { key: 'time', title: 'Time' },
-            { key: 'category', title: 'Category' },
+            { key: 'agent', title: 'Agent' },
             { key: 'prompt', title: 'Prompt' },
+            { key: 'nature', title: 'Prompt Nature' },
+            { key: 'aspect', title: 'Prompt Aspect' },
           ]}
-          limit={10}
-          onPageChange={() => {}}
-          onRowsPerPageChange={() => {}}
-          page={1}
+          limit={PROMPT_HISTORY_PAGE_LIMIT}
+          onPageChange={setPage}
+          page={page}
           rows={promptHistoryRows}
         />
       </div>
@@ -111,7 +103,7 @@ const PromptHistory = () => {
         <p className="text-sm">
           <span className="text-muted-foreground">Showing:</span>{' '}
           <span className="font-medium">
-            {promptHistory.length} of {totalPrompts} prompts
+            {data.value.length} of {data.count} prompts
           </span>
         </p>
       </div>

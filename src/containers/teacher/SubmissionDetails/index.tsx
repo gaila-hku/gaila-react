@@ -151,6 +151,7 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
           assignment={submissionDetails.assignment}
           essay={submittedEssay}
           goalContent={submittedGoalContent}
+          studentId={studentId}
         />
       </div>
 

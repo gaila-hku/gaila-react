@@ -21,6 +21,7 @@ type Props = {
   assignment: Assignment;
   essay: string;
   goalContent: AssignmentGoalContent;
+  studentId: number;
 };
 
 const SubmissionDetailsAnalytics = ({
@@ -28,6 +29,7 @@ const SubmissionDetailsAnalytics = ({
   assignment,
   essay,
   goalContent,
+  studentId,
 }: Props) => {
   return (
     <Card
@@ -72,8 +74,7 @@ const SubmissionDetailsAnalytics = ({
           {
             key: 'history',
             title: 'Prompt History',
-            // FIXME: add prompt history
-            content: <PromptHistory />,
+            content: <PromptHistory studentId={studentId} />,
           },
         ]}
       />
