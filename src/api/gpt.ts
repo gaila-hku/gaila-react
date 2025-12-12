@@ -17,7 +17,9 @@ export interface AskGptStructuredRequestData extends AskGptRequestData {
 }
 
 export const apiAskIdeationAgent = (
-  payload: PartialBy<AskGptStructuredRequestData, 'question'>,
+  payload: PartialBy<AskGptStructuredRequestData, 'question'> & {
+    ideation_stage?: number;
+  },
 ): Promise<GptLog> =>
   callAPIHandler('post', '/gpt/ask-ideation', payload, true);
 

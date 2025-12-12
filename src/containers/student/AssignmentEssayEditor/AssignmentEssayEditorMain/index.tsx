@@ -196,24 +196,7 @@ function AssignmentEssayEditorMain() {
     setOutlineConfirmed,
   ]);
 
-  const handleConfirmDraft = useCallback(() => {
-    if (!assignmentProgress || !currentStage) {
-      return;
-    }
-    setDraftConfirmed(true);
-    saveSubmissionContent(
-      { draft_confirmed: true },
-      false,
-      'You are now at the revision stage. Use various tools to aid your revision.',
-    );
-  }, [
-    assignmentProgress,
-    currentStage,
-    saveSubmissionContent,
-    setDraftConfirmed,
-  ]);
-
-  const handleFinalSave = useCallback(() => {
+  const checkWordCountAndAlert = useCallback(() => {
     const wordCount = getWordCount(essay);
     if (
       assignment?.requirements?.min_word_count &&
@@ -224,7 +207,7 @@ function AssignmentEssayEditorMain() {
           assignment.requirements.min_word_count +
           ' words.',
       );
-      return;
+      return false;
     }
 
     if (
@@ -236,10 +219,38 @@ function AssignmentEssayEditorMain() {
           assignment.requirements.max_word_count +
           ' words.',
       );
+      return false;
+    }
+    return true;
+  }, [alertMsg, assignment?.requirements, essay]);
+
+  const handleConfirmDraft = useCallback(() => {
+    if (!assignmentProgress || !currentStage) {
+      return;
+    }
+    if (!checkWordCountAndAlert()) {
+      return;
+    }
+    setDraftConfirmed(true);
+    saveSubmissionContent(
+      { draft_confirmed: true },
+      false,
+      'You are now at the revision stage. Use various tools to aid your revision.',
+    );
+  }, [
+    assignmentProgress,
+    checkWordCountAndAlert,
+    currentStage,
+    saveSubmissionContent,
+    setDraftConfirmed,
+  ]);
+
+  const handleFinalSave = useCallback(() => {
+    if (!checkWordCountAndAlert()) {
       return;
     }
     setSubmitModalOpen(true);
-  }, [alertMsg, assignment?.requirements, essay]);
+  }, [checkWordCountAndAlert]);
 
   const activeWritingStep = useMemo(() => {
     if (!outlineConfirmed) {
@@ -407,6 +418,7 @@ function AssignmentEssayEditorMain() {
 
         {/* Sidebar with Tabs */}
         <Tabs
+          className="sticky top-[80px] bottom-0"
           tabs={[
             {
               key: 'overview',

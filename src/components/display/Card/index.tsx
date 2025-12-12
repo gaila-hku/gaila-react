@@ -27,6 +27,7 @@ type Props = {
   };
   collapsible?: boolean;
   defaultCollapsed?: boolean;
+  maxHeightUncollapsed?: number;
   className?: string;
   footer?: React.ReactNode;
 };
@@ -42,6 +43,7 @@ function Card({
   footer,
   collapsible,
   defaultCollapsed = false,
+  maxHeightUncollapsed = 1000,
   classes,
   className,
 }: Props) {
@@ -147,10 +149,10 @@ function Card({
 
       {collapsible ? (
         <div
-          className={clsx([
-            'overflow-hidden transition-max-h duration-300 ease-in-out',
-            isCollapsed ? 'max-h-0' : 'max-h-[1000px]',
-          ])}
+          className="overflow-hidden transition-max-h duration-300 ease-in-out"
+          style={{
+            maxHeight: isCollapsed ? '0' : `${maxHeightUncollapsed}px`,
+          }}
         >
           {childrenAndFooter}
         </div>

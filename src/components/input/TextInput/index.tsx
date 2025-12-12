@@ -6,9 +6,11 @@ import clsx from 'clsx';
 
 type DeprecatedInputTypes = 'number' | 'search' | 'tel' | 'url';
 
-type Props<T extends React.HTMLInputTypeAttribute> = React.ComponentProps<
-  typeof TextField
+type Props<T extends React.HTMLInputTypeAttribute> = Omit<
+  React.ComponentProps<typeof TextField>,
+  'size'
 > & {
+  size?: 'xs' | 'small' | 'medium';
   icon?: React.ReactNode;
   type?: T extends DeprecatedInputTypes ? never : T;
 };
@@ -21,6 +23,7 @@ const TextInput = <T extends React.HTMLInputTypeAttribute>({
   variant = 'filled',
   type,
   icon,
+  sx,
   ...props
 }: Props<T>) => {
   return (
@@ -28,7 +31,7 @@ const TextInput = <T extends React.HTMLInputTypeAttribute>({
       className={clsx(['w-full', className])}
       label={label}
       multiline={multiline}
-      size={size}
+      size={size === 'xs' ? 'medium' : size}
       slotProps={{
         input: {
           disableUnderline: true,
@@ -42,17 +45,16 @@ const TextInput = <T extends React.HTMLInputTypeAttribute>({
         },
       }}
       sx={{
-        ...(label
-          ? {}
-          : {
-              '& .MuiInputBase-root': {
-                paddingTop: 1,
-              },
-              '& .MuiInputBase-input': {
-                paddingTop: 0,
-              },
-            }),
-        ...props.sx,
+        '& .MuiInputBase-root': {
+          ...(label ? {} : { paddingTop: 1 }),
+          ...sx?.['& .MuiInputBase-root'],
+        },
+        '& .MuiInputBase-input': {
+          ...(label ? {} : { paddingTop: 0 }),
+          ...(size === 'xs' ? { fontSize: 12, height: 12 } : {}),
+          ...sx?.['& .MuiInputBase-input'],
+        },
+        ...sx,
       }}
       type={type}
       variant={variant}

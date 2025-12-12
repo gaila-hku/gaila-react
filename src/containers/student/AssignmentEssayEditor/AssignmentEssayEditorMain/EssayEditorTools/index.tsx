@@ -21,8 +21,8 @@ const EssayEditorTools = () => {
   const tools = currentStage?.tools ?? [];
   const ideationTool = tools.find(tool => tool.key === 'ideation');
   const dictionaryTool = tools.find(tool => tool.key === 'dictionary');
-  const grammarTool = tools.find(tool => tool.key === 'grammar');
   const autoGradeTool = tools.find(tool => tool.key === 'autograde');
+  const revisionTool = tools.find(tool => tool.key === 'revision');
 
   const { data, isLoading, error } = useQuery(
     tuple([
@@ -72,11 +72,11 @@ const EssayEditorTools = () => {
           toolId={autoGradeTool.id}
         />
       )}
-      {!!grammarTool && draftConfirmed && (
+      {!!revisionTool && draftConfirmed && (
         <EssayEditorRevisionTool
           essay={essay}
-          latestResult={getLatestResult(grammarTool.id)}
-          toolId={grammarTool.id}
+          latestResult={getLatestResult(revisionTool.id)}
+          toolId={revisionTool.id}
         />
       )}
     </div>

@@ -11,15 +11,32 @@ export interface GptLog {
   is_structured?: boolean;
 }
 
-export interface RevisionResult {
-  score: number;
-  mistakes: {
-    severity: any;
-    description: string;
-    original_sentence: string;
-    corrected_sentence: string;
+export interface IdeationScaffoldResult {
+  idea_scaffolds: {
+    heading: string;
+    question: string;
   }[];
 }
+
+export interface IdeationIdeaResult {
+  sections: {
+    title: string;
+    content: string[];
+    notes: string;
+  }[];
+  summary: string;
+}
+
+// export interface GrammarResult {
+//   score: number;
+//   mistakes: {
+//     severity: any;
+//     description: string;
+//     original_sentence: string;
+//     corrected_sentence: string;
+//   }[];
+// }
+
 export interface DictionaryResult {
   original_word: string;
   parts_of_speech: string;
@@ -37,5 +54,20 @@ export interface AutoGradeResult {
     score: number;
     max_score: number;
     feedback: string;
+  }[];
+}
+
+export interface RevisionResult {
+  revision_items: {
+    aspect_id: string;
+    aspect_title: string;
+    max_suggestions: number;
+    suggestions: {
+      order: number;
+      current_text: string;
+      replace_text: string;
+      applicability: 'low' | 'medium' | 'high';
+    }[];
+    explanation: string;
   }[];
 }

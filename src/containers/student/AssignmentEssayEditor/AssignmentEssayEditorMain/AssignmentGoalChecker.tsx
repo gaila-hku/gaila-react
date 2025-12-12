@@ -66,8 +66,8 @@ const AssignmentGoalChecker = ({ goals, onChangeGoals, readonly }: Props) => {
           </Badge>
           {goals[section.categoryKey].map((goal, goalIndex) => (
             <div key={`goal-${goalIndex}`}>
-              <div className="flex gap-2 items-center ml-2">
-                <div className="bg-black w-1 h-1 rounded-full" />
+              <div className="flex gap-2 items-start ml-2">
+                <div className="bg-black w-1 h-1 rounded-full  relative top-2" />
                 <p className="text-sm">{goal.goalText}</p>
               </div>
               {goal.strategies.map((strategy, strategyIndex) => (

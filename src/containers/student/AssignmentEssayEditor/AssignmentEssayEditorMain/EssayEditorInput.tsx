@@ -37,6 +37,16 @@ const EssayEditorInput = ({
     [inputOnChange, updateWordCountStatus],
   );
 
+  const onBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      if (e.relatedTarget?.tagName === 'BUTTON') {
+        return;
+      }
+      handleAutoSave(false, false);
+    },
+    [handleAutoSave],
+  );
+
   const onPaste = useCallback(
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       if (!assignment || !currentStage) {
@@ -88,7 +98,7 @@ const EssayEditorInput = ({
     <TextInput
       disabled={readonly || inputDisabled}
       multiline
-      onBlur={() => handleAutoSave(false, false)}
+      onBlur={onBlur}
       onChange={onChange}
       onPaste={onPaste}
       placeholder="Start writing your essay here..."

@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import clsx from 'clsx';
 import { ArrowRight, CheckCircle, ClipboardList } from 'lucide-react';
 import { useMutation } from 'react-query';
 
-import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
@@ -45,6 +43,15 @@ const EssayEditorRevisionTool = ({ toolId, latestResult, essay }: Props) => {
     setRevisionResult(result);
   }, [latestResult]);
 
+  // TODO: finish this function
+  // TODO: add explanation input, database
+  const handleApplyRevision = useCallback(
+    (suggestions: RevisionResult['revision_items'][number]['suggestions']) => {
+      console.log(suggestions);
+    },
+    [],
+  );
+
   return (
     <Card
       classes={{
@@ -54,6 +61,7 @@ const EssayEditorRevisionTool = ({ toolId, latestResult, essay }: Props) => {
       }}
       collapsible
       defaultCollapsed
+      maxHeightUncollapsed={3000}
       title={
         <>
           <ClipboardList className="h-4 w-4" /> AI Revision
@@ -71,50 +79,30 @@ const EssayEditorRevisionTool = ({ toolId, latestResult, essay }: Props) => {
       </Button>
 
       {!!revisionResult && (
-        <div className="p-2 border rounded text-xs space-y-1.5">
-          <div className="flex items-center justify-between">
-            <h4 className="font-medium capitalize">Results</h4>
-            <Badge
-              className="text-xs"
-              variant={
-                revisionResult.score >= 80
-                  ? 'primary'
-                  : revisionResult.score >= 60
-                    ? 'secondary'
-                    : 'destructive'
-              }
-            >
-              {revisionResult.score}%
-            </Badge>
-          </div>
-          <div className="space-y-1">
-            {revisionResult.mistakes.map((mistake, idx) => (
-              <div
-                className={clsx(
-                  'border rounded-lg p-2',
-                  mistake.severity === 'high'
-                    ? 'bg-red-50'
-                    : mistake.severity === 'medium'
-                      ? 'bg-yellow-50'
-                      : 'bg-blue-50',
-                )}
-                key={idx}
+        <div className="space-y-1">
+          {revisionResult.revision_items.map(item => (
+            <div className="border rounded-lg p-2" key={item.aspect_id}>
+              <h4 className="font-medium">{item.aspect_title}</h4>
+              {item.suggestions.map((chunk, index) => (
+                <React.Fragment key={index}>
+                  <p className="text-xs text-rose-500">{chunk.current_text}</p>
+                  <div className="flex items-start gap-1">
+                    <ArrowRight className="h-3 w-3 mt-[2px] shrink-0" />
+                    <p className="text-xs text-green-500">
+                      {chunk.replace_text}
+                    </p>
+                  </div>
+                </React.Fragment>
+              ))}
+              <div className="text-xs mt-2">{item.explanation}</div>
+              <Button
+                className="w-full mt-2"
+                onClick={() => handleApplyRevision(item.suggestions)}
               >
-                <p className="text-xs text-muted-foreground mb-2">
-                  {mistake.description}
-                </p>
-                <p className="text-xs text-rose-500">
-                  {mistake.original_sentence}
-                </p>
-                <div className="flex items-start gap-1">
-                  <ArrowRight className="h-3 w-3 mt-[2px] shrink-0" />
-                  <p className="text-xs text-green-500">
-                    {mistake.corrected_sentence}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+                Apply
+              </Button>
+            </div>
+          ))}
         </div>
       )}
 
