@@ -87,9 +87,9 @@ const ClassListing = () => {
         ]}
         count={data?.count}
         limit={limit}
-        onPageChange={page => setPage(page + 1)}
+        onPageChange={setPage}
         onRowsPerPageChange={handleLimitChange}
-        page={page - 1}
+        page={page}
         placeholder="You don't have any classes yet"
         rows={rows}
       />

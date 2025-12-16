@@ -51,6 +51,7 @@ const PromptHistory = ({ studentId }: Props) => {
       return [];
     }
     return data.value.map(item => ({
+      id: item.id,
       time: dayjs(item.user_ask_time).format('MMM D, YYYY'),
       agent: startCase(item.tool_key),
       prompt: item.user_question,
@@ -93,6 +94,7 @@ const PromptHistory = ({ studentId }: Props) => {
             { key: 'nature', title: 'Prompt Nature' },
             { key: 'aspect', title: 'Prompt Aspect' },
           ]}
+          count={data.count}
           limit={PROMPT_HISTORY_PAGE_LIMIT}
           onPageChange={setPage}
           page={page}

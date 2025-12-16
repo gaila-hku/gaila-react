@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import clsx from 'clsx';
+import { Eye, EyeOff } from 'lucide-react';
+
+import Button from 'components/input/Button';
 
 type DeprecatedInputTypes = 'number' | 'search' | 'tel' | 'url';
 
@@ -26,6 +29,8 @@ const TextInput = <T extends React.HTMLInputTypeAttribute>({
   sx,
   ...props
 }: Props<T>) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <TextField
       className={clsx(['w-full', className])}
@@ -39,6 +44,22 @@ const TextInput = <T extends React.HTMLInputTypeAttribute>({
             ? {
                 startAdornment: (
                   <InputAdornment position="start">{icon}</InputAdornment>
+                ),
+              }
+            : {}),
+          ...(type === 'password'
+            ? {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      aria-label="toggle password visibility"
+                      className="relative -top-1 left-2"
+                      onClick={() => setShowPassword(!showPassword)}
+                      variant="ghost"
+                    >
+                      {showPassword ? <EyeOff /> : <Eye />}
+                    </Button>
+                  </InputAdornment>
                 ),
               }
             : {}),
@@ -56,7 +77,7 @@ const TextInput = <T extends React.HTMLInputTypeAttribute>({
         },
         ...sx,
       }}
-      type={type}
+      type={type === 'password' && showPassword ? 'text' : type}
       variant={variant}
       {...props}
     />

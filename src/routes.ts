@@ -18,6 +18,10 @@ export const pathnames = {
     `/submission/${assignmentId}/${studentId}`,
   classDetails: (id: string) => `/class/${id}`,
   adminPortal: () => '/admin',
+  adminUserManagement: () => '/admin/users',
+  adminClassManagement: () => '/admin/classes',
+  adminAgentConfig: () => '/admin/agents',
+  adminTraceLogs: () => '/admin/logs',
 };
 
 export default [
@@ -38,4 +42,8 @@ export default [
   ),
   route(pathnames.classDetails(':id'), 'pages/class.tsx'),
   route(pathnames.adminPortal(), 'pages/admin.tsx'),
+  route(pathnames.adminUserManagement(), 'pages/admin.user.tsx'),
+  route(pathnames.adminClassManagement(), 'pages/admin.class.tsx'),
+  route(pathnames.adminAgentConfig(), 'pages/admin.agent.tsx'),
+  route(pathnames.adminTraceLogs(), 'pages/admin.logs.tsx'),
 ] satisfies RouteConfig;

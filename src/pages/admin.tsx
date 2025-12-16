@@ -2,18 +2,19 @@ import React from 'react';
 
 import { Bot, School, ScrollText, Users } from 'lucide-react';
 import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router';
+import { pathnames } from 'routes';
 
 import Button from 'components/input/Button';
 
 import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
-import useAlert from 'containers/common/AlertProvider/useAlert';
 import TeacherHeader from 'containers/teacher/TeacherHeader';
 
 import { apiGetVersion } from 'api/common';
 import tuple from 'utils/types/tuple';
 
 const AdminPortalPage = () => {
-  const { alertMsg } = useAlert();
+  const navigate = useNavigate();
 
   const { data: versionData } = useQuery(
     tuple([apiGetVersion.queryKey]),
@@ -33,7 +34,7 @@ const AdminPortalPage = () => {
         <div className="grid grid-cols-2 gap-4">
           <Button
             className="gap-2 !h-16"
-            onClick={() => alertMsg('Coming Soon!')}
+            onClick={() => navigate(pathnames.adminUserManagement())}
             size="lg"
             variant="outline"
           >
@@ -42,7 +43,7 @@ const AdminPortalPage = () => {
           </Button>
           <Button
             className="gap-2 !h-16"
-            onClick={() => alertMsg('Coming Soon!')}
+            onClick={() => navigate(pathnames.adminClassManagement())}
             size="lg"
             variant="outline"
           >
@@ -51,7 +52,7 @@ const AdminPortalPage = () => {
           </Button>
           <Button
             className="gap-2 !h-16"
-            onClick={() => alertMsg('Coming Soon!')}
+            onClick={() => navigate(pathnames.adminAgentConfig())}
             size="lg"
             variant="outline"
           >
@@ -60,7 +61,7 @@ const AdminPortalPage = () => {
           </Button>
           <Button
             className="gap-2 !h-16"
-            onClick={() => alertMsg('Coming Soon!')}
+            onClick={() => navigate(pathnames.adminTraceLogs())}
             size="lg"
             variant="outline"
           >

@@ -2,14 +2,12 @@ export interface User {
   id: number;
   username: string;
   password: string;
-  email: string;
   role: 'admin' | 'teacher' | 'student';
-  last_access?: number;
+  first_name?: string;
+  last_name?: string;
   last_login?: number;
   time_created?: number;
   time_modified?: number;
-  first_name?: string;
-  last_name?: string;
   deleted?: boolean;
   lang?: string;
 }
@@ -24,3 +22,5 @@ export interface UserOption {
 }
 
 export type StudentOptionResponse = UserOption[];
+
+export type UserListingItem = Omit<User, 'password' | 'deleted'>;

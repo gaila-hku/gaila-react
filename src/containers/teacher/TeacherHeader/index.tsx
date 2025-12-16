@@ -102,7 +102,8 @@ export function TeacherHeader() {
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Assignments</span>
             </Button>
-            <Button
+            {/* TODO: Dashboard */}
+            {/* <Button
               className="gap-2"
               onClick={() => onViewChange('dashboard')}
               size="sm"
@@ -110,7 +111,7 @@ export function TeacherHeader() {
             >
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
-            </Button>
+            </Button> */}
             {role === 'admin' && (
               <Button
                 className="gap-2"

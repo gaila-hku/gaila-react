@@ -215,9 +215,9 @@ const AssignmentSubmissionListing = ({ assignmentId, isRecent }: Props) => {
             ]}
             count={data?.count || 0}
             limit={limit}
-            onPageChange={page => setPage(page + 1)}
+            onPageChange={setPage}
             onRowsPerPageChange={setLimit}
-            page={page - 1}
+            page={page}
             rows={submissionRows.slice((page - 1) * limit, page * limit)}
           />
         ) : (

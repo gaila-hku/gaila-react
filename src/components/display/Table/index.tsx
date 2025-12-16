@@ -18,7 +18,7 @@ type Props = {
   rows: {
     [key: string]: any;
   }[];
-  page: number;
+  page: number; // NOTE: 1-indexed
   onPageChange: (newPage: number) => void;
   limit?: number;
   count?: number;
@@ -97,11 +97,11 @@ export default function Table({
         <TablePagination
           component="div"
           count={count || 0}
-          onPageChange={(_, newPage) => onPageChange?.(newPage)}
+          onPageChange={(_, newPage) => onPageChange?.(newPage + 1)}
           onRowsPerPageChange={e =>
             onRowsPerPageChange?.(parseInt(e.target.value, 10))
           }
-          page={page}
+          page={page - 1}
           rowsPerPage={limit}
           rowsPerPageOptions={[5, 10, 25]}
           sx={
