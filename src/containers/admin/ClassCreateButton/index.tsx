@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 
 import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
-import { Plus, X } from 'lucide-react';
+import { Info, Plus, X } from 'lucide-react';
 import { useMutation, useQueryClient } from 'react-query';
 
 import Label from 'components/display/Label';
@@ -10,16 +10,21 @@ import Button from 'components/input/Button';
 import Clickable from 'components/input/Clickable';
 import TextInput from 'components/input/TextInput';
 
+import useAlert from 'containers/common/AlertProvider/useAlert';
+
 import { apiCreateClass, apiGetAllClasses } from 'api/class';
 
 const defaultClassValue = {
   name: '',
+  class_key: '',
   description: '',
   teachers: [],
   students: [],
 };
 
 const ClassCreateButton = () => {
+  const { alertMsg, errorMsg } = useAlert();
+
   const [open, setOpen] = useState(false);
   const [classValue, setClassValue] = useState(defaultClassValue);
 
@@ -28,6 +33,10 @@ const ClassCreateButton = () => {
     onSuccess: () => {
       queryClient.invalidateQueries([apiGetAllClasses.queryKey]);
       setOpen(false);
+      alertMsg('Class created');
+    },
+    onError: e => {
+      errorMsg(e);
     },
   });
 
@@ -79,6 +88,17 @@ const ClassCreateButton = () => {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="class_key">Class Key</Label>
+              <TextInput
+                id="class_key"
+                onChange={e =>
+                  setClassValue({ ...classValue, class_key: e.target.value })
+                }
+                placeholder="Key"
+                value={classValue.class_key}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <TextInput
                 id="description"
@@ -88,6 +108,10 @@ const ClassCreateButton = () => {
                 placeholder="Description"
                 value={classValue.description}
               />
+            </div>
+            <div className="text-sm text-muted-foreground items-center">
+              <Info className="w-4 h-4 inline" /> You can add teachers and
+              students after creating the class
             </div>
           </div>
           <Button className="w-full" loading={isLoading} onClick={handleSubmit}>

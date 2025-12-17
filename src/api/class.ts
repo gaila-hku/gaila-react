@@ -52,6 +52,7 @@ apiGetAllClasses.queryKey = '/class/listing-all';
 export const apiUpdateClass = async (req: {
   id: number;
   name?: string;
+  class_key: string;
   description?: string;
   students?: number[];
   teachers?: number[];
@@ -67,6 +68,7 @@ export const apiUpdateClass = async (req: {
 
 export const apiCreateClass = async (req: {
   name: string;
+  class_key: string;
   description?: string;
 }) => {
   const res = await callAPIHandler<ListingResponse<Class>>(

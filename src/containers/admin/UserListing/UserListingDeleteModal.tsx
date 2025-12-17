@@ -21,7 +21,7 @@ type Props = {
 };
 
 const UserListingDeleteModal = ({ deleteItem, setDeleteItem }: Props) => {
-  const { alertMsg } = useAlert();
+  const { alertMsg, errorMsg } = useAlert();
   const queryClient = useQueryClient();
 
   const { mutate: deleteUser, isLoading } = useMutation(apiDeleteUser, {
@@ -29,6 +29,9 @@ const UserListingDeleteModal = ({ deleteItem, setDeleteItem }: Props) => {
       queryClient.invalidateQueries([apiGetUserListing.queryKey]);
       setDeleteItem(null);
       alertMsg('User deleted');
+    },
+    onError: e => {
+      errorMsg(e);
     },
   });
 

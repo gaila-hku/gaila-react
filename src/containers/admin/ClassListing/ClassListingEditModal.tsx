@@ -34,13 +34,14 @@ type Props = {
 
 const defaultClassValue = {
   name: '',
+  class_key: '',
   description: '',
   students: [],
   teachers: [],
 };
 
 const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
-  const { alertMsg } = useAlert();
+  const { alertMsg, errorMsg } = useAlert();
   const queryClient = useQueryClient();
 
   const { mutate: updateClass, isLoading: isUpdateLoading } = useMutation(
@@ -53,6 +54,9 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
         setClassItem(null);
         alertMsg('Class updated');
       },
+      onError: e => {
+        errorMsg(e);
+      },
     },
   );
 
@@ -64,6 +68,7 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
     if (classItem) {
       setClassValue({
         name: classItem.name,
+        class_key: classItem.class_key,
         description: classItem.description,
         students: classItem.students,
         teachers: classItem.teachers,
@@ -161,6 +166,7 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
     updateClass({
       id: classItem.id,
       name: classValue.name,
+      class_key: classValue.class_key,
       description: classValue.description,
       students: classValue.students.map(student => student.id),
       teachers: classValue.teachers.map(teacher => teacher.id),
@@ -196,6 +202,17 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
               }
               placeholder="Class name"
               value={classValue.name}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="class_key">Class Key</Label>
+            <TextInput
+              id="class_key"
+              onChange={e =>
+                setClassValue({ ...classValue, class_key: e.target.value })
+              }
+              placeholder="Key"
+              value={classValue.class_key}
             />
           </div>
           <div className="space-y-2">

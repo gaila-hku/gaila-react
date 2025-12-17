@@ -3,6 +3,7 @@ import type { ListingResponse } from 'types/response';
 export interface Class {
   id: number;
   name: string;
+  class_key: string;
   description?: string;
   start_at?: number;
   end_at?: number;

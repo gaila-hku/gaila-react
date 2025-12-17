@@ -37,7 +37,7 @@ const UserListingEditModal = ({
   isCreating,
   setIsCreating,
 }: Props) => {
-  const { alertMsg } = useAlert();
+  const { alertMsg, errorMsg } = useAlert();
   const queryClient = useQueryClient();
 
   const { mutate: updateUser, isLoading: isUpdateLoading } = useMutation(
@@ -47,6 +47,9 @@ const UserListingEditModal = ({
         queryClient.invalidateQueries([apiGetUserListing.queryKey]);
         setUser(null);
         alertMsg('User updated');
+      },
+      onError: e => {
+        errorMsg(e);
       },
     },
   );
@@ -58,6 +61,9 @@ const UserListingEditModal = ({
         queryClient.invalidateQueries([apiGetUserListing.queryKey]);
         setIsCreating(false);
         alertMsg('User created');
+      },
+      onError: e => {
+        errorMsg(e);
       },
     },
   );

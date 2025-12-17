@@ -57,7 +57,7 @@ function Clickable(
     <div
       className={cx([
         'relative appearance-none bg-transparent border-none p-0 shadow-none',
-        disabled ? '' : 'hovercursor-pointer',
+        disabled ? '' : 'hover:cursor-pointer',
         className,
       ])}
       onClick={onClickHandler}

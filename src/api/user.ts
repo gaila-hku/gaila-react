@@ -1,7 +1,12 @@
 import { callAPIHandler } from 'api/_base';
 import { type ClassOptionResponse } from 'types/class';
 import type { ListingResponse } from 'types/response';
-import type { StudentOptionResponse, User, UserListingItem } from 'types/user';
+import type {
+  StudentOptionResponse,
+  User,
+  UserListingItem,
+  UserUploadResult,
+} from 'types/user';
 
 export const apiGetClassOptions = async ({
   queryKey: _,
@@ -83,5 +88,15 @@ export const apiCreateUser = async (
   >,
 ) => {
   const res = await callAPIHandler<User>('post', '/user/create', req, true);
+  return res;
+};
+
+export const apiUploadUser = async (req: { file: File }) => {
+  const res = await callAPIHandler<UserUploadResult[]>(
+    'post',
+    '/user/upload',
+    req,
+    true,
+  );
   return res;
 };

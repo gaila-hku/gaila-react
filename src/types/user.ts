@@ -24,3 +24,11 @@ export interface UserOption {
 export type StudentOptionResponse = UserOption[];
 
 export type UserListingItem = Omit<User, 'password' | 'deleted'>;
+
+export interface UserUploadResult {
+  data: User & {
+    class?: string;
+  };
+  error: boolean;
+  message: string;
+}

@@ -3,6 +3,7 @@ import React from 'react';
 import Tabs from 'components/navigation/Tabs';
 
 import UserListing from 'containers/admin/UserListing';
+import UserUploader from 'containers/admin/UserUploader';
 import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
 import TeacherHeader from 'containers/teacher/TeacherHeader';
 
@@ -23,7 +24,7 @@ const UserManagementPage = () => {
             {
               key: 'upload',
               title: 'Upload Users (CSV)',
-              content: <>Coming Soon!</>,
+              content: <UserUploader />,
             },
           ]}
         />
