@@ -1,4 +1,4 @@
-import React, { type ComponentProps } from 'react';
+import React, { type ComponentProps, useCallback } from 'react';
 
 import MuiPopover from '@mui/material/Popover';
 import clsx from 'clsx';
@@ -8,6 +8,8 @@ import Button from 'components/input/Button';
 type Props = {
   buttonText: React.ReactNode;
   buttonVariant?: ComponentProps<typeof Button>['variant'];
+  onClickButton?: () => void;
+  onClosePopover?: () => void;
   childClass?: string;
   buttonClass?: string;
   className?: string;
@@ -17,6 +19,8 @@ type Props = {
 const Popover = ({
   buttonText,
   buttonVariant = 'secondary',
+  onClickButton,
+  onClosePopover,
   childClass,
   buttonClass,
   className,
@@ -26,13 +30,18 @@ const Popover = ({
     null,
   );
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget);
+      onClickButton?.();
+    },
+    [onClickButton],
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+    onClosePopover?.();
+  }, [onClosePopover]);
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;

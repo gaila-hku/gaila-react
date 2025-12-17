@@ -6,6 +6,7 @@ import { SearchIcon } from 'lucide-react';
 
 type Props = {
   includeSearch?: boolean;
+  onSearchChange?: (search: string) => void;
   searchPlaceholder?: string;
   emptyPlaceholder?: string;
   className?: string;
@@ -15,6 +16,7 @@ type Props = {
 
 function Command({
   includeSearch,
+  onSearchChange,
   searchPlaceholder,
   emptyPlaceholder,
   className,
@@ -45,6 +47,7 @@ function Command({
               searchClassName,
             )}
             data-slot="command-input"
+            onValueChange={onSearchChange}
             placeholder={searchPlaceholder}
           />
         </div>

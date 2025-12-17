@@ -51,3 +51,5 @@ export interface ClassOption {
 }
 
 export type ClassOptionResponse = ClassOption[];
+
+export type ClassManagementDetail = Omit<Class, 'assignments'>;
