@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { useMutation } from 'react-query';
 
+import ErrorComponent from 'components/display/ErrorComponent';
 import Table from 'components/display/Table';
 import Button from 'components/input/Button';
 import FileInput from 'components/input/FileInput';
@@ -15,11 +16,14 @@ const UserUploader = () => {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploadResult, setUploadResult] = useState<UserUploadResult[]>([]);
 
-  const { mutate: uploadUser, isLoading } = useMutation(apiUploadUser, {
+  const {
+    mutate: uploadUser,
+    isLoading,
+    error,
+  } = useMutation(apiUploadUser, {
     onSuccess: res => {
       setUploadResult(res);
     },
-    onError: () => {},
   });
 
   const handleCsvUpload = useCallback(() => {
@@ -82,6 +86,8 @@ const UserUploader = () => {
         <Upload className="h-4 w-4" />
         Upload CSV
       </Button>
+
+      {!!error && <ErrorComponent error={error} />}
 
       {!!uploadResult.length && (
         <Table
