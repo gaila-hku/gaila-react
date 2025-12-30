@@ -418,7 +418,8 @@ function AssignmentEssayEditorMain() {
 
         {/* Sidebar with Tabs */}
         <Tabs
-          className="sticky top-[80px] bottom-0"
+          className="sticky top-[137px] bottom-0"
+          classes={{ panel: 'overflow-auto max-h-[calc(100vh-233px)]' }}
           tabs={[
             {
               key: 'overview',

@@ -48,7 +48,9 @@ const AssignmentEssayEditor = () => {
     <AssignmentEssayEditorProvider>
       <Tabs
         classes={{
-          panel: 'mt-4',
+          panel: 'mt-2',
+          tabListWrapper:
+            '!sticky top-[64px] z-10 -mx-6 px-6 -mt-4 pt-4 -mb-2 pb-2',
           tab: '!h-10',
           indicator: '!h-8',
         }}

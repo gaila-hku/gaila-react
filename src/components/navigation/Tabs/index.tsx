@@ -15,6 +15,7 @@ type Props = {
   classes?: {
     tab?: string;
     indicator?: string;
+    tabListWrapper?: string;
     tabList?: string;
     panel?: string;
     root?: string;
@@ -33,21 +34,23 @@ function Tabs({ tabs, defaultTab, classes, className, onClick }: Props) {
       className={clsx(styles.tabs, classes?.root, className)}
       defaultValue={defaultTab || tabs[0].key}
     >
-      <BaseTabs.List className={clsx(styles.list, classes?.tabList)}>
-        {tabs.map(tab => (
-          <BaseTabs.Tab
-            className={clsx(styles.tab, classes?.tab)}
-            key={tab.key}
-            onClick={onClick ? () => onClick(tab.key) : undefined}
-            value={tab.key}
-          >
-            {tab.title}
-          </BaseTabs.Tab>
-        ))}
-        <BaseTabs.Indicator
-          className={clsx(styles.indicator, classes?.indicator)}
-        />
-      </BaseTabs.List>
+      <div className={clsx('bg-white', classes?.tabListWrapper)}>
+        <BaseTabs.List className={clsx(styles.list, classes?.tabList)}>
+          {tabs.map(tab => (
+            <BaseTabs.Tab
+              className={clsx(styles.tab, classes?.tab)}
+              key={tab.key}
+              onClick={onClick ? () => onClick(tab.key) : undefined}
+              value={tab.key}
+            >
+              {tab.title}
+            </BaseTabs.Tab>
+          ))}
+          <BaseTabs.Indicator
+            className={clsx(styles.indicator, classes?.indicator)}
+          />
+        </BaseTabs.List>
+      </div>
       {tabs.map(tab => (
         <BaseTabs.Panel
           className={clsx(styles.panel, classes?.panel)}
