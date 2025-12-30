@@ -69,16 +69,15 @@ export function TeacherHeader() {
     [currentView, navigate, role],
   );
 
-  // TODO: profile edit, profile details in menu
   const handleMenuClick = useCallback(
     (key: string) => {
       if (key === 'profile') {
-        window.alert('Profile editing coming soon!');
+        navigate(pathnames.profile());
       } else if (key === 'logout') {
         logoutAction();
       }
     },
-    [logoutAction],
+    [logoutAction, navigate],
   );
 
   return (

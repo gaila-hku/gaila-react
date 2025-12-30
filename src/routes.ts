@@ -22,6 +22,7 @@ export const pathnames = {
   adminClassManagement: () => '/admin/classes',
   adminAgentConfig: () => '/admin/agents',
   adminTraceLogs: () => '/admin/logs',
+  profile: () => '/profile',
 };
 
 export default [
@@ -46,4 +47,5 @@ export default [
   route(pathnames.adminClassManagement(), 'pages/admin.class.tsx'),
   route(pathnames.adminAgentConfig(), 'pages/admin.agent.tsx'),
   route(pathnames.adminTraceLogs(), 'pages/admin.logs.tsx'),
+  route(pathnames.profile(), 'pages/profile.tsx'),
 ] satisfies RouteConfig;

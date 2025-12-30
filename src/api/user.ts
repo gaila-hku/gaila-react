@@ -107,11 +107,22 @@ export const apiGetUserProfile = async () => {
     '/user/profile',
     {},
     true,
-    {
-      redirect: false,
-      cache: 604800000,
-    },
+    { redirect: false },
   );
   return res;
 };
 apiGetUserProfile.queryKey = '/user/profile';
+
+export const apiUpdateUserProfile = async (
+  req: Partial<
+    Pick<User, 'first_name' | 'last_name' | 'username' | 'password' | 'lang'>
+  >,
+) => {
+  const res = await callAPIHandler<UserUploadResult[]>(
+    'post',
+    '/user/update-profile',
+    req,
+    true,
+  );
+  return res;
+};

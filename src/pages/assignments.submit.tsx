@@ -1,33 +1,29 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 
 import { isNumber, isString, parseInt } from 'lodash-es';
-import { ArrowLeft } from 'lucide-react';
-import { useQueryClient } from 'react-query';
-import { useNavigate, useParams } from 'react-router';
-import { pathnames } from 'routes';
+import { useParams } from 'react-router';
 
 import ErrorComponent from 'components/display/ErrorComponent';
-import Button from 'components/input/Button';
 
 import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
 import AssignmentSubmissionEditorSwitcher from 'containers/student/AssignmentSubmissionEditorSwitcher';
 import AssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider';
 import StudentHeader from 'containers/student/StudentHeader';
 
-import { apiGetGptChatLogs } from 'api/gpt';
+// import { apiGetGptChatLogs } from 'api/gpt';
 
 const AssignmentSubmitPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  // const navigate = useNavigate();
+  // const queryClient = useQueryClient();
 
   const assignmentId =
     isString(id) && isNumber(parseInt(id, 10)) ? parseInt(id, 10) : undefined;
 
-  const onBack = useCallback(async () => {
-    await queryClient.invalidateQueries([apiGetGptChatLogs.queryKey]);
-    navigate(pathnames.home());
-  }, [navigate, queryClient]);
+  // const onBack = useCallback(async () => {
+  //   await queryClient.invalidateQueries([apiGetGptChatLogs.queryKey]);
+  //   navigate(pathnames.home());
+  // }, [navigate, queryClient]);
 
   if (!isNumber(assignmentId)) {
     return <ErrorComponent error="Missing assignment ID" />;
@@ -38,10 +34,10 @@ const AssignmentSubmitPage = () => {
       <AssignmentSubmissionProvider assignmentId={assignmentId}>
         <StudentHeader />
         <div className="px-6 py-4 max-w-full mx-auto mb-10">
-          <Button className="gap-2 mb-4" onClick={onBack} variant="ghost">
+          {/* <Button className="gap-2 mb-4" onClick={onBack} variant="ghost">
             <ArrowLeft className="h-4 w-4" />
             Back to Assignments
-          </Button>
+          </Button> */}
           {isNumber(assignmentId) ? (
             <AssignmentSubmissionEditorSwitcher />
           ) : (

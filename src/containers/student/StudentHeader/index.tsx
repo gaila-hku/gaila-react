@@ -61,16 +61,15 @@ export function StudentHeader() {
     [currentView, navigate, saveTraceData],
   );
 
-  // TODO: profile edit, profile details in menu
   const onClickProfileMenu = useCallback(
     (key: string) => {
       if (key === 'profile') {
-        alert('Profile editing feature coming soon!');
+        navigate(pathnames.profile());
       } else if (key === 'logout') {
         logoutAction();
       }
     },
-    [logoutAction],
+    [logoutAction, navigate],
   );
 
   return (
