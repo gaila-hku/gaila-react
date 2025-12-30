@@ -12,6 +12,7 @@ import TextInput from 'components/input/TextInput';
 
 import useAlert from 'containers/common/AlertProvider/useAlert';
 
+import { apiGetAssignments } from 'api/assignment';
 import { apiCreateClass, apiGetAllClasses } from 'api/class';
 
 const defaultClassValue = {
@@ -32,6 +33,7 @@ const ClassCreateButton = () => {
   const { mutate: createClass, isLoading } = useMutation(apiCreateClass, {
     onSuccess: () => {
       queryClient.invalidateQueries([apiGetAllClasses.queryKey]);
+      queryClient.invalidateQueries([apiGetAssignments.queryKey]);
       setOpen(false);
       alertMsg('Class created');
     },

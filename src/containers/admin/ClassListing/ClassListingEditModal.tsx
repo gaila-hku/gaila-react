@@ -18,6 +18,7 @@ import TextInput from 'components/input/TextInput';
 
 import useAlert from 'containers/common/AlertProvider/useAlert';
 
+import { apiGetAssignments } from 'api/assignment';
 import { apiGetAllClasses, apiGetClasses, apiUpdateClass } from 'api/class';
 import { apiGetClassOptions, apiGetUserListing } from 'api/user';
 import type { ClassManagementDetail } from 'types/class';
@@ -51,6 +52,7 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
         queryClient.invalidateQueries([apiGetAllClasses.queryKey]);
         queryClient.invalidateQueries([apiGetClasses.queryKey]);
         queryClient.invalidateQueries([apiGetClassOptions.queryKey]);
+        queryClient.invalidateQueries([apiGetAssignments.queryKey]);
         setClassItem(null);
         alertMsg('Class updated');
       },
@@ -261,7 +263,7 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
                       <div className="flex items-center gap-2">
                         {isClassAdded && <Check className="h-4 w-4" />}
                         <div>
-                          <p className="text-sm">{getUserName(user)}</p>
+                          <p className="text-sm">{getUserName(user, true)}</p>
                         </div>
                       </div>
                     </div>
@@ -283,7 +285,7 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
                     className="p-2 border rounded transition-colors flex justify-between items-center"
                     key={teacher.id}
                   >
-                    <p className="text-sm">{getUserName(teacher)}</p>
+                    <p className="text-sm">{getUserName(teacher, true)}</p>
                     <Button
                       className="!h-6"
                       onClick={() => handleRemoveTeacher(teacher.id)}
@@ -312,7 +314,7 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
                     className="p-2 border rounded transition-colors flex justify-between items-center"
                     key={student.id}
                   >
-                    <p className="text-sm">{getUserName(student)}</p>
+                    <p className="text-sm">{getUserName(student, true)}</p>
                     <Button
                       className="!h-6"
                       onClick={() => handleRemoveStudent(student.id)}
