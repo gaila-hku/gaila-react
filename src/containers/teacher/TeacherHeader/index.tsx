@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { BarChart3, FileText, LogOut, User, Users, Wrench } from 'lucide-react';
+import { FileText, LogOut, User, Users, Wrench } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router';
 import { pathnames } from 'routes';
 
@@ -10,12 +10,17 @@ import DropdownMenu from 'components/navigation/DropdownMenu';
 import useAuth from 'containers/auth/AuthProvider/useAuth';
 import Logo from 'containers/common/Logo';
 
+import getUserName from 'utils/helper/getUserName';
+import useProfile from 'utils/hooks/useProfile';
+
 type TeacherCurrentView = 'home' | 'assignments' | 'dashboard' | 'admin';
 
 export function TeacherHeader() {
   const { logoutAction, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { data: profile, isLoading } = useProfile();
 
   const [currentView, setCurrentView] = useState<TeacherCurrentView | null>(
     null,
@@ -78,7 +83,7 @@ export function TeacherHeader() {
 
   return (
     <header className="border-b bg-card sticky top-0 z-50">
-      <div className="px-4 sm:px-6 py-4 max-w-[1800px] mx-auto">
+      <div className="px-4 sm:px-6 py-4 max-w-full mx-auto">
         <div className="flex items-center justify-between gap-4 relative">
           <Logo />
 
@@ -131,14 +136,11 @@ export function TeacherHeader() {
               items={[
                 {
                   type: 'text',
-                  label: (
-                    <div className="flex flex-col space-y-1">
-                      <p>Teacher Name</p>
-                      <p className="text-xs text-muted-foreground">
-                        teacher@school.edu
-                      </p>
-                    </div>
-                  ),
+                  label: isLoading
+                    ? 'Loading...'
+                    : profile
+                      ? getUserName(profile)
+                      : '-',
                 },
                 { type: 'divider' },
                 {

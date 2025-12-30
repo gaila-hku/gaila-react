@@ -100,3 +100,18 @@ export const apiUploadUser = async (req: { file: File }) => {
   );
   return res;
 };
+
+export const apiGetUserProfile = async () => {
+  const res = await callAPIHandler<UserListingItem>(
+    'get',
+    '/user/profile',
+    {},
+    true,
+    {
+      redirect: false,
+      cache: 604800000,
+    },
+  );
+  return res;
+};
+apiGetUserProfile.queryKey = '/user/profile';

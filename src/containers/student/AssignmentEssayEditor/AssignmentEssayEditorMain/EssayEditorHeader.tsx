@@ -38,7 +38,7 @@ const EssayEditorHeader = ({
     try {
       const submissionContent = currentStage.submission
         .content as AssignmentEssayContent;
-      setTitle(submissionContent.outline);
+      setTitle(submissionContent.title);
     } catch (e) {
       console.error(e);
     }

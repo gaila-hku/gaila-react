@@ -14,6 +14,8 @@ import AssignmentSubmissionStepper from 'containers/student/AssignmentSubmission
 import StudentHeaderNotifications from 'containers/student/StudentHeader/StudentHeaderNotifications';
 
 import { apiSaveTraceData } from 'api/trace-data';
+import getUserName from 'utils/helper/getUserName';
+import useProfile from 'utils/hooks/useProfile';
 
 type StudentCurrentView = 'home' | 'dashboard';
 
@@ -22,6 +24,7 @@ export function StudentHeader() {
   const location = useLocation();
   const { logoutAction } = useAuth();
 
+  const { data: profile, isLoading } = useProfile();
   const { mutate: saveTraceData } = useMutation(apiSaveTraceData);
 
   const [currentView, setCurrentView] = useState<StudentCurrentView>('home');
@@ -72,7 +75,7 @@ export function StudentHeader() {
 
   return (
     <header className="border-b bg-card sticky top-0 z-50">
-      <div className="px-4 sm:px-6 py-4 max-w-[1800px] mx-auto">
+      <div className="px-4 sm:px-6 py-4 max-w-full mx-auto">
         <div className="flex items-center justify-between">
           <Logo />
           {location.pathname.startsWith(
@@ -104,7 +107,14 @@ export function StudentHeader() {
             <StudentHeaderNotifications />
             <DropdownMenu
               items={[
-                { type: 'text', label: 'My Account' },
+                {
+                  type: 'text',
+                  label: isLoading
+                    ? 'Loading...'
+                    : profile
+                      ? getUserName(profile)
+                      : '-',
+                },
                 { type: 'divider' },
                 {
                   key: 'profile',
