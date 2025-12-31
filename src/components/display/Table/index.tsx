@@ -14,6 +14,7 @@ type Props = {
     key: string;
     title: string;
     align?: 'right' | 'left' | 'center';
+    width?: string | number;
   }[];
   rows: {
     [key: string]: any;
@@ -58,6 +59,7 @@ export default function Table({
                 <TableCell
                   align={column.align ? column.align : 'left'}
                   key={`${column.title}-${index}`}
+                  width={column.width}
                 >
                   {column.title}
                 </TableCell>

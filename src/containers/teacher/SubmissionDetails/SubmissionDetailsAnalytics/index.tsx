@@ -9,6 +9,7 @@ import DashboardAgentUsage from 'containers/common/Dashboard/DashboardAgentUsage
 import DashboardAnalyticsSummary from 'containers/common/Dashboard/DashboardAnalyticsSummary';
 import DashboardPromptChart from 'containers/common/Dashboard/DashboardPromptChart';
 import PromptHistory from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/PromptHistory';
+import RevisionExplanationHistory from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/RevisionExplanationHistory';
 
 import type {
   Assignment,
@@ -74,8 +75,27 @@ const SubmissionDetailsAnalytics = ({
           {
             key: 'history',
             title: 'Prompt History',
-            content: <PromptHistory studentId={studentId} />,
+            content: (
+              <PromptHistory
+                assignmentId={assignment.id}
+                studentId={studentId}
+              />
+            ),
           },
+          ...(assignment.config?.revision_tool_ask_explanation
+            ? [
+                {
+                  key: 'revision_explanations',
+                  title: 'Revision Explanations',
+                  content: (
+                    <RevisionExplanationHistory
+                      assignmentId={assignment.id}
+                      studentId={studentId}
+                    />
+                  ),
+                },
+              ]
+            : []),
         ]}
       />
     </Card>

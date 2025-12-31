@@ -83,6 +83,7 @@ apiGetLatestSturcturedGptLog.queryKey = '/gpt/latest-structured';
 
 interface GetAllGptPromptsQueryParam {
   user_id: number;
+  assignment_id: number;
   page: number;
   limit: number;
 }
@@ -132,11 +133,15 @@ export const apiSubmitRevisionExplanation = (payload: {
 export const apiGetRevisionExplanationListing = async ({
   queryKey,
 }: {
-  queryKey: [string, { user_id: number; page: number; limit: number }];
+  queryKey: [
+    string,
+    { student_id: number; assignment_id: number; page: number; limit: number },
+  ];
 }) => {
   const [, queryParam] = queryKey;
   const res = await callAPIHandler<
     ListingResponse<StudentRevisionExplanationListingItem>
-  >('get', '/gpt/listing-revision-explanations', queryParam, true);
+  >('get', '/gpt/revision-explanation-listing', queryParam, true);
   return res;
 };
+apiGetRevisionExplanationListing.queryKey = '/gpt/revision-explanation-listing';

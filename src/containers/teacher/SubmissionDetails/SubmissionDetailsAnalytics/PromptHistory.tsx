@@ -33,15 +33,20 @@ const getPromptAspectLabel = (code: number) => {
   }
 };
 
-type Props = { studentId: number };
+type Props = { studentId: number; assignmentId: number };
 
-const PromptHistory = ({ studentId }: Props) => {
+const PromptHistory = ({ studentId, assignmentId }: Props) => {
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery(
     tuple([
       apiGetAllGptPrompts.queryKey,
-      { page, limit: PROMPT_HISTORY_PAGE_LIMIT, user_id: studentId },
+      {
+        page,
+        limit: PROMPT_HISTORY_PAGE_LIMIT,
+        user_id: studentId,
+        assignment_id: assignmentId,
+      },
     ]),
     apiGetAllGptPrompts,
   );

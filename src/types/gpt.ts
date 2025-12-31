@@ -82,6 +82,7 @@ export interface StudentRevisionExplanation {
   user_id: number;
   gpt_log_id: number;
   aspect_id: string;
+  saved_at: number;
   response_type?: 'agree' | 'disagree' | 'partial';
   explanation?: string;
 }
