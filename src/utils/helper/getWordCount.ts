@@ -1,4 +1,5 @@
-const getWordCount = (text: string) => {
+const getWordCount = (text: string | undefined) => {
+  if (!text) return 0;
   return text
     .trim()
     .split(/\s+/)

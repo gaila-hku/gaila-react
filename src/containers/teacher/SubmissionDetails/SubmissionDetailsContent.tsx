@@ -142,7 +142,7 @@ const SubmissionDetailsContent = ({
         const outline = submissionContent.outline;
         const essay = submissionContent.essay;
         const wordCount = essay
-          .trim()
+          ?.trim()
           .split(/\s+/)
           .filter(word => word.length > 0).length;
         return (
@@ -150,7 +150,7 @@ const SubmissionDetailsContent = ({
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               {header}
               <span>•</span>
-              <span>{wordCount} words</span>
+              <span>{wordCount || 0} words</span>
             </div>
 
             <Divider />
@@ -181,7 +181,9 @@ const SubmissionDetailsContent = ({
               </div>
             )}
             <div className="prose max-w-none">
-              <p className="whitespace-pre-wrap">{highlightText(essay)}</p>
+              <p className="whitespace-pre-wrap">
+                {highlightText(essay) || '-'}
+              </p>
             </div>
           </div>
         );
