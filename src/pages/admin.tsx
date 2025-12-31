@@ -70,7 +70,7 @@ const AdminPortalPage = () => {
           </Button>
         </div>
         <div className="pt-4 text-sm text-muted-foreground">
-          Version: {versionData?.version || '-'}
+          Version: alpha-1_{versionData?.version || '-'}
         </div>
       </div>
     </AuthPageWrapper>
