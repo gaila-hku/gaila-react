@@ -16,7 +16,8 @@ const AgentConfigurationPage = () => {
             Configure default settings for AI chatbot assistants
           </p>
         </div>
-        <div></div>
+        {/* TODO: add this */}
+        <div>Coming Soon!</div>
       </div>
     </AuthPageWrapper>
   );

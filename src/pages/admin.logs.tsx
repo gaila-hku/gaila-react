@@ -14,7 +14,8 @@ const TraceLogsPage = () => {
             Export and analyze student activity data
           </p>
         </div>
-        <div></div>
+        {/* TODO: add this */}
+        <div>Coming Soon!</div>
       </div>
     </AuthPageWrapper>
   );
