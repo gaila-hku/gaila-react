@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { useMutation } from 'react-query';
 
@@ -65,34 +65,33 @@ const EssayEditorInput = ({
   );
 
   const isUnload = useRef(false);
-  // FIXME: recover this
   // Save before quitting page
-  // useEffect(() => {
-  //   if (readonly) {
-  //     return;
-  //   }
+  useEffect(() => {
+    if (readonly) {
+      return;
+    }
 
-  //   const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-  //     e.preventDefault();
-  //     isUnload.current = true;
-  //     handleSave(false, false);
-  //   };
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      isUnload.current = true;
+      handleAutoSave(false, false);
+    };
 
-  //   const handleVisibilityChange = () => {
-  //     if (isUnload.current) {
-  //       return;
-  //     }
-  //     handleSave(false, false);
-  //   };
+    const handleVisibilityChange = () => {
+      if (isUnload.current) {
+        return;
+      }
+      handleAutoSave(false, false);
+    };
 
-  //   window.addEventListener('beforeunload', handleBeforeUnload);
-  //   document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
-  //   return () => {
-  //     window.removeEventListener('beforeunload', handleBeforeUnload);
-  //     document.removeEventListener('visibilitychange', handleVisibilityChange);
-  //   };
-  // }, [handleSave, readonly]);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [handleAutoSave, readonly]);
 
   return (
     <TextInput

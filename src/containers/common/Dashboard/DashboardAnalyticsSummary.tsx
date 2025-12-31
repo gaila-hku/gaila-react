@@ -98,9 +98,9 @@ const DashboardAnalyticsSummary = ({
           }
         >
           <div className="flex items-end gap-2">
-            <p className="text-2xl font-bold">54%</p>
+            <p className="text-2xl font-bold">- (WIP)</p>
             <p className="text-xs text-muted-foreground">(lexical)</p>
-            <p className="pl-4 text-2xl font-bold">60%</p>
+            <p className="pl-4 text-2xl font-bold">- (WIP)</p>
             <p className="text-xs text-muted-foreground">(syntatic)</p>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
