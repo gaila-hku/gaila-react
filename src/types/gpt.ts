@@ -76,3 +76,20 @@ export interface RevisionResult {
 export interface PromptHistoryItem extends GptLog {
   tool_key: string;
 }
+
+export interface StudentRevisionExplanation {
+  id: number;
+  user_id: number;
+  gpt_log_id: number;
+  aspect_id: string;
+  response_type?: 'agree' | 'disagree' | 'partial';
+  explanation?: string;
+}
+
+export interface StudentRevisionExplanationListingItem
+  extends Omit<StudentRevisionExplanation, 'gpt_log_id'> {
+  gpt_log: Pick<
+    GptLog,
+    'id' | 'user_ask_time' | 'user_question' | 'gpt_answer' | 'is_structured'
+  >;
+}

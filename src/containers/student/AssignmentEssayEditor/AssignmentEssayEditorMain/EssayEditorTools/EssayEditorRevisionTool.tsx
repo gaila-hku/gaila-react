@@ -1,28 +1,49 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { ArrowRight, CheckCircle, ClipboardList } from 'lucide-react';
-import { useMutation } from 'react-query';
+import { CheckCircle, ClipboardList } from 'lucide-react';
+import { useMutation, useQuery } from 'react-query';
 
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
 import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
+import EssayEditorRevisionToolRevisionItem from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorRevisionToolRevisionItem';
 
-import { apiAskRevisionAgent } from 'api/gpt';
+import { apiAskRevisionAgent, apiGetRevisionExplanations } from 'api/gpt';
 import type { GptLog, RevisionResult } from 'types/gpt';
+import tuple from 'utils/types/tuple';
 
 type Props = {
   toolId: number;
-  latestResult: GptLog | null;
+  latestLog: GptLog | null;
   essay: string;
 };
 
-const EssayEditorRevisionTool = ({ toolId, latestResult, essay }: Props) => {
+const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
   const { mutateAsync: askRevisionAgent, isLoading: isAgentLoading } =
     useMutation(apiAskRevisionAgent);
 
-  const [revisionResult, setRevisionResult] = useState<RevisionResult | null>(
-    null,
+  const [revisionLog, setRevisionLog] = useState<GptLog | null>(null);
+  const revisionResult = revisionLog
+    ? (JSON.parse(revisionLog.gpt_answer) as RevisionResult)
+    : null;
+
+  const {
+    data: explanationData,
+    isLoading: isExplanationLoading,
+    refetch: fetchRevisionExplanations,
+  } = useQuery(
+    tuple([
+      apiGetRevisionExplanations.queryKey,
+      {
+        gpt_log_ids:
+          revisionResult?.revision_items.map(_ => revisionLog?.id || -1) || [],
+        aspect_ids:
+          revisionResult?.revision_items.map(item => item.aspect_id) || [],
+      },
+    ]),
+    apiGetRevisionExplanations,
+    { enabled: !!revisionResult },
   );
 
   const handleRevisionCheck = useCallback(async () => {
@@ -31,26 +52,15 @@ const EssayEditorRevisionTool = ({ toolId, latestResult, essay }: Props) => {
       is_structured: true,
       essay,
     });
-    const result = JSON.parse(res.gpt_answer) as RevisionResult;
-    setRevisionResult(result);
+    setRevisionLog(res);
   }, [askRevisionAgent, essay, toolId]);
 
   useEffect(() => {
-    if (!latestResult) {
+    if (!latestLog) {
       return;
     }
-    const result = JSON.parse(latestResult.gpt_answer) as RevisionResult;
-    setRevisionResult(result);
-  }, [latestResult]);
-
-  // TODO: finish this function
-  // TODO: add explanation input, database
-  const handleApplyRevision = useCallback(
-    (suggestions: RevisionResult['revision_items'][number]['suggestions']) => {
-      console.log(suggestions);
-    },
-    [],
-  );
+    setRevisionLog(latestLog);
+  }, [latestLog]);
 
   return (
     <Card
@@ -81,27 +91,19 @@ const EssayEditorRevisionTool = ({ toolId, latestResult, essay }: Props) => {
       {!!revisionResult && (
         <div className="space-y-1">
           {revisionResult.revision_items.map(item => (
-            <div className="border rounded-lg p-2" key={item.aspect_id}>
-              <h4 className="font-medium">{item.aspect_title}</h4>
-              {item.suggestions.map((chunk, index) => (
-                <React.Fragment key={index}>
-                  <p className="text-xs text-rose-500">{chunk.current_text}</p>
-                  <div className="flex items-start gap-1">
-                    <ArrowRight className="h-3 w-3 mt-[2px] shrink-0" />
-                    <p className="text-xs text-green-500">
-                      {chunk.replace_text}
-                    </p>
-                  </div>
-                </React.Fragment>
-              ))}
-              <div className="text-xs mt-2">{item.explanation}</div>
-              <Button
-                className="w-full mt-2"
-                onClick={() => handleApplyRevision(item.suggestions)}
-              >
-                Apply
-              </Button>
-            </div>
+            <EssayEditorRevisionToolRevisionItem
+              explanationItem={
+                explanationData?.find(
+                  explanationItem =>
+                    explanationItem.aspect_id === item.aspect_id,
+                ) || null
+              }
+              isExplanationLoading={isExplanationLoading}
+              key={item.aspect_id}
+              refetchExplanations={fetchRevisionExplanations}
+              revisionItem={item}
+              revisionLogId={revisionLog?.id || -1}
+            />
           ))}
         </div>
       )}

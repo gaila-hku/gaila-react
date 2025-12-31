@@ -116,16 +116,14 @@ const AssignmentEditorFormStageInput = ({
   );
 
   const onStageToggleTools = useCallback(
-    (index: number, value: string[]) => {
+    (stageIndex: number, toolKey: string, value: boolean) => {
       const newStages = [...stages];
-      const availableTools =
-        availableStages.find(
-          stage => stage.stage_type === stages[index].stage_type,
-        )?.tools || [];
-      newStages[index].tools = availableTools.map(tool => ({
-        key: tool.key,
-        enabled: value.includes(tool.key),
-      }));
+      const newTool = newStages[stageIndex].tools.find(t => t.key === toolKey);
+      if (newTool) {
+        newTool.enabled = value;
+      } else {
+        newStages[stageIndex].tools.push({ key: toolKey, enabled: value });
+      }
       setStages(newStages);
       onFormDataChange('stages', newStages);
     },
@@ -159,7 +157,7 @@ const AssignmentEditorFormStageInput = ({
         </p>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        {availableStages.map((stage, index) => (
+        {availableStages.map((stage, stageIndex) => (
           <div
             className="p-4 border rounded-lg bg-muted/30"
             key={stage.stage_type}
@@ -168,8 +166,8 @@ const AssignmentEditorFormStageInput = ({
               <h4>{stage.label}</h4>
               {stage.stage_type !== 'writing' && (
                 <SwitchInput
-                  onChange={value => onStageToggleEnable(index, value)}
-                  value={stages[index].enabled}
+                  onChange={value => onStageToggleEnable(stageIndex, value)}
+                  value={stages[stageIndex].enabled}
                 />
               )}
             </div>
@@ -197,15 +195,59 @@ const AssignmentEditorFormStageInput = ({
                 <Divider className="!mb-2" />
               </div>
             )}
-            <CheckboxInput
-              disabled={!stages[index].enabled}
-              labelSx={{ '& .MuiTypography-root': { fontSize: '0.875rem' } }}
-              onChange={value => onStageToggleTools(index, value)}
-              options={stage.tools}
-              value={stages[index].tools
-                .filter(tool => tool.enabled)
-                .map(tool => tool.key)}
-            />
+            {stage.tools.map(tool => (
+              <React.Fragment key={tool.key}>
+                <CheckboxInput
+                  disabled={!stages[stageIndex].enabled}
+                  labelSx={{
+                    '& .MuiTypography-root': { fontSize: '0.875rem' },
+                  }}
+                  onChange={value =>
+                    onStageToggleTools(stageIndex, tool.key, !!value.length)
+                  }
+                  options={[tool]}
+                  value={
+                    stages[stageIndex].tools.find(t => t.key === tool.key)
+                      ?.enabled
+                      ? [tool.key]
+                      : []
+                  }
+                />
+                {tool.key === 'revision' && stage.stage_type === 'writing' && (
+                  <div className="pl-5 mt-1">
+                    <CheckboxInput
+                      defaultValue={
+                        formDataConfigValue?.revision_tool_ask_explanation
+                          ? ['revision_tool_ask_explanation']
+                          : []
+                      }
+                      disabled={
+                        !stages[stageIndex].enabled ||
+                        !stages[stageIndex].tools.find(
+                          t => t.key === 'revision' && t.enabled,
+                        )
+                      }
+                      labelSx={{
+                        '& .MuiTypography-root': { fontSize: '0.875rem' },
+                      }}
+                      onChange={value =>
+                        onFormDataChange(
+                          'config.revision_tool_ask_explanation',
+                          !!value.length,
+                        )
+                      }
+                      options={[
+                        {
+                          key: 'revision_tool_ask_explanation',
+                          label:
+                            'Prompt students to provide explanation for revisions',
+                        },
+                      ]}
+                    />
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
             {stage.stage_type === 'reflection' && (
               <>
                 <Divider />

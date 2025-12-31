@@ -15,6 +15,7 @@ export interface Assignment {
   config?: {
     outline_enabled?: boolean;
     revision_enabled?: boolean;
+    revision_tool_ask_explanation?: boolean;
     dashboard?: {
       enabled?: boolean;
       word_count?: boolean;

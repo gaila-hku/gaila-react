@@ -44,18 +44,14 @@ const CheckboxInput = ({
     if (!isNil(inputValue)) {
       return inputValue;
     }
-    if (!isNil(defaultValue)) {
-      return defaultValue;
-    }
     return value;
-  }, [defaultValue, inputValue, value]);
+  }, [inputValue, value]);
 
   const onCheckAllChange = useCallback(
     (checked: boolean) => {
       const newValue = checked ? options.map(option => option.key) : [];
-      if (inputValue) {
-        onChange?.(newValue);
-      } else {
+      onChange?.(newValue);
+      if (!inputValue) {
         setValue(newValue);
       }
     },
@@ -69,9 +65,8 @@ const CheckboxInput = ({
         ? [...(oldValue || []), key]
         : oldValue?.filter(v => v !== key);
 
-      if (inputValue) {
-        onChange?.(newValue);
-      } else {
+      onChange?.(newValue);
+      if (!inputValue) {
         setValue(newValue);
       }
     },

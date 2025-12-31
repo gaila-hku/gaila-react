@@ -1,5 +1,10 @@
 import { callAPIHandler } from 'api/_base';
-import type { GptLog, PromptHistoryItem } from 'types/gpt';
+import type {
+  GptLog,
+  PromptHistoryItem,
+  StudentRevisionExplanation,
+  StudentRevisionExplanationListingItem,
+} from 'types/gpt';
 import type { ListingResponse } from 'types/response';
 import type { PartialBy } from 'utils/types/partialBy';
 
@@ -96,3 +101,42 @@ export const apiGetAllGptPrompts = async ({
   return res;
 };
 apiGetAllGptPrompts.queryKey = '/gpt/listing-all-prompt';
+
+export const apiGetRevisionExplanations = async ({
+  queryKey,
+}: {
+  queryKey: [string, { gpt_log_ids: number[]; aspect_ids: string[] }];
+}) => {
+  const [, { gpt_log_ids, aspect_ids }] = queryKey;
+  const res = await callAPIHandler<StudentRevisionExplanation[]>(
+    'get',
+    '/gpt/revision-explanations',
+    {
+      gpt_log_ids: JSON.stringify(gpt_log_ids),
+      aspect_ids: JSON.stringify(aspect_ids),
+    },
+    true,
+  );
+  return res;
+};
+apiGetRevisionExplanations.queryKey = '/gpt/revision-explanations';
+
+export const apiSubmitRevisionExplanation = (payload: {
+  gpt_log_id: number;
+  aspect_id: string;
+  response_type: 'agree' | 'disagree' | 'partial';
+  explanation?: string;
+}): Promise<void> =>
+  callAPIHandler('post', '/gpt/submit-revision-explanation', payload, true);
+
+export const apiGetRevisionExplanationListing = async ({
+  queryKey,
+}: {
+  queryKey: [string, { user_id: number; page: number; limit: number }];
+}) => {
+  const [, queryParam] = queryKey;
+  const res = await callAPIHandler<
+    ListingResponse<StudentRevisionExplanationListingItem>
+  >('get', '/gpt/listing-revision-explanations', queryParam, true);
+  return res;
+};

@@ -75,7 +75,7 @@ const EssayEditorTools = () => {
       {!!revisionTool && draftConfirmed && (
         <EssayEditorRevisionTool
           essay={essay}
-          latestResult={getLatestResult(revisionTool.id)}
+          latestLog={getLatestResult(revisionTool.id)}
           toolId={revisionTool.id}
         />
       )}
