@@ -128,9 +128,9 @@ function Card({
               {!!collapsible && (
                 <Clickable onClick={() => setIsCollapsed(!isCollapsed)}>
                   {isCollapsed ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
                     <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronUp className="w-4 h-4" />
                   )}
                 </Clickable>
               )}
