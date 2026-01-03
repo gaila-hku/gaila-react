@@ -75,6 +75,16 @@ const AssignmentReflectionEditor = () => {
     tool => tool.key === 'reflection_general',
   );
 
+  const onInputBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      if (e.relatedTarget?.tagName === 'BUTTON') {
+        return;
+      }
+      handleSubmit(false, false);
+    },
+    [handleSubmit],
+  );
+
   useEffect(() => {
     if (currentStage?.submission?.content) {
       setReflections(
@@ -141,7 +151,7 @@ const AssignmentReflectionEditor = () => {
                   className="resize-none"
                   disabled={readonly}
                   multiline
-                  onBlur={() => handleSubmit(false, false)}
+                  onBlur={onInputBlur}
                   onChange={e => handleReflectionChange(index, e.target.value)}
                   placeholder={question.placeholder}
                   rows={3}

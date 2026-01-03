@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import dayjs from 'dayjs';
 import { FileText, Save } from 'lucide-react';
@@ -44,6 +44,16 @@ const EssayEditorHeader = ({
     }
   }, [currentStage?.submission, setTitle]);
 
+  const onTitleBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      if (e.relatedTarget?.tagName === 'BUTTON') {
+        return;
+      }
+      saveSubmissionContent({}, false);
+    },
+    [saveSubmissionContent],
+  );
+
   if (!assignment) {
     return;
   }
@@ -82,7 +92,7 @@ const EssayEditorHeader = ({
           className="text-base sm:text-lg font-semibold"
           disabled={readonly}
           label="Essay Title"
-          onBlur={() => saveSubmissionContent({}, false)}
+          onBlur={onTitleBlur}
           onChange={e => setTitle(e.target.value)}
           value={title}
         />

@@ -256,6 +256,16 @@ const AssignmentGoalEditor = () => {
     ],
   );
 
+  const onInputBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      if (e.relatedTarget?.tagName === 'BUTTON') {
+        return;
+      }
+      handleSubmit(false, false);
+    },
+    [handleSubmit],
+  );
+
   useEffect(() => {
     if (!currentStage?.submission?.content) {
       return;
@@ -328,7 +338,7 @@ const AssignmentGoalEditor = () => {
                         <TextInput
                           className="resize-none"
                           disabled={readonly || goalValue.goal_confirmed}
-                          onBlur={() => handleSubmit(false, false)}
+                          onBlur={onInputBlur}
                           onChange={e =>
                             handleChangeGoalText(
                               section.categoryKey,
@@ -383,7 +393,7 @@ const AssignmentGoalEditor = () => {
                               <TextInput
                                 className="resize-none"
                                 disabled={readonly}
-                                onBlur={() => handleSubmit(false, false)}
+                                onBlur={onInputBlur}
                                 onChange={e =>
                                   handleChangeStrategyText(
                                     section.categoryKey,
