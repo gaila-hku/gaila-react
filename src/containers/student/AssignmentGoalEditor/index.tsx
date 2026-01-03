@@ -202,7 +202,7 @@ const AssignmentGoalEditor = () => {
     }
     const newGoalValue = {
       ...goalValue,
-      isGoalConfirmed: false,
+      goal_confirmed: false,
     };
     setGoalValue(newGoalValue);
 
