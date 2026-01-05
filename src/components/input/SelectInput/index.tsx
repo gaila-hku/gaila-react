@@ -12,10 +12,14 @@ type Props<T> = {
     value: T;
   }[];
   emptyOption?: boolean | string;
+  defaultValue?: T;
   value?: T;
   onChange?: (value: T) => void;
   className?: string;
-} & Omit<React.ComponentProps<typeof Select>, 'onChange'>;
+} & Omit<
+  React.ComponentProps<typeof Select>,
+  'defaultValue' | 'value' | 'onChange'
+>;
 
 export function SelectInput<T extends string | number | null>({
   label,
@@ -33,6 +37,7 @@ export function SelectInput<T extends string | number | null>({
         <InputLabel htmlFor="grouped-native-select">{label}</InputLabel>
       )}
       <Select
+        displayEmpty={!!emptyOption}
         label={label}
         onChange={e => onChange?.(e.target.value as T)}
         size={size}
@@ -40,8 +45,10 @@ export function SelectInput<T extends string | number | null>({
         {...props}
       >
         {emptyOption && (
-          <MenuItem aria-label="None" value="all">
-            {typeof emptyOption === 'string' ? emptyOption : ''}
+          <MenuItem aria-label="None" value="">
+            <em className="text-muted-foreground">
+              {typeof emptyOption === 'string' ? emptyOption : ''}
+            </em>
           </MenuItem>
         )}
         {options.map(option => (

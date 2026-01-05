@@ -38,6 +38,8 @@ export const getStatusText = (status: string) => {
 
 export const getBadgeText = (type: AssignmentDetails['type']) => {
   switch (type) {
+    case 'argumentative':
+      return 'Argumentative';
     case 'narrative':
       return 'Narrative';
     case 'expository':
@@ -45,7 +47,7 @@ export const getBadgeText = (type: AssignmentDetails['type']) => {
     case 'descriptive':
       return 'Descriptive';
     default:
-      return 'Argumentative';
+      return 'General';
   }
 };
 

@@ -37,7 +37,7 @@ const defaultData: AssignmentFormData = {
   title: '',
   description: '',
   due_date: null,
-  type: 'argumentative',
+  type: 'general',
   instructions: '',
   requirements: {
     min_word_count: null,

@@ -29,14 +29,14 @@ export function StudentHome() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInputTimer, setSearchInputTimer] = useState<NodeJS.Timeout>();
 
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('due_date');
 
   const hasFilter =
     !!searchQuery ||
-    typeFilter !== 'all' ||
-    statusFilter !== 'all' ||
+    typeFilter !== '' ||
+    statusFilter !== '' ||
     sortBy !== 'due_date';
 
   const onEditEssay = useCallback(
@@ -50,8 +50,8 @@ export function StudentHome() {
     setSearchInput('');
     setSearchQuery('');
     setSearchInputTimer(undefined);
-    setTypeFilter('all');
-    setStatusFilter('all');
+    setTypeFilter('');
+    setStatusFilter('');
     setSortBy('due_date');
   }, []);
 
@@ -102,10 +102,10 @@ export function StudentHome() {
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <SelectInput
-            emptyOption="All types"
-            label="Essay types"
+            emptyOption="Essay types"
             onChange={setTypeFilter}
             options={[
+              { value: 'general', label: 'General' },
               { value: 'argumentative', label: 'Argumentative' },
               { value: 'narrative', label: 'Narrative' },
               { value: 'expository', label: 'Expository' },
@@ -114,8 +114,7 @@ export function StudentHome() {
             value={typeFilter}
           />
           <SelectInput
-            emptyOption="All statuses"
-            label="Statuses"
+            emptyOption="Statuses"
             onChange={setStatusFilter}
             options={[
               { label: 'Upcoming', value: 'upcoming' },
@@ -215,8 +214,8 @@ export function StudentHome() {
               limit: 10,
               filter: {
                 search: searchQuery,
-                type: typeFilter === 'all' ? undefined : typeFilter,
-                status: statusFilter === 'all' ? undefined : statusFilter,
+                type: typeFilter === '' ? undefined : typeFilter,
+                status: statusFilter === '' ? undefined : statusFilter,
               },
               sort: sortBy,
             },

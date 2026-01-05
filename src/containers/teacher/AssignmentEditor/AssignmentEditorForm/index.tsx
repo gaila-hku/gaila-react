@@ -85,13 +85,16 @@ const AssignmentEditorForm = ({
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="essayType">Essay Type</Label>
+            <Label htmlFor="essayType" required>
+              Essay Type
+            </Label>
             <SelectInput
               className="w-full"
               defaultValue={formData.current.type}
               fullWidth
               onChange={value => onFormDataChange('type', value)}
               options={[
+                { value: 'general', label: 'General' },
                 { value: 'argumentative', label: 'Argumentative' },
                 { value: 'narrative', label: 'Narrative' },
                 { value: 'expository', label: 'Expository' },
