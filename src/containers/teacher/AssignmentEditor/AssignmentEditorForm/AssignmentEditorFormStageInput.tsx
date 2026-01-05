@@ -33,10 +33,20 @@ const availableStages = [
     stage_type: 'writing',
     label: 'Writing',
     tools: [
-      { key: 'ideation', label: 'Ideation Chatbot (Outline stage only)' },
+      {
+        key: 'ideation',
+        label: 'Ideation Chatbot',
+        tooltip:
+          'This tool will only be shown in outlining stage. If outlining stage is not separated, this tool will only be shown in draft stage',
+      },
       { key: 'dictionary', label: 'Dictionary Chatbot' },
       { key: 'autograde', label: 'AI Auto Grading' },
-      { key: 'revision', label: 'AI Revision (Revise stage only)' },
+      {
+        key: 'revision',
+        label: 'AI Revision',
+        tooltip:
+          'This tool will only be shown in revision stage. If revision stage is not separated, this tool will only be shown in draft stage.',
+      },
       { key: 'writing_general', label: 'General Chatbot' },
     ],
   },

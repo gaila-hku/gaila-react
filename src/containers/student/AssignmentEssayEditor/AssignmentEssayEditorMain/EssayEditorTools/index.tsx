@@ -54,7 +54,8 @@ const EssayEditorTools = () => {
   const availableTools = useMemo(() => {
     return [
       ...(!!ideationTool &&
-      (!outlineConfirmed || !assignment?.config?.outline_enabled)
+      (!outlineConfirmed || !assignment?.config?.outline_enabled) &&
+      (!draftConfirmed || !assignment?.config?.revision_enabled)
         ? ['ideation']
         : []),
       ...(dictionaryTool ? ['dictionary'] : []),
@@ -63,6 +64,7 @@ const EssayEditorTools = () => {
         ? ['autograde']
         : []),
       ...(!!revisionTool &&
+      (outlineConfirmed || !assignment?.config?.outline_enabled) &&
       (draftConfirmed || !assignment?.config?.revision_enabled)
         ? ['revision']
         : []),

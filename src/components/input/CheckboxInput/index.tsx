@@ -9,7 +9,9 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import { styled } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
 import { isNil } from 'lodash-es';
+import { Info } from 'lucide-react';
 
 type Props = {
   value?: string[];
@@ -22,6 +24,7 @@ type Props = {
     disabled?: boolean;
     required?: boolean;
     labelOnly?: boolean;
+    tooltip?: string;
   }[];
   includeAll?: boolean;
   className?: string;
@@ -106,7 +109,16 @@ const CheckboxInput = ({
             }
             disabled={option.disabled}
             key={option.key}
-            label={option.label}
+            label={
+              <div className="flex items-center gap-2">
+                <span>{option.label}</span>
+                {option.tooltip && (
+                  <Tooltip title={option.tooltip}>
+                    <Info className="w-4 h-4" />
+                  </Tooltip>
+                )}
+              </div>
+            }
             sx={includeAll ? { ml: 2, ...labelSx } : labelSx}
           />
         ),
