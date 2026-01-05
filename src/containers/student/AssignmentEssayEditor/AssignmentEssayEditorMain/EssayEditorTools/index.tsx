@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { useQuery } from 'react-query';
 
@@ -15,14 +15,22 @@ import { apiGetLatestSturcturedGptLog } from 'api/gpt';
 import tuple from 'utils/types/tuple';
 
 const EssayEditorTools = () => {
-  const { essay, currentStage, outlineConfirmed, draftConfirmed } =
+  const { assignment, essay, currentStage, outlineConfirmed, draftConfirmed } =
     useAssignmentEssayEditorProvider();
 
   const tools = currentStage?.tools ?? [];
-  const ideationTool = tools.find(tool => tool.key === 'ideation');
-  const dictionaryTool = tools.find(tool => tool.key === 'dictionary');
-  const autoGradeTool = tools.find(tool => tool.key === 'autograde');
-  const revisionTool = tools.find(tool => tool.key === 'revision');
+  const ideationTool = tools.find(
+    tool => tool.key === 'ideation' && tool.enabled,
+  );
+  const dictionaryTool = tools.find(
+    tool => tool.key === 'dictionary' && tool.enabled,
+  );
+  const autoGradeTool = tools.find(
+    tool => tool.key === 'autograde' && tool.enabled,
+  );
+  const revisionTool = tools.find(
+    tool => tool.key === 'revision' && tool.enabled,
+  );
 
   const { data, isLoading, error } = useQuery(
     tuple([
@@ -43,6 +51,80 @@ const EssayEditorTools = () => {
     [data],
   );
 
+  const availableTools = useMemo(() => {
+    return [
+      ...(!!ideationTool &&
+      (!outlineConfirmed || !assignment?.config?.outline_enabled)
+        ? ['ideation']
+        : []),
+      ...(dictionaryTool ? ['dictionary'] : []),
+      ...(!!autoGradeTool &&
+      (outlineConfirmed || !assignment?.config?.outline_enabled)
+        ? ['autograde']
+        : []),
+      ...(!!revisionTool &&
+      (draftConfirmed || !assignment?.config?.revision_enabled)
+        ? ['revision']
+        : []),
+    ];
+  }, [
+    assignment?.config?.outline_enabled,
+    assignment?.config?.revision_enabled,
+    autoGradeTool,
+    dictionaryTool,
+    draftConfirmed,
+    ideationTool,
+    outlineConfirmed,
+    revisionTool,
+  ]);
+
+  const renderTool = useCallback(
+    (toolKey: string) => {
+      switch (toolKey) {
+        case 'ideation':
+          return (
+            <EssayEditorIdeationTool
+              latestResult={getLatestResult(ideationTool!.id)}
+              toolId={ideationTool!.id}
+            />
+          );
+        case 'dictionary':
+          return (
+            <EssayEditorDictionaryTool
+              latestResult={getLatestResult(dictionaryTool!.id)}
+              toolId={dictionaryTool!.id}
+            />
+          );
+        case 'autograde':
+          return (
+            <EssayEditorAutoGradeTool
+              essay={essay}
+              latestResult={getLatestResult(autoGradeTool!.id)}
+              toolId={autoGradeTool!.id}
+            />
+          );
+        case 'revision':
+          return (
+            <EssayEditorRevisionTool
+              essay={essay}
+              latestLog={getLatestResult(revisionTool!.id)}
+              toolId={revisionTool!.id}
+            />
+          );
+        default:
+          return null;
+      }
+    },
+    [
+      autoGradeTool,
+      dictionaryTool,
+      essay,
+      getLatestResult,
+      ideationTool,
+      revisionTool,
+    ],
+  );
+
   if (isLoading) {
     return <Loading />;
   }
@@ -53,31 +135,13 @@ const EssayEditorTools = () => {
 
   return (
     <div className="space-y-4">
-      {!!ideationTool && !outlineConfirmed && (
-        <EssayEditorIdeationTool
-          latestResult={getLatestResult(ideationTool.id)}
-          toolId={ideationTool.id}
-        />
-      )}
-      {!!dictionaryTool && (
-        <EssayEditorDictionaryTool
-          latestResult={getLatestResult(dictionaryTool.id)}
-          toolId={dictionaryTool.id}
-        />
-      )}
-      {!!autoGradeTool && outlineConfirmed && (
-        <EssayEditorAutoGradeTool
-          essay={essay}
-          latestResult={getLatestResult(autoGradeTool.id)}
-          toolId={autoGradeTool.id}
-        />
-      )}
-      {!!revisionTool && draftConfirmed && (
-        <EssayEditorRevisionTool
-          essay={essay}
-          latestLog={getLatestResult(revisionTool.id)}
-          toolId={revisionTool.id}
-        />
+      {availableTools.map(toolKey => (
+        <React.Fragment key={toolKey}>{renderTool(toolKey)}</React.Fragment>
+      ))}
+      {!availableTools.length && (
+        <div className="text-center text-sm text-muted-foreground">
+          No tools available for this stage.
+        </div>
       )}
     </div>
   );

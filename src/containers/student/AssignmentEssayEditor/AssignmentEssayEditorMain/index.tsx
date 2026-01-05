@@ -252,20 +252,25 @@ function AssignmentEssayEditorMain() {
     setSubmitModalOpen(true);
   }, [checkWordCountAndAlert]);
 
-  const activeWritingStep = useMemo(() => {
-    if (!outlineConfirmed) {
-      return 0;
+  const activeWritingStep: 'outline' | 'draft' | 'revision' = useMemo(() => {
+    let currentStep: 'outline' | 'draft' | 'revision' = 'draft';
+    if (!outlineConfirmed && assignment?.config?.outline_enabled) {
+      currentStep = 'outline';
+    } else if (draftConfirmed && assignment?.config?.revision_enabled) {
+      currentStep = 'revision';
     }
-    if (!draftConfirmed) {
-      return 1;
-    }
-    return 2;
-  }, [draftConfirmed, outlineConfirmed]);
+    return currentStep;
+  }, [
+    assignment?.config?.outline_enabled,
+    assignment?.config?.revision_enabled,
+    draftConfirmed,
+    outlineConfirmed,
+  ]);
 
   const bottomButton = useMemo(() => {
     const buttonClass = 'w-full gap-2';
     switch (activeWritingStep) {
-      case 0:
+      case 'outline':
         return (
           <Button
             className={buttonClass}
@@ -277,7 +282,7 @@ function AssignmentEssayEditorMain() {
             Lock Outline & Start Drafting
           </Button>
         );
-      case 1:
+      case 'draft':
         return (
           <Button
             className={buttonClass}
@@ -289,7 +294,7 @@ function AssignmentEssayEditorMain() {
             Confirm Draft & Start Revising
           </Button>
         );
-      case 2:
+      case 'revision':
         return (
           <Button
             className={buttonClass}
@@ -366,30 +371,32 @@ function AssignmentEssayEditorMain() {
           />
 
           {/* Outline editor */}
-          <Card
-            classes={{
-              description: '-mt-2 mb-2',
-            }}
-            description="Create a structured outline for your essay. This will help guide your writing in the next stage."
-            title="Outline Your Essay"
-          >
-            {teacherGrade ? (
-              <div className="text-xs text-purple-600">
-                This essay has been graded and can no longer be edited.
-              </div>
-            ) : readonly ? (
-              <div className="text-xs text-green-600">
-                You have submitted your essay.
-              </div>
-            ) : null}
-            <EssayEditorInput
-              disabled={outlineConfirmed}
-              handleAutoSave={handleAutoSave}
-              minHeight={outlineConfirmed ? 0 : 400}
-              onChange={setOutline}
-              value={outline}
-            />
-          </Card>
+          {assignment.config?.outline_enabled && (
+            <Card
+              classes={{
+                description: '-mt-2 mb-2',
+              }}
+              description="Create a structured outline for your essay. This will help guide your writing in the next stage."
+              title="Outline Your Essay"
+            >
+              {teacherGrade ? (
+                <div className="text-xs text-purple-600">
+                  This essay has been graded and can no longer be edited.
+                </div>
+              ) : readonly ? (
+                <div className="text-xs text-green-600">
+                  You have submitted your essay.
+                </div>
+              ) : null}
+              <EssayEditorInput
+                disabled={outlineConfirmed}
+                handleAutoSave={handleAutoSave}
+                minHeight={outlineConfirmed ? 0 : 400}
+                onChange={setOutline}
+                value={outline}
+              />
+            </Card>
+          )}
 
           {/* Essay Editor */}
           {outlineConfirmed && (
