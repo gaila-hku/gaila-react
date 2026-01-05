@@ -97,18 +97,22 @@ function Card({
         >
           {(!!badgeText || !!status) && (
             <div>
-              <Badge
-                className={clsx(classes?.badge, 'mb-2 text-xs float-left')}
-                variant={badgeVariant}
-              >
-                {badgeText}
-              </Badge>
-              <Badge
-                className={clsx([classes?.status, 'text-xs float-right'])}
-                variant="plain"
-              >
-                {status}
-              </Badge>
+              {!!badgeText && (
+                <Badge
+                  className={clsx(classes?.badge, 'mb-2 text-xs float-left')}
+                  variant={badgeVariant}
+                >
+                  {badgeText}
+                </Badge>
+              )}
+              {!!status && (
+                <Badge
+                  className={clsx([classes?.status, 'text-xs float-right'])}
+                  variant="plain"
+                >
+                  {status}
+                </Badge>
+              )}
             </div>
           )}
           {(!!title || !!action || collapsible) && (
