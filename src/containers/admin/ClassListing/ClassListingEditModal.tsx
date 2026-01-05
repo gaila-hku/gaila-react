@@ -196,7 +196,9 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
         </div>
         <div className="space-y-4 pb-4 max-h-[60vh] overflow-y-auto">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" required>
+              Name
+            </Label>
             <TextInput
               id="name"
               onChange={e =>
@@ -207,7 +209,9 @@ const ClassListingEditModal = ({ classItem, setClassItem }: Props) => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="class_key">Class Key</Label>
+            <Label htmlFor="class_key" required>
+              Class Key
+            </Label>
             <TextInput
               id="class_key"
               onChange={e =>

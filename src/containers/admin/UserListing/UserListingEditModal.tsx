@@ -154,7 +154,9 @@ const UserListingEditModal = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username" required>
+              Username
+            </Label>
             <TextInput
               id="username"
               onChange={e =>
@@ -165,7 +167,9 @@ const UserListingEditModal = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" required>
+              Password
+            </Label>
             <TextInput
               id="password"
               onChange={e =>
@@ -177,7 +181,9 @@ const UserListingEditModal = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
+            <Label htmlFor="role" required>
+              Role
+            </Label>
             <SelectInput
               id="role"
               onChange={value => setUserValue({ ...userValue, role: value })}

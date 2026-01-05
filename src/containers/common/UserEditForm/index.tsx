@@ -82,7 +82,9 @@ const UserEditForm = () => {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="username">Username</Label>
+        <Label htmlFor="username" required>
+          Username
+        </Label>
         <TextInput
           id="username"
           onChange={e => setUsername(e.target.value)}
@@ -91,7 +93,9 @@ const UserEditForm = () => {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password" required>
+          Password
+        </Label>
         <TextInput
           id="last_name"
           onChange={e => setPassword(e.target.value)}

@@ -64,6 +64,10 @@ const UserUploader = () => {
             &quot;admin&quot;
           </li>
           <li>Username, password and role are required</li>
+          <li>
+            In the class column, fill in the class key that the student belong
+            to. If the class is not created yet, create it first.
+          </li>
         </ul>
       </div>
 
