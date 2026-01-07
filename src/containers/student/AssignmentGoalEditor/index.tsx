@@ -186,6 +186,7 @@ const AssignmentGoalEditor = () => {
       is_final: false,
       alertMsg:
         'Good job on setting your goals! Now, think about your strategies for each goal.',
+      refetchProgress: true,
     });
   }, [
     alertMsg,
@@ -211,6 +212,7 @@ const AssignmentGoalEditor = () => {
       stage_id: currentStage.id,
       content: newGoalValue,
       is_final: false,
+      refetchProgress: true,
     });
   }, [assignmentProgress, currentStage, goalValue, readonly, saveSubmission]);
 
@@ -244,6 +246,7 @@ const AssignmentGoalEditor = () => {
         content: goalValue,
         is_final: isFinal,
         alertMsg: isManual ? 'Goals draft saved.' : undefined,
+        refetchProgress: true,
       });
     },
     [

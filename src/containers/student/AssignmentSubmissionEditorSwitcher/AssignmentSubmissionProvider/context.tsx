@@ -14,7 +14,6 @@ export interface AssignmentSubmissionProviderType {
   assignmentProgress: AssignmentProgress | undefined;
   isLoading: boolean;
   error: unknown | null;
-  isStepperClickable: boolean;
   currentStage: AssignmentProgress['stages'][number] | null;
   assignment: Assignment | null;
   teacherGrade: AssignmentGrade | null;
@@ -34,7 +33,6 @@ const AssignmentSubmissionProviderContext =
     assignmentProgress: undefined,
     isLoading: false,
     error: null,
-    isStepperClickable: false,
     currentStage: null,
     assignment: null,
     teacherGrade: null,

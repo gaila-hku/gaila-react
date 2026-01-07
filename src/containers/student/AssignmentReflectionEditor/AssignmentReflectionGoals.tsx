@@ -9,7 +9,7 @@ import LinearProgress from 'components/display/Progress/LinearProgress';
 import AssignmentGoalChecker from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/AssignmentGoalChecker';
 
 import type {
-  AssignmentEssayContent,
+  AssignmentGoalContent,
   AssignmentProgress,
 } from 'types/assignment';
 import getGoalCounts from 'utils/helper/getGoalCounts';
@@ -21,14 +21,14 @@ type Props = {
 const AssignmentReflectionGoals = ({ assignmentProgress }: Props) => {
   const goalContent = useMemo(() => {
     const goalSettingStage = assignmentProgress.stages.find(
-      stage => stage.stage_type === 'writing',
+      stage => stage.stage_type === 'goal_setting',
     );
     if (!goalSettingStage?.submission) {
       return null;
     }
     const content = goalSettingStage.submission
-      .content as AssignmentEssayContent;
-    return content.goals;
+      .content as AssignmentGoalContent;
+    return content;
   }, [assignmentProgress.stages]);
 
   const [completeGoalCount, totalGoalCount] = useMemo(

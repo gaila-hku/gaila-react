@@ -38,15 +38,16 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       return;
     }
 
+    const goalStage = assignmentProgress.stages.find(stage => {
+      return stage.stage_type === 'goal_setting';
+    });
+    if (goalStage?.submission) {
+      setGoalContent(goalStage.submission.content as AssignmentGoalContent);
+    }
+
     const submission = currentStage.submission;
 
     if (!submission) {
-      const goalStage = assignmentProgress.stages.find(stage => {
-        return stage.stage_type === 'goal_setting';
-      });
-      if (goalStage?.submission) {
-        setGoalContent(goalStage.submission.content as AssignmentGoalContent);
-      }
       return;
     }
 
@@ -55,7 +56,6 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       setEssay(submissionContent.essay);
       setOutlineConfirmed(submissionContent.outline_confirmed);
       setDraftConfirmed(submissionContent.draft_confirmed);
-      setGoalContent(submissionContent.goals || null);
     } catch (e) {
       console.error(e);
     }

@@ -28,7 +28,7 @@ import getGoalCounts from 'utils/helper/getGoalCounts';
 type Props = {
   grade: AssignmentGrade | null;
   assignment: Assignment;
-  onChangeGoals: (goals: AssignmentGoalContent | null) => void;
+  onChangeGoals: (goals: AssignmentGoalContent) => void;
   readonly: boolean;
 };
 

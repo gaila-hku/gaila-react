@@ -11,17 +11,13 @@ import { apiSaveTraceData } from 'api/trace-data';
 import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
 
 const AssignmentSubmissionStepper = () => {
-  const {
-    assignmentProgress,
-    currentStage,
-    isStepperClickable,
-    setCurrentStageIndex,
-  } = useAssignmentSubmissionProvider();
+  const { assignmentProgress, currentStage, setCurrentStageIndex } =
+    useAssignmentSubmissionProvider();
   const { mutate: saveTraceData } = useMutation(apiSaveTraceData);
 
   const handleStepClick = useCallback(
     (index: number) => {
-      if (!isStepperClickable || !assignmentProgress || !currentStage) {
+      if (!assignmentProgress || !currentStage) {
         return;
       }
       setCurrentStageIndex(index);
@@ -34,13 +30,7 @@ const AssignmentSubmissionStepper = () => {
         }),
       });
     },
-    [
-      assignmentProgress,
-      currentStage,
-      isStepperClickable,
-      saveTraceData,
-      setCurrentStageIndex,
-    ],
+    [assignmentProgress, currentStage, saveTraceData, setCurrentStageIndex],
   );
 
   if (!assignmentProgress) {
@@ -55,21 +45,15 @@ const AssignmentSubmissionStepper = () => {
   );
 
   return (
-    <Stepper
-      activeStep={
-        isStepperClickable
-          ? assignmentProgress.stages.length - 1
-          : stepperActiveStep
-      }
-      className="basis-[400px]"
-    >
+    <Stepper activeStep={stepperActiveStep} className="basis-[400px]">
       {assignmentProgress.stages
         .filter(s => s.enabled)
         .map((stage, index) => (
           <Step
-            className={isStepperClickable ? 'cursor-pointer' : ''}
+            className="!cursor-pointer"
             key={stage.stage_type}
             onClick={() => handleStepClick(index)}
+            sx={{ '& .Mui-disabled': { cursor: 'pointer' } }}
           >
             <StepLabel>{getStageTypeLabel(stage)}</StepLabel>
           </Step>

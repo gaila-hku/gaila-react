@@ -19,7 +19,7 @@ type Props = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 
-  onChangeGoals: (goals: AssignmentGoalContent | null) => void;
+  onChangeGoals: (goals: AssignmentGoalContent) => void;
   saveSubmissionContent: (
     newContent: Partial<AssignmentEssayContent>,
     isFinal: boolean,

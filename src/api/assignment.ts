@@ -113,6 +113,7 @@ export type AssignmentSaveSubmissionPayload = {
   content: AssignmentSubmission['content'];
   is_final: boolean;
   alertMsg?: string;
+  refetchProgress?: boolean;
 };
 
 export const apiSaveAssignmentSubmission = (

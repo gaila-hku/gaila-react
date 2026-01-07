@@ -172,11 +172,31 @@ function AssignmentEssayEditorMain() {
   }, [saveSubmissionContent]);
 
   const onChangeGoals = useCallback(
-    (newGoals: AssignmentGoalContent | null) => {
+    (newGoals: AssignmentGoalContent) => {
       setGoalContent(newGoals);
-      saveSubmissionContent({ goals: newGoals }, false);
+
+      const goalStage = assignmentProgress?.stages.find(
+        stage => stage.stage_type === 'goal_setting',
+      );
+
+      if (!assignmentProgress || !goalStage) {
+        return;
+      }
+
+      const currentContent = goalStage?.submission
+        ?.content as AssignmentGoalContent;
+
+      const newContent = defaultsDeep(newGoals, currentContent);
+
+      saveSubmission({
+        assignment_id: assignmentProgress.assignment.id,
+        stage_id: goalStage.id,
+        content: newContent,
+        is_final: false,
+        refetchProgress: true,
+      });
     },
-    [saveSubmissionContent, setGoalContent],
+    [assignmentProgress, saveSubmission, setGoalContent],
   );
 
   const handleConfirmOutline = useCallback(() => {

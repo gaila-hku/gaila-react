@@ -13,13 +13,13 @@ import type { AssignmentGoalContent } from 'types/assignment';
 
 type Props = {
   goals: AssignmentGoalContent | null;
-  onChangeGoals?: (goals: AssignmentGoalContent | null) => void;
+  onChangeGoals?: (goals: AssignmentGoalContent) => void;
   readonly?: boolean;
 };
 
 const AssignmentGoalChecker = ({ goals, onChangeGoals, readonly }: Props) => {
   const handleGoalToggle = useCallback(
-    async (
+    (
       category: 'writing_goals' | 'ai_goals',
       goalIndex: number,
       strategyIndex: number,

@@ -96,7 +96,6 @@ export interface AssignmentEssayContent {
   title: string;
   outline: string;
   essay: string;
-  goals: AssignmentGoalContent | null;
   outline_confirmed: boolean;
   draft_confirmed: boolean;
 }

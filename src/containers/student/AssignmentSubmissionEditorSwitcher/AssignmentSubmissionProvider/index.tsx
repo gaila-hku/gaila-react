@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { isNumber } from 'lodash-es';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -32,22 +32,13 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
   );
 
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
+  const initStageIndex = useRef(false);
   useEffect(() => {
-    if (assignmentProgress) {
-      setCurrentStageIndex(Math.max(assignmentProgress.current_stage, 0));
+    if (initStageIndex.current || !assignmentProgress) {
+      return;
     }
-  }, [assignmentProgress]);
-
-  const isStepperClickable = useMemo(() => {
-    if (!assignmentProgress) {
-      return false;
-    }
-    return (
-      assignmentProgress.stages.some(stage => !!stage.grade) ||
-      assignmentProgress.stages.every(
-        stage => stage.submission && stage.submission.is_final,
-      )
-    );
+    setCurrentStageIndex(Math.max(assignmentProgress.current_stage, 0));
+    initStageIndex.current = true;
   }, [assignmentProgress]);
 
   const currentStage = useMemo(() => {
@@ -68,6 +59,11 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
             : currentStage?.stage_type === 'writing'
               ? 'Essay'
               : 'Reflections';
+
+        if (req.refetchProgress) {
+          queryClient.invalidateQueries([apiViewAssignmentProgress.queryKey]);
+        }
+
         if (res.is_final) {
           successMsg(`${currentContent} submitted.`);
           await queryClient.invalidateQueries([
@@ -95,7 +91,6 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
   const value = useMemo(
     () => ({
       assignmentProgress: assignmentProgress,
-      isStepperClickable,
       currentStage,
       assignment,
       teacherGrade,
@@ -113,7 +108,6 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
       error,
       isLoading,
       isSaving,
-      isStepperClickable,
       readonly,
       saveSubmission,
       teacherGrade,
