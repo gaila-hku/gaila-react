@@ -10,11 +10,12 @@ import { apiSaveTraceData } from 'api/trace-data';
 
 type Props = {
   updateWordCountStatus?: (essay: string) => void;
-  handleAutoSave: (isFinal: boolean, isManual: boolean) => void;
+  handleAutoSave?: (isFinal: boolean, isManual: boolean) => void;
   value: string;
   onChange: (x: string) => void;
   minHeight?: number;
   disabled?: boolean;
+  disableAutoSave?: boolean;
 };
 
 const EssayEditorInput = ({
@@ -24,6 +25,7 @@ const EssayEditorInput = ({
   onChange: inputOnChange,
   minHeight,
   disabled: inputDisabled,
+  disableAutoSave,
 }: Props) => {
   const { readonly, assignment, currentStage } =
     useAssignmentEssayEditorProvider();
@@ -39,12 +41,12 @@ const EssayEditorInput = ({
 
   const onBlur = useCallback(
     (e: React.FocusEvent<HTMLInputElement>) => {
-      if (e.relatedTarget?.tagName === 'BUTTON') {
+      if (disableAutoSave || e.relatedTarget?.tagName === 'BUTTON') {
         return;
       }
-      handleAutoSave(false, false);
+      handleAutoSave?.(false, false);
     },
-    [handleAutoSave],
+    [disableAutoSave, handleAutoSave],
   );
 
   const onPaste = useCallback(
@@ -67,21 +69,21 @@ const EssayEditorInput = ({
   const isUnload = useRef(false);
   // Save before quitting page
   useEffect(() => {
-    if (readonly) {
+    if (readonly || disableAutoSave) {
       return;
     }
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       isUnload.current = true;
-      handleAutoSave(false, false);
+      handleAutoSave?.(false, false);
     };
 
     const handleVisibilityChange = () => {
       if (isUnload.current) {
         return;
       }
-      handleAutoSave(false, false);
+      handleAutoSave?.(false, false);
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -91,7 +93,7 @@ const EssayEditorInput = ({
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [handleAutoSave, readonly]);
+  }, [disableAutoSave, handleAutoSave, readonly]);
 
   return (
     <TextInput

@@ -14,6 +14,7 @@ import ResizableSidebar from 'containers/common/ResizableSidebar';
 import EssayEditorAIChat from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorAIChat';
 import EssayEditorHeader from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorHeader';
 import EssayEditorInput from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorInput';
+import EssayEditorOutlineEditModal from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOutlineEditModal';
 import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOverview';
 import EssayEditorStageStepper from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorStageStepper';
 import EssayEditorSubmitModal from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorSubmitModal';
@@ -62,6 +63,7 @@ function AssignmentEssayEditorMain() {
     color: '',
     text: '',
   });
+  const [editOutlineModalOpen, setEditOutlineModalOpen] = useState(false);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
 
   const updateWordCountStatus = useCallback(
@@ -415,6 +417,21 @@ function AssignmentEssayEditorMain() {
                 onChange={setOutline}
                 value={outline}
               />
+              {outlineConfirmed && (
+                <>
+                  <Button
+                    className="mt-3 ml-auto"
+                    onClick={() => setEditOutlineModalOpen(true)}
+                  >
+                    Edit Outline
+                  </Button>
+                  <EssayEditorOutlineEditModal
+                    open={editOutlineModalOpen}
+                    saveSubmissionContent={saveSubmissionContent}
+                    setOpen={setEditOutlineModalOpen}
+                  />
+                </>
+              )}
             </Card>
           )}
 
