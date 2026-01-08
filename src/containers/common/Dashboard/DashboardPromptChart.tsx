@@ -15,11 +15,15 @@ import {
 import Badge from 'components/display/Badge';
 import Tabs from 'components/navigation/Tabs';
 
+import PromptHistory from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/PromptHistory';
+
 import type { PromptAnalytics } from 'types/assignment';
 
 type Props = {
+  assignmentId: number;
   promptData: PromptAnalytics;
   showAspect?: boolean;
+  showHistory?: boolean;
 };
 
 const natureKeyMap = {
@@ -36,7 +40,12 @@ const aspectKeyMap = {
   error_correction: 'Error Correction',
 };
 
-const DashboardPromptChart = ({ promptData, showAspect }: Props) => {
+const DashboardPromptChart = ({
+  assignmentId,
+  promptData,
+  showAspect,
+  showHistory,
+}: Props) => {
   const promptNatureData = useMemo(() => {
     const structuredData = promptData.nature_counts.reduce((acc, item) => {
       const natureName = natureKeyMap[item.key];
@@ -202,25 +211,46 @@ const DashboardPromptChart = ({ promptData, showAspect }: Props) => {
     );
   }, [promptAspectData]);
 
-  if (showAspect)
-    return (
-      <Tabs
-        tabs={[
-          {
-            key: 'nature',
-            title: 'Perform vs Learning',
-            content: promptNatureChart,
-          },
-          {
-            key: 'aspect',
-            title: 'Aspects of writing',
-            content: promptAspectChart,
-          },
-        ]}
-      />
-    );
+  const tabs = useMemo(
+    () => [
+      {
+        key: 'nature',
+        title: 'Perform vs Learning',
+        content: promptNatureChart,
+      },
+      ...(showAspect
+        ? [
+            {
+              key: 'aspect',
+              title: 'Aspects of writing',
+              content: promptAspectChart,
+            },
+          ]
+        : []),
+      ...(showHistory
+        ? [
+            {
+              key: 'history',
+              title: 'Prompt History',
+              content: <PromptHistory assignmentId={assignmentId} />,
+            },
+          ]
+        : []),
+    ],
+    [
+      assignmentId,
+      promptAspectChart,
+      promptNatureChart,
+      showAspect,
+      showHistory,
+    ],
+  );
 
-  return promptNatureChart;
+  if (tabs.length === 1) {
+    return tabs[0].content;
+  }
+
+  return <Tabs tabs={tabs} />;
 };
 
 export default DashboardPromptChart;

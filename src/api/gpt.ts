@@ -85,7 +85,7 @@ export const apiGetLatestSturcturedGptLog = async ({
 apiGetLatestSturcturedGptLog.queryKey = '/gpt/latest-structured';
 
 interface GetAllGptPromptsQueryParam {
-  user_id: number;
+  user_id?: number;
   assignment_id: number;
   page: number;
   limit: number;

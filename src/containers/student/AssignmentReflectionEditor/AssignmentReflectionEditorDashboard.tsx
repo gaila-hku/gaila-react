@@ -95,8 +95,10 @@ const AssignmentReflectionEditorDashboard = ({ assignmentId }: Props) => {
           }
         >
           <DashboardPromptChart
+            assignmentId={assignmentId}
             promptData={analytics.prompt_data}
             showAspect={dashboardConfig?.prompt_category_aspect}
+            showHistory
           />
         </Card>
       )}

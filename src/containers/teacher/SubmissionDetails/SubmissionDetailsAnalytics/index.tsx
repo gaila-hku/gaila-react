@@ -69,7 +69,10 @@ const SubmissionDetailsAnalytics = ({
             key: 'prompts',
             title: 'Prompt Types',
             content: (
-              <DashboardPromptChart promptData={analytics.prompt_data} />
+              <DashboardPromptChart
+                assignmentId={assignment.id}
+                promptData={analytics.prompt_data}
+              />
             ),
           },
           {

@@ -313,7 +313,9 @@ function AssignmentEssayEditorMain() {
             size="lg"
           >
             <CheckCircle className="h-4 w-4" />
-            Confirm Draft & Start Revising
+            {assignment?.config?.revision_enabled
+              ? 'Confirm Draft & Start Revising'
+              : 'Submit Essay'}
           </Button>
         );
       case 'revision':
@@ -330,6 +332,7 @@ function AssignmentEssayEditorMain() {
     }
   }, [
     activeWritingStep,
+    assignment?.config?.revision_enabled,
     handleConfirmDraft,
     handleConfirmOutline,
     handleFinalSave,

@@ -33,7 +33,7 @@ const getPromptAspectLabel = (code: number) => {
   }
 };
 
-type Props = { studentId: number; assignmentId: number };
+type Props = { studentId?: number; assignmentId: number };
 
 const PromptHistory = ({ studentId, assignmentId }: Props) => {
   const [page, setPage] = useState(1);

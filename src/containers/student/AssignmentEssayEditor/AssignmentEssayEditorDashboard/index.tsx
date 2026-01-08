@@ -100,7 +100,7 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
   );
 
   const dashboardComponent = useMemo(() => {
-    if (error || !analytics || !assignmentProgress) {
+    if (error || !analytics || !assignment || !assignmentProgress) {
       return <ErrorComponent error={error || 'Failed to get analytics'} />;
     }
 
@@ -156,8 +156,10 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
             }
           >
             <DashboardPromptChart
+              assignmentId={assignment.id}
               promptData={analytics.prompt_data}
-              showAspect={assignment?.config?.dashboard?.prompt_category_aspect}
+              showAspect={assignment.config?.dashboard?.prompt_category_aspect}
+              showHistory
             />
           </Card>
         );
@@ -176,7 +178,7 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
   }, [
     activeDashboard,
     analytics,
-    assignment?.config?.dashboard,
+    assignment,
     assignmentProgress,
     error,
     essay,
