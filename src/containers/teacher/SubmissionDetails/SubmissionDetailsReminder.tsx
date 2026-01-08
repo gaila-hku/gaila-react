@@ -138,8 +138,8 @@ const SubmissionDetailsReminder = ({
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground">Last Dashboard:</span>
           <span className="font-medium">
-            {engagement.last_ai_use
-              ? dayjs().to(dayjs(lastSubmittedAt))
+            {engagement.last_dashboard_use
+              ? dayjs().to(dayjs(engagement.last_dashboard_use))
               : 'Never viewed'}
           </span>
         </div>
