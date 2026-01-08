@@ -118,6 +118,16 @@ const SubmissionDetailsReminder = ({
     [assignmentId, errorMsg, lastRemindedAt, sendReminder, studentId],
   );
 
+  const disabledStatus = useMemo(
+    () => ({
+      writing: dayjs().diff(dayjs(lastSubmittedAt), 'day') < 3,
+      ai: dayjs().diff(dayjs(engagement.last_ai_use), 'day') < 3,
+      dashboard: dayjs().diff(dayjs(engagement.last_dashboard_use), 'day') < 3,
+      copying: false,
+    }),
+    [engagement.last_ai_use, engagement.last_dashboard_use, lastSubmittedAt],
+  );
+
   return (
     <Card classes={{ children: 'space-y-3' }} title="Student Engagement">
       <div className="text-sm space-y-2 mb-4">
@@ -163,7 +173,7 @@ const SubmissionDetailsReminder = ({
         {REMINDER_TYPES.map(type => (
           <Button
             className="w-full gap-2 justify-start"
-            disabled={isLoading}
+            disabled={isLoading || disabledStatus[type]}
             key={type}
             onClick={() => handleSendReminder(type)}
             size="sm"
