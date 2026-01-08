@@ -42,8 +42,7 @@ const availableStages = [
       {
         key: 'outline_review',
         label: 'Outline Review Agent',
-        tooltip:
-          'This tool will only be shown in outlining stage. If outlining stage is not separated, this tool will only be shown in draft stage',
+        tooltip: 'This tool will only be shown in outlining stage.',
       },
       { key: 'dictionary', label: 'Dictionary Chatbot' },
       { key: 'autograde', label: 'AI Auto Grading' },

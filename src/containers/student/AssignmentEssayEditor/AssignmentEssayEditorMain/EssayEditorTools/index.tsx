@@ -63,7 +63,8 @@ const EssayEditorTools = () => {
         ? ['ideation_guiding']
         : []),
       ...(!!outlineReviewTool &&
-      (!outlineConfirmed || !assignment?.config?.outline_enabled) &&
+      assignment?.config?.outline_enabled &&
+      !outlineConfirmed &&
       (!draftConfirmed || !assignment?.config?.revision_enabled)
         ? ['outline_review']
         : []),
