@@ -21,12 +21,15 @@ export interface AskGptStructuredRequestData extends AskGptRequestData {
   is_structured: boolean;
 }
 
-export const apiAskIdeationAgent = (
-  payload: PartialBy<AskGptStructuredRequestData, 'question'> & {
-    ideation_stage?: number;
-  },
+export const apiAskIdeationGuidingAgent = (
+  payload: PartialBy<AskGptStructuredRequestData, 'question'>,
 ): Promise<GptLog> =>
-  callAPIHandler('post', '/gpt/ask-ideation', payload, true);
+  callAPIHandler('post', '/gpt/ask-ideation-guiding', payload, true);
+
+export const apiAskOutlineReviewAgent = (
+  payload: PartialBy<AskGptStructuredRequestData, 'question'>,
+): Promise<GptLog> =>
+  callAPIHandler('post', '/gpt/ask-outline-review', payload, true);
 
 export const apiAskDictionaryAgent = (
   payload: AskGptStructuredRequestData,

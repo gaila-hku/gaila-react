@@ -52,6 +52,7 @@ const defaultData: AssignmentFormData = {
   config: {
     outline_enabled: true,
     revision_enabled: true,
+    revision_tool_ask_explanation: true,
     dashboard: {
       enabled: true,
       word_count: true,

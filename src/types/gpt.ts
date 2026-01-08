@@ -19,13 +19,21 @@ export interface IdeationScaffoldResult {
   }[];
 }
 
-export interface IdeationIdeaResult {
-  sections: {
+// export interface IdeationIdeaResult {
+//   sections: {
+//     title: string;
+//     content: string[];
+//     notes: string;
+//   }[];
+//   summary: string;
+// }
+
+export interface OutlineReviewResult {
+  comments: {
     title: string;
-    content: string[];
-    notes: string;
+    comment: string;
+    explanation: string;
   }[];
-  summary: string;
 }
 
 // export interface GrammarResult {

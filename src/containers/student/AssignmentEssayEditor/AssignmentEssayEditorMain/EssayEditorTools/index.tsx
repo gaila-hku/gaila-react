@@ -7,7 +7,8 @@ import Loading from 'components/display/Loading';
 
 import EssayEditorAutoGradeTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorAutoGradeTool';
 import EssayEditorDictionaryTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorDictionaryTool';
-import EssayEditorIdeationTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorIdeationTool';
+import EssayEditorIdeationGuidingTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorIdeationGuidingTool';
+import EssayEditorOutlineReviewTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorOutlineReviewTool';
 import EssayEditorRevisionTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorRevisionTool';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
@@ -19,8 +20,11 @@ const EssayEditorTools = () => {
     useAssignmentEssayEditorProvider();
 
   const tools = currentStage?.tools ?? [];
-  const ideationTool = tools.find(
-    tool => tool.key === 'ideation' && tool.enabled,
+  const ideationGuidingTool = tools.find(
+    tool => tool.key === 'ideation_guiding' && tool.enabled,
+  );
+  const outlineReviewTool = tools.find(
+    tool => tool.key === 'outline_review' && tool.enabled,
   );
   const dictionaryTool = tools.find(
     tool => tool.key === 'dictionary' && tool.enabled,
@@ -53,10 +57,15 @@ const EssayEditorTools = () => {
 
   const availableTools = useMemo(() => {
     return [
-      ...(!!ideationTool &&
+      ...(!!ideationGuidingTool &&
       (!outlineConfirmed || !assignment?.config?.outline_enabled) &&
       (!draftConfirmed || !assignment?.config?.revision_enabled)
-        ? ['ideation']
+        ? ['ideation_guiding']
+        : []),
+      ...(!!outlineReviewTool &&
+      (!outlineConfirmed || !assignment?.config?.outline_enabled) &&
+      (!draftConfirmed || !assignment?.config?.revision_enabled)
+        ? ['outline_review']
         : []),
       ...(dictionaryTool ? ['dictionary'] : []),
       ...(!!autoGradeTool &&
@@ -75,7 +84,8 @@ const EssayEditorTools = () => {
     autoGradeTool,
     dictionaryTool,
     draftConfirmed,
-    ideationTool,
+    ideationGuidingTool,
+    outlineReviewTool,
     outlineConfirmed,
     revisionTool,
   ]);
@@ -83,11 +93,18 @@ const EssayEditorTools = () => {
   const renderTool = useCallback(
     (toolKey: string) => {
       switch (toolKey) {
-        case 'ideation':
+        case 'ideation_guiding':
           return (
-            <EssayEditorIdeationTool
-              latestResult={getLatestResult(ideationTool!.id)}
-              toolId={ideationTool!.id}
+            <EssayEditorIdeationGuidingTool
+              latestResult={getLatestResult(ideationGuidingTool!.id)}
+              toolId={ideationGuidingTool!.id}
+            />
+          );
+        case 'outline_review':
+          return (
+            <EssayEditorOutlineReviewTool
+              latestResult={getLatestResult(outlineReviewTool!.id)}
+              toolId={outlineReviewTool!.id}
             />
           );
         case 'dictionary':
@@ -122,7 +139,8 @@ const EssayEditorTools = () => {
       dictionaryTool,
       essay,
       getLatestResult,
-      ideationTool,
+      ideationGuidingTool,
+      outlineReviewTool,
       revisionTool,
     ],
   );

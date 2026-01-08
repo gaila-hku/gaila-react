@@ -34,8 +34,14 @@ const availableStages = [
     label: 'Writing',
     tools: [
       {
-        key: 'ideation',
-        label: 'Ideation Chatbot',
+        key: 'ideation_guiding',
+        label: 'Ideation Agent',
+        tooltip:
+          'This tool will only be shown in outlining stage. If outlining stage is not separated, this tool will only be shown in draft stage',
+      },
+      {
+        key: 'outline_review',
+        label: 'Outline Review Agent',
         tooltip:
           'This tool will only be shown in outlining stage. If outlining stage is not separated, this tool will only be shown in draft stage',
       },
@@ -67,7 +73,8 @@ const defaultStages: AssignmentStageEditType[] = [
     stage_type: 'writing',
     enabled: true,
     tools: [
-      { key: 'ideation', enabled: true },
+      { key: 'ideation_guiding', enabled: true },
+      { key: 'outline_review', enabled: true },
       { key: 'dictionary', enabled: true },
       { key: 'autograde', enabled: true },
       { key: 'revision', enabled: true },
