@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import dayjs from 'dayjs';
 import { Bell, TriangleAlert } from 'lucide-react';
+import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router';
 import { pathnames } from 'routes';
 
@@ -11,7 +12,9 @@ import InfiniteList from 'components/display/InfiniteList';
 import DropdownMenu from 'components/navigation/DropdownMenu';
 
 import { apiGetReminders } from 'api/reminder';
+import { apiSaveTraceData } from 'api/trace-data';
 import type { ReminderListingResponse, StudentReminder } from 'types/reminder';
+import useProfile from 'utils/hooks/useProfile';
 import usePersistState from 'utils/service/usePersistState';
 import tuple from 'utils/types/tuple';
 
@@ -30,10 +33,11 @@ const getReminderMessage = (type: StudentReminder['reminder_type']) => {
 
 const StudentHeaderNotifications = () => {
   const navigate = useNavigate();
+  const { data: profile } = useProfile();
+  const { mutate: saveTraceData } = useMutation(apiSaveTraceData);
 
-  // TODO: add student ID to persist state key
   const [readNotifications, setReadNotifications] = usePersistState<number[]>(
-    'student-read-notifications',
+    'student-read-notifications' + (profile ? `_${profile.id}` : ''),
     [],
   );
   const [hasUnread, setHasUnread] = useState(false);
@@ -41,11 +45,17 @@ const StudentHeaderNotifications = () => {
   const onClickNotification = useCallback(
     (reminder: StudentReminder) => {
       setReadNotifications([...readNotifications, reminder.id]);
+      saveTraceData({
+        assignment_id: null,
+        stage_id: null,
+        action: 'CLICK_NOTIFICATION',
+        content: JSON.stringify({ reminder }),
+      });
       navigate(
         pathnames.assignmentEditSubmission(String(reminder.assignment_id)),
       );
     },
-    [navigate, readNotifications, setReadNotifications],
+    [navigate, readNotifications, saveTraceData, setReadNotifications],
   );
 
   const onFetchRemindersSuccess = useCallback(
