@@ -178,8 +178,12 @@ export async function callAPIHandler<T>(
     // Unauthorized
     if (res.status === 401) {
       console.log('redirecting', apiPath, apiConfig);
-      redirectToLoginPage(apiConfig.redirect === false, apiPath);
-      throw new Error(res.data?.message || 'Unauthorized');
+      redirectToLoginPage(
+        apiConfig.redirect === false,
+        apiPath,
+        res.data?.error_message || 'Unauthorized',
+      );
+      throw new Error(res.data?.error_message || 'Unauthorized');
     }
 
     // Not ok

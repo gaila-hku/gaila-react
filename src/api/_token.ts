@@ -44,7 +44,11 @@ export const setTokenHeader = async (optional = false, apiPath?: string) => {
   if (refreshTokenExpiresIn < timeNow - serverTime) {
     // Expired refresh token
     // Redirect user to login page
-    await redirectToLoginPage(optional, apiPath);
+    await redirectToLoginPage(
+      optional,
+      apiPath,
+      'Your session has expired. Please login again.',
+    );
     return false;
   }
 
@@ -61,7 +65,11 @@ export const setTokenHeader = async (optional = false, apiPath?: string) => {
       console.error(e);
       // Failed to get token
       await setLocalItem('auth', {});
-      await redirectToLoginPage(optional, apiPath);
+      await redirectToLoginPage(
+        optional,
+        apiPath,
+        'Your session has expired. Please login again.',
+      );
       return false;
     }
     promise.refresh = null;
@@ -74,7 +82,11 @@ export const setTokenHeader = async (optional = false, apiPath?: string) => {
       !data?.refreshTokenExpiresIn ||
       !data?.serverTime
     ) {
-      await redirectToLoginPage(optional, apiPath);
+      await redirectToLoginPage(
+        optional,
+        apiPath,
+        'Your session is outdated. Please login again.',
+      );
       return false;
     }
 

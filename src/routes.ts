@@ -3,10 +3,10 @@ import { createSearchParams } from 'react-router';
 
 export const pathnames = {
   home: () => '/',
-  login: (redirect?: string, clear?: boolean) =>
+  login: (redirect?: string, errorMessage?: string) =>
     `/login?${createSearchParams({
       ...(redirect ? { r: redirect } : {}),
-      ...(clear ? { clear: '1' } : {}),
+      ...(errorMessage ? { e: errorMessage } : {}),
     }).toString()}`,
   dashboard: () => '/dashboard',
   assignments: () => '/assignments',

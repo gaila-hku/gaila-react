@@ -3,7 +3,11 @@ import { pathnames } from 'routes';
 import { clearCache } from 'api/_requestor';
 import history from 'utils/service/history';
 
-const redirectToLoginPage = async (optional = false, apiPath?: string) => {
+const redirectToLoginPage = async (
+  optional = false,
+  apiPath?: string,
+  errorMessage?: string,
+) => {
   try {
     if (optional) return;
     console.warn('401', apiPath);
@@ -25,13 +29,14 @@ const redirectToLoginPage = async (optional = false, apiPath?: string) => {
 
     const injectedLogout = window.gaila.injectedLogout;
     if (injectedLogout) {
-      injectedLogout(pathnames.login(url));
+      injectedLogout(pathnames.login(url, errorMessage));
     }
   } catch (e) {
     console.error(e);
     // @ts-expect-error assigning window.location
     window.location = `${window.location.origin}${pathnames.login(
       window.location.pathname,
+      errorMessage,
     )}`;
   }
 };

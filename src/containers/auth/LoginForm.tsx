@@ -1,9 +1,6 @@
 import React, { type FormEvent, useCallback, useState } from 'react';
 
-import { isString } from 'lodash-es';
-import qs from 'query-string';
 import { useMutation } from 'react-query';
-import { useLocation } from 'react-router';
 
 import Card from 'components/display/Card';
 import ErrorMessage from 'components/display/ErrorMessage';
@@ -14,14 +11,17 @@ import { type ServerAuthToken, apiUserLogin } from 'api/auth';
 
 import TokenLoginRedirect from './TokenLoginRedirect';
 
-const LoginForm = () => {
+type Props = {
+  redirect?: string;
+  errorMessage?: string;
+};
+
+const LoginForm = ({ redirect, errorMessage }: Props) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [token, setToken] = useState<ServerAuthToken>();
 
-  const { search } = useLocation();
-  const { r } = qs.parse(search);
-  const redirect = isString(r) ? r : undefined;
+  const [displayErrorMessage, setDisplayErrorMessage] = useState(errorMessage);
 
   const {
     mutate: loginRequest,
@@ -39,6 +39,7 @@ const LoginForm = () => {
       if (!username || !password) {
         return;
       }
+      setDisplayErrorMessage('');
       loginRequest({ username, password });
     },
     [loginRequest, password, username],
@@ -60,7 +61,9 @@ const LoginForm = () => {
           type="password"
           value={password}
         />
-        {!!error && <ErrorMessage error={error} />}
+        {!isLoading && (!!displayErrorMessage || !!error) && (
+          <ErrorMessage error={displayErrorMessage || error} />
+        )}
         <Button
           disabled={!username || !password}
           loading={isLoading}
