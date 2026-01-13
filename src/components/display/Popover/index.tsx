@@ -1,7 +1,13 @@
-import React, { type ComponentProps, useCallback } from 'react';
+import React, {
+  type ComponentProps,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 
 import MuiPopover from '@mui/material/Popover';
 import clsx from 'clsx';
+import { isBoolean } from 'lodash-es';
 
 import Button from 'components/input/Button';
 
@@ -10,6 +16,7 @@ type Props = {
   buttonVariant?: ComponentProps<typeof Button>['variant'];
   onClickButton?: () => void;
   onClosePopover?: () => void;
+  open?: boolean;
   childClass?: string;
   buttonClass?: string;
   className?: string;
@@ -21,6 +28,7 @@ const Popover = ({
   buttonVariant = 'secondary',
   onClickButton,
   onClosePopover,
+  open: inputOpen,
   childClass,
   buttonClass,
   className,
@@ -29,9 +37,19 @@ const Popover = ({
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (isBoolean(inputOpen)) {
+      setOpen(inputOpen && Boolean(anchorEl));
+      return;
+    }
+    setOpen(Boolean(anchorEl));
+  }, [anchorEl, inputOpen]);
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
+      setOpen(false);
       setAnchorEl(event.currentTarget);
       onClickButton?.();
     },
@@ -39,11 +57,11 @@ const Popover = ({
   );
 
   const handleClose = useCallback(() => {
+    setOpen(false);
     setAnchorEl(null);
     onClosePopover?.();
   }, [onClosePopover]);
 
-  const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
   return (

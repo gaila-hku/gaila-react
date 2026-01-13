@@ -1,3 +1,4 @@
+import type { AssignmentCreatePayload } from 'api/assignment';
 import type { ClassOption } from 'types/class';
 import type { StudentReminder } from 'types/reminder';
 import type { ListingResponse } from 'types/response';
@@ -67,6 +68,8 @@ export interface AssignmentStage {
   order_index: number;
   tools: { id: number; key: string; enabled: boolean }[];
 }
+
+export type AssignmentStageEditType = AssignmentCreatePayload['stages'][number];
 
 export interface AssignmentProgress {
   assignment: Assignment;
