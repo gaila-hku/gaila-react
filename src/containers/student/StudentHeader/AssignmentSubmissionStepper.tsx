@@ -33,7 +33,9 @@ const AssignmentSubmissionStepper = () => {
     [assignmentProgress, currentStage, saveTraceData, setCurrentStageIndex],
   );
 
-  if (!assignmentProgress) {
+  const enabledStages = assignmentProgress?.stages.filter(s => s.enabled);
+
+  if (!assignmentProgress || !enabledStages || enabledStages.length <= 1) {
     return <></>;
   }
 
