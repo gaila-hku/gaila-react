@@ -439,7 +439,7 @@ function AssignmentEssayEditorMain() {
           )}
 
           {/* Essay Editor */}
-          {outlineConfirmed && (
+          {(!assignment.config?.outline_enabled || outlineConfirmed) && (
             <Card title="Essay Content">
               {teacherGrade ? (
                 <div className="text-xs text-purple-600">
