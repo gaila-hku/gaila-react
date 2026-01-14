@@ -41,6 +41,10 @@ const DashboardPlagiarismDetector = ({ plagiarisedSegments, essay }: Props) => {
       };
       return [normalSegment, plagiarisedSegment];
     });
+    segments.push({
+      content: essay.slice(lastIndex),
+      type: 'normal',
+    });
     return (
       <>
         {segments.map((segment, index) => (

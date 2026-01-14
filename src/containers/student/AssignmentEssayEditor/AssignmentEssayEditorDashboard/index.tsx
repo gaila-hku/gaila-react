@@ -68,10 +68,10 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
       enabledSections.push('prompt_category');
     }
     if (
+      enabledSections.includes('word_count') ||
       enabledSections.includes('goal_progress') ||
       enabledSections.includes('complexity_scores') ||
-      enabledSections.includes('accuracy_scores') ||
-      enabledSections.includes('copying_detector')
+      enabledSections.includes('accuracy_scores')
     ) {
       enabledSections.push('performance');
     }
