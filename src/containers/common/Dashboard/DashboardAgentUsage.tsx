@@ -44,7 +44,9 @@ const DashboardAgentUsage = ({ usageData }: Props) => {
             <CartesianGrid horizontal={false} strokeDasharray="3 3" />
             <XAxis type="number" />
             <YAxis dataKey="agentType" type="category" width={80} />
-            <RechartsTooltip formatter={value => `${value} min(s)`} />
+            <RechartsTooltip
+              formatter={value => `${value} time${value === 1 ? '' : 's'}`}
+            />
             <Bar dataKey="Agent uses" fill="#3b82f6" stackId="a" />
             <Bar
               dataKey="Follow-up prompts"
