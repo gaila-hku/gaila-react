@@ -9,6 +9,8 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import clsx from 'clsx';
 
+const ROWS_PER_PAGE_OPTIONS = [5, 10, 25];
+
 type Props = {
   columns: {
     key: string;
@@ -95,7 +97,7 @@ export default function Table({
           </TableBody>
         </MuiTable>
       </TableContainer>
-      {!!count && count > limit && (
+      {!!count && count > ROWS_PER_PAGE_OPTIONS[0] && (
         <TablePagination
           component="div"
           count={count || 0}
@@ -105,7 +107,7 @@ export default function Table({
           }
           page={page - 1}
           rowsPerPage={limit}
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
           sx={
             onRowsPerPageChange
               ? {}
