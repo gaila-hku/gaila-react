@@ -124,18 +124,18 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
   const [update, setUpdate] = useState(0);
 
   useEffect(() => {
-    if (!assignmentData) {
-      return;
+    if (assignmentData) {
+      formData.current = {
+        ...assignmentData,
+        tips: assignmentData.tips || defaultData.tips,
+        rubrics: assignmentData.rubrics || defaultData.rubrics,
+        requirements: assignmentData.requirements || defaultData.requirements,
+      };
+    } else {
+      formData.current = { ...defaultData };
     }
-
-    formData.current = {
-      ...assignmentData,
-      tips: assignmentData.tips || defaultData.tips,
-      rubrics: assignmentData.rubrics || defaultData.rubrics,
-      requirements: assignmentData.requirements || defaultData.requirements,
-    };
     setEdited(false);
-    setUpdate(update => update + 1);
+    setUpdate(Date.now());
   }, [assignmentData]);
 
   const onFormDataChange = useCallback((field: string, value: any) => {
