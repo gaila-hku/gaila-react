@@ -143,7 +143,9 @@ const AssignmentEditorFormStageInput = ({
         >
           <Command>
             {availableStages?.map(stage => {
-              const isStageAdded = stages.some(s => s.stage_type === stage.key);
+              const isStageAdded = stages.some(
+                s => s.stage_type === stage.key && s.enabled,
+              );
               return (
                 <CommandItem
                   disabled={isStageAdded}
@@ -163,7 +165,7 @@ const AssignmentEditorFormStageInput = ({
           </Command>
         </Popover>
       </div>
-      <div>
+      {/* <div>
         <DndContext onDragEnd={handleDragEnd}>
           {stages.map((stage, index) =>
             stage.enabled ? (
@@ -177,7 +179,20 @@ const AssignmentEditorFormStageInput = ({
               />
             ) : null,
           )}
-        </DndContext>
+        </DndContext>  */}
+      <div>
+        {stages.map((stage, index) =>
+          stage.enabled ? (
+            <AssignmentEditorFormStageInputItem
+              formDataConfigValue={formDataConfigValue}
+              key={index}
+              onFormDataChange={onFormDataChange}
+              onStageChange={handleStageChange}
+              stage={stage}
+              stageIndex={index}
+            />
+          ) : null,
+        )}
       </div>
     </div>
   );
