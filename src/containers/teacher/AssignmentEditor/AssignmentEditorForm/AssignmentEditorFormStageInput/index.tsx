@@ -2,68 +2,40 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { type DragEndEvent, DndContext } from '@dnd-kit/core';
 import { isEmpty } from 'lodash-es';
-import { Check } from 'lucide-react';
 
-import Popover from 'components/display/Popover';
-import Command, { CommandItem } from 'components/display/Popover/Command';
-
+import useAlert from 'containers/common/AlertProvider/useAlert';
+import AssignmentEditorFormAddStageButton from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormAddStageButton';
 import AssignmentEditorFormStageInputItem from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormStageInputItem';
+import {
+  DEFAULT_STAGES,
+  validateStageOrder,
+} from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/utils';
 
-import type { Assignment, AssignmentStageEditType } from 'types/assignment';
+import type {
+  AssignmentStage,
+  AssignmentStageEditType,
+} from 'types/assignment';
 
 type Props = {
   formDataStageValue: AssignmentStageEditType[];
-  formDataConfigValue: Assignment['config'];
   onFormDataChange: (field: string, value: any) => void;
   isEditing: boolean;
 };
 
-const availableStages = [
-  { key: 'goal_setting', label: 'Goal Setting' },
-  { key: 'writing', label: 'Writing' },
-  { key: 'reflection', label: 'Reflection' },
-];
-
-const defaultStages: AssignmentStageEditType[] = [
-  {
-    stage_type: 'goal_setting',
-    enabled: true,
-    tools: [{ key: 'goal_general', enabled: true }],
-  },
-  {
-    stage_type: 'writing',
-    enabled: true,
-    tools: [
-      { key: 'ideation_guiding', enabled: true },
-      { key: 'outline_review', enabled: true },
-      { key: 'dictionary', enabled: true },
-      { key: 'autograde', enabled: true },
-      { key: 'revision', enabled: true },
-      { key: 'writing_general', enabled: true },
-    ],
-  },
-  {
-    stage_type: 'reflection',
-    enabled: true,
-    tools: [{ key: 'reflection_general', enabled: true }],
-  },
-];
-
 const AssignmentEditorFormStageInput = ({
   formDataStageValue,
-  formDataConfigValue,
   onFormDataChange,
   isEditing,
 }: Props) => {
+  const { errorMsg } = useAlert();
   const [stages, setStages] =
-    useState<AssignmentStageEditType[]>(defaultStages);
-  const [popoverOpen, setPopoverOpen] = useState(false);
+    useState<AssignmentStageEditType[]>(DEFAULT_STAGES);
 
   useEffect(() => {
     if (isEmpty(formDataStageValue)) {
-      setStages(defaultStages);
+      setStages(DEFAULT_STAGES);
       if (!isEditing) {
-        onFormDataChange('stages', defaultStages);
+        onFormDataChange('stages', DEFAULT_STAGES);
       }
     } else {
       setStages(formDataStageValue);
@@ -85,7 +57,7 @@ const AssignmentEditorFormStageInput = ({
   );
 
   const handleAddStage = useCallback(
-    (stageType: string) => {
+    (stageType: AssignmentStage['stage_type']) => {
       const newStages = [...stages];
       const existingStage = newStages.find(s => s.stage_type === stageType);
       if (existingStage) {
@@ -95,11 +67,11 @@ const AssignmentEditorFormStageInput = ({
           stage_type: stageType,
           enabled: true,
           tools: [],
+          config: {},
         });
       }
       setStages(newStages);
       onFormDataChange('stages', newStages);
-      setPopoverOpen(false);
     },
     [onFormDataChange, stages],
   );
@@ -110,19 +82,29 @@ const AssignmentEditorFormStageInput = ({
       if (!over || !active) {
         return;
       }
+
       const overId = Number((over.id as string).split('-')[3]);
       const activeId = Number((active.id as string).split('-')[3]);
       if (isNaN(overId) || isNaN(activeId) || overId === activeId) {
         return;
       }
+
       const newStages = [...stages];
-      const [removed] = newStages.splice(activeId, 1);
-      newStages.splice(overId, 0, removed);
-      console.log(newStages);
+      if (activeId < overId) {
+        newStages.splice(overId, 0, newStages.splice(activeId, 1)[0]);
+      } else {
+        newStages.splice(overId + 1, 0, newStages.splice(activeId, 1)[0]);
+      }
+
+      const orderErrorMsg = validateStageOrder(newStages);
+      if (orderErrorMsg) {
+        errorMsg(orderErrorMsg);
+        return;
+      }
       setStages(newStages);
       onFormDataChange('stages', newStages);
     },
-    [onFormDataChange, stages],
+    [errorMsg, onFormDataChange, stages],
   );
 
   return (
@@ -134,65 +116,24 @@ const AssignmentEditorFormStageInput = ({
             Choose to include writing stages and enable tools for students
           </p>
         </div>
-        <Popover
-          buttonText="Add Stage"
-          childClass="!p-2"
-          onClickButton={() => setPopoverOpen(true)}
-          onClosePopover={() => setPopoverOpen(false)}
-          open={popoverOpen}
-        >
-          <Command>
-            {availableStages?.map(stage => {
-              const isStageAdded = stages.some(
-                s => s.stage_type === stage.key && s.enabled,
-              );
-              return (
-                <CommandItem
-                  disabled={isStageAdded}
-                  key={stage.key}
-                  onSelect={() => handleAddStage(stage.key)}
-                  value={stage.key}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2">
-                      {isStageAdded && <Check className="h-4 w-4" />}
-                      <p className="text-sm">{stage.label}</p>
-                    </div>
-                  </div>
-                </CommandItem>
-              );
-            })}
-          </Command>
-        </Popover>
+        <AssignmentEditorFormAddStageButton
+          onAddStage={handleAddStage}
+          stages={stages}
+        />
       </div>
-      {/* <div>
+      <div>
         <DndContext onDragEnd={handleDragEnd}>
           {stages.map((stage, index) =>
             stage.enabled ? (
               <AssignmentEditorFormStageInputItem
-                formDataConfigValue={formDataConfigValue}
+                index={index}
                 key={index}
-                onFormDataChange={onFormDataChange}
-                onStageChange={handleStageChange}
+                onStageChange={stage => handleStageChange(index, stage)}
                 stage={stage}
-                stageIndex={index}
               />
             ) : null,
           )}
-        </DndContext>  */}
-      <div>
-        {stages.map((stage, index) =>
-          stage.enabled ? (
-            <AssignmentEditorFormStageInputItem
-              formDataConfigValue={formDataConfigValue}
-              key={index}
-              onFormDataChange={onFormDataChange}
-              onStageChange={handleStageChange}
-              stage={stage}
-              stageIndex={index}
-            />
-          ) : null,
-        )}
+        </DndContext>
       </div>
     </div>
   );

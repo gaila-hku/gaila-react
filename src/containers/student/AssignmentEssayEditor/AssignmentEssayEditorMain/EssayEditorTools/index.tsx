@@ -11,12 +11,15 @@ import EssayEditorIdeationGuidingTool from 'containers/student/AssignmentEssayEd
 import EssayEditorOutlineReviewTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorOutlineReviewTool';
 import EssayEditorRevisionTool from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorRevisionTool';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import { apiGetLatestSturcturedGptLog } from 'api/gpt';
 import tuple from 'utils/types/tuple';
 
 const EssayEditorTools = () => {
-  const { assignment, essay, currentStage, outlineConfirmed, draftConfirmed } =
+  const { outliningEnabled, revisingEnabled } =
+    useAssignmentSubmissionProvider();
+  const { essay, currentStage, outlineConfirmed, draftConfirmed } =
     useAssignmentEssayEditorProvider();
 
   const tools = currentStage?.tools ?? [];
@@ -58,36 +61,35 @@ const EssayEditorTools = () => {
   const availableTools = useMemo(() => {
     return [
       ...(!!ideationGuidingTool &&
-      (!outlineConfirmed || !assignment?.config?.outline_enabled) &&
-      (!draftConfirmed || !assignment?.config?.revision_enabled)
+      (!outlineConfirmed || !outliningEnabled) &&
+      (!draftConfirmed || !revisingEnabled)
         ? ['ideation_guiding']
         : []),
       ...(!!outlineReviewTool &&
-      assignment?.config?.outline_enabled &&
+      outliningEnabled &&
       !outlineConfirmed &&
-      (!draftConfirmed || !assignment?.config?.revision_enabled)
+      (!draftConfirmed || !revisingEnabled)
         ? ['outline_review']
         : []),
       ...(dictionaryTool ? ['dictionary'] : []),
-      ...(!!autoGradeTool &&
-      (outlineConfirmed || !assignment?.config?.outline_enabled)
+      ...(!!autoGradeTool && (outlineConfirmed || !outliningEnabled)
         ? ['autograde']
         : []),
       ...(!!revisionTool &&
-      (outlineConfirmed || !assignment?.config?.outline_enabled) &&
-      (draftConfirmed || !assignment?.config?.revision_enabled)
+      (outlineConfirmed || !outliningEnabled) &&
+      (draftConfirmed || !revisingEnabled)
         ? ['revision']
         : []),
     ];
   }, [
-    assignment?.config?.outline_enabled,
-    assignment?.config?.revision_enabled,
-    autoGradeTool,
-    dictionaryTool,
-    draftConfirmed,
     ideationGuidingTool,
-    outlineReviewTool,
     outlineConfirmed,
+    outliningEnabled,
+    draftConfirmed,
+    revisingEnabled,
+    outlineReviewTool,
+    dictionaryTool,
+    autoGradeTool,
     revisionTool,
   ]);
 

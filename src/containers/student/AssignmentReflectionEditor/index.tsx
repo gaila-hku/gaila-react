@@ -21,7 +21,10 @@ import AssignmentReflectionGoals from 'containers/student/AssignmentReflectionEd
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type { AssignmentReflectionContent } from 'types/assignment';
+import type {
+  AssignmentReflectionContent,
+  AssignmentStageReflection,
+} from 'types/assignment';
 
 const AssignmentReflectionEditor = () => {
   const {
@@ -99,14 +102,14 @@ const AssignmentReflectionEditor = () => {
   }
 
   const reflectionQuestions =
-    assignmentProgress.assignment.config?.reflection_questions?.map(
-      question => ({
-        question,
-        placeholder:
-          REFLECTION_QUESTIONS.find(q => q.question === question)
-            ?.placeholder || '',
-      }),
-    ) || REFLECTION_QUESTIONS;
+    (
+      currentStage as AssignmentStageReflection
+    ).config.reflection_questions?.map(question => ({
+      question,
+      placeholder:
+        REFLECTION_QUESTIONS.find(q => q.question === question)?.placeholder ||
+        '',
+    })) || REFLECTION_QUESTIONS;
 
   return (
     <>

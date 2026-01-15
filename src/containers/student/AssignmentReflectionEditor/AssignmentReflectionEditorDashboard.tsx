@@ -13,7 +13,10 @@ import DashboardPromptChart from 'containers/common/Dashboard/DashboardPromptCha
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import { apiGetAssignmentStudentAnalytics } from 'api/assignment';
-import type { AssignmentEssayContent } from 'types/assignment';
+import type {
+  AssignmentDraftingContent,
+  AssignmentRevisingContent,
+} from 'types/assignment';
 import tuple from 'utils/types/tuple';
 
 type Props = {
@@ -36,10 +39,16 @@ const AssignmentReflectionEditorDashboard = ({ assignmentId }: Props) => {
     if (!assignmentProgress) {
       return '';
     }
-    const essaySubmission = assignmentProgress.stages.find(
-      stage => stage.stage_type === 'writing',
-    ) as AssignmentEssayContent | undefined;
-    return essaySubmission?.essay || '';
+    const reviseSubmission = assignmentProgress.stages.find(
+      stage => stage.stage_type === 'revising',
+    ) as AssignmentRevisingContent | undefined;
+    if (reviseSubmission) {
+      return reviseSubmission.essay;
+    }
+    const draftSubmission = assignmentProgress.stages.find(
+      stage => stage.stage_type === 'drafting',
+    ) as AssignmentDraftingContent | undefined;
+    return draftSubmission?.essay || '';
   }, [assignmentProgress]);
 
   if (isLoading) {

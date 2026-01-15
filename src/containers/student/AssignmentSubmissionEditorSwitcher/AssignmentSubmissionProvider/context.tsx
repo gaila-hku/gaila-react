@@ -26,6 +26,8 @@ export interface AssignmentSubmissionProviderType {
     unknown
   >;
   isSaving: boolean;
+  outliningEnabled: boolean;
+  revisingEnabled: boolean;
 }
 
 const AssignmentSubmissionProviderContext =
@@ -40,6 +42,8 @@ const AssignmentSubmissionProviderContext =
     setCurrentStageIndex: () => {},
     saveSubmission: () => {},
     isSaving: false,
+    outliningEnabled: false,
+    revisingEnabled: false,
   });
 
 export const { Provider, Consumer } = AssignmentSubmissionProviderContext;

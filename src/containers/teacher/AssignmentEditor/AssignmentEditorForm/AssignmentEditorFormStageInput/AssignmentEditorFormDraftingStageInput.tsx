@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 
 import CheckboxInput from 'components/input/CheckboxInput';
 
-import { GOAL_STAGE_TOOLS } from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/utils';
+import { DRAFTING_STAGE_TOOLS } from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/utils';
 
 import type { AssignmentStageEditType } from 'types/assignment';
 
@@ -11,7 +11,7 @@ type Props = {
   onStageChange: (stage: AssignmentStageEditType) => void;
 };
 
-const AssignmentEditorFormGoalStageInput = ({
+const AssignmentEditorFormDraftingStageInput = ({
   stage,
   onStageChange,
 }: Props) => {
@@ -32,7 +32,7 @@ const AssignmentEditorFormGoalStageInput = ({
 
   return (
     <>
-      {GOAL_STAGE_TOOLS.map(tool => (
+      {DRAFTING_STAGE_TOOLS.map(tool => (
         <CheckboxInput
           key={tool.key}
           labelSx={{
@@ -49,4 +49,4 @@ const AssignmentEditorFormGoalStageInput = ({
   );
 };
 
-export default AssignmentEditorFormGoalStageInput;
+export default AssignmentEditorFormDraftingStageInput;

@@ -9,24 +9,18 @@ import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmis
 type Props = { activeWritingStep: 'outline' | 'draft' | 'revision' };
 
 const EssayEditorStageStepper = ({ activeWritingStep }: Props) => {
-  const { assignment } = useAssignmentSubmissionProvider();
+  const { outliningEnabled, revisingEnabled } =
+    useAssignmentSubmissionProvider();
 
   const activeStep = useMemo(() => {
     return [
-      ...(assignment?.config?.outline_enabled ? ['outline'] : []),
+      ...(outliningEnabled ? ['outline'] : []),
       'draft',
-      ...(assignment?.config?.revision_enabled ? ['revision'] : []),
+      ...(revisingEnabled ? ['revision'] : []),
     ].indexOf(activeWritingStep);
-  }, [
-    activeWritingStep,
-    assignment?.config?.outline_enabled,
-    assignment?.config?.revision_enabled,
-  ]);
+  }, [activeWritingStep, outliningEnabled, revisingEnabled]);
 
-  if (
-    !assignment?.config?.outline_enabled &&
-    !assignment?.config?.revision_enabled
-  ) {
+  if (!outliningEnabled && !revisingEnabled) {
     return null;
   }
 
@@ -37,7 +31,7 @@ const EssayEditorStageStepper = ({ activeWritingStep }: Props) => {
         alternativeLabel
         className="basis-[400px]"
       >
-        {assignment?.config?.outline_enabled && (
+        {outliningEnabled && (
           <Step>
             <StepLabel>
               <div className="-mt-2">Outline</div>
@@ -55,7 +49,7 @@ const EssayEditorStageStepper = ({ activeWritingStep }: Props) => {
             </div>
           </StepLabel>
         </Step>
-        {assignment?.config?.revision_enabled && (
+        {revisingEnabled && (
           <Step>
             <StepLabel>
               <div className="-mt-2">Revising</div>

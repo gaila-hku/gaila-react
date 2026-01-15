@@ -47,7 +47,7 @@ const AssignmentSubmissionStepper = () => {
   );
 
   return (
-    <Stepper activeStep={stepperActiveStep} className="basis-[400px]">
+    <Stepper activeStep={stepperActiveStep} className="basis-[1000px]">
       {assignmentProgress.stages
         .filter(s => s.enabled)
         .map((stage, index) => (

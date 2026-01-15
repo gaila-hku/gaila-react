@@ -28,9 +28,10 @@ const EssayEditorRevisionToolRevisionItem = ({
   explanationItem,
   isExplanationLoading,
 }: Props) => {
-  const { assignment, essay, setEssay } = useAssignmentEssayEditorProvider();
+  const { currentStage, essay, setEssay } = useAssignmentEssayEditorProvider();
   const isRevisionAskExplanation =
-    assignment?.config?.revision_tool_ask_explanation ?? false;
+    currentStage?.stage_type === 'revising' &&
+    currentStage.config.revision_tool_ask_explanation;
 
   const [explanation, setExplanation] = useState('');
 

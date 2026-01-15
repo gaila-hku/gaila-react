@@ -8,27 +8,23 @@ import Clickable from 'components/input/Clickable';
 import TextInput from 'components/input/TextInput';
 
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
+import { REFLECTION_STAGE_TOOLS } from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/utils';
 
-import type { Assignment, AssignmentStageEditType } from 'types/assignment';
+import type {
+  AssignmentStageEditType,
+  AssignmentStageReflection,
+} from 'types/assignment';
 
 type Props = {
   stage: AssignmentStageEditType;
   onStageChange: (stage: AssignmentStageEditType) => void;
-  formDataConfigValue: Assignment['config'];
-  onFormDataChange: (field: string, value: any) => void;
 };
-
-const REFLECTION_STAGE_TOOLS = [
-  { key: 'reflection_general', label: 'General Chatbot' },
-];
 
 const defaultReflectionQuestions = REFLECTION_QUESTIONS.map(s => s.question);
 
 const AssignmentEditorFormReflectionStageInput = ({
   stage,
   onStageChange,
-  formDataConfigValue,
-  onFormDataChange,
 }: Props) => {
   const [reflectionQuestions, setReflectionQuestions] = useState(
     defaultReflectionQuestions,
@@ -52,26 +48,39 @@ const AssignmentEditorFormReflectionStageInput = ({
 
   useEffect(() => {
     setReflectionQuestions(
-      formDataConfigValue?.reflection_questions || defaultReflectionQuestions,
+      (stage as AssignmentStageReflection).config.reflection_questions ||
+        defaultReflectionQuestions,
     );
-  }, [formDataConfigValue?.reflection_questions]);
+  }, [stage]);
 
   const onAddReflectionQuestion = useCallback(() => {
     const newReflectionQuestions = [...reflectionQuestions];
     newReflectionQuestions.push(reflectionQuestionInput.trim());
     setReflectionQuestions(newReflectionQuestions);
-    onFormDataChange('config.reflection_questions', newReflectionQuestions);
+    onStageChange({
+      ...stage,
+      config: {
+        ...stage.config,
+        reflection_questions: newReflectionQuestions,
+      },
+    });
     setReflectionQuestionInput('');
-  }, [onFormDataChange, reflectionQuestionInput, reflectionQuestions]);
+  }, [onStageChange, reflectionQuestionInput, reflectionQuestions, stage]);
 
   const onRemoveReflectionQuestion = useCallback(
     (index: number) => {
       const newReflectionQuestions = [...reflectionQuestions];
       newReflectionQuestions.splice(index, 1);
       setReflectionQuestions(newReflectionQuestions);
-      onFormDataChange('config.reflection_questions', newReflectionQuestions);
+      onStageChange({
+        ...stage,
+        config: {
+          ...stage.config,
+          reflection_questions: newReflectionQuestions,
+        },
+      });
     },
-    [onFormDataChange, reflectionQuestions],
+    [onStageChange, reflectionQuestions, stage],
   );
 
   return (
@@ -94,7 +103,7 @@ const AssignmentEditorFormReflectionStageInput = ({
       {reflectionQuestions.map((question, index) => (
         <div className="flex gap-2 items-start pb-2" key={index}>
           <p className="text-sm">{index + 1}. </p>
-          <p className="text-sm">{question}</p>
+          <p className="text-sm w-full">{question}</p>
           <Clickable onClick={() => onRemoveReflectionQuestion(index)}>
             <X className="w-4 h-4" />
           </Clickable>

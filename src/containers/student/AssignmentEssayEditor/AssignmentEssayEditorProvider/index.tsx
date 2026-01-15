@@ -4,8 +4,9 @@ import { Provider } from 'containers/student/AssignmentEssayEditor/AssignmentEss
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import type {
-  AssignmentEssayContent,
+  AssignmentDraftingContent,
   AssignmentGoalContent,
+  AssignmentOutliningContent,
 } from 'types/assignment';
 
 type Props = {
@@ -13,15 +14,8 @@ type Props = {
 };
 
 const AssignmentEssayEditorProvider = ({ children }: Props) => {
-  const {
-    assignmentProgress,
-    currentStage,
-    isLoading,
-    error,
-    assignment,
-    teacherGrade,
-    readonly,
-  } = useAssignmentSubmissionProvider();
+  const { assignmentProgress, currentStage } =
+    useAssignmentSubmissionProvider();
 
   const [title, setTitle] = useState('');
   const [outline, setOutline] = useState('');
@@ -34,10 +28,11 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
   );
 
   useEffect(() => {
-    if (!assignmentProgress || !currentStage) {
+    if (!assignmentProgress) {
       return;
     }
 
+    // 1. Init goal content
     const goalStage = assignmentProgress.stages.find(stage => {
       return stage.stage_type === 'goal_setting';
     });
@@ -45,30 +40,51 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       setGoalContent(goalStage.submission.content as AssignmentGoalContent);
     }
 
-    const submission = currentStage.submission;
-
-    if (!submission) {
-      return;
+    // 2. Init outline
+    const outliningStage = assignmentProgress.stages.find(stage => {
+      return stage.stage_type === 'outlining';
+    });
+    if (outliningStage?.submission) {
+      const outlineContent = outliningStage.submission
+        .content as AssignmentOutliningContent;
+      setOutline(outlineContent.outline);
+      setOutlineConfirmed(outliningStage.submission.is_final || false);
     }
 
-    try {
-      const submissionContent = submission.content as AssignmentEssayContent;
-      setEssay(submissionContent.essay);
-      setOutlineConfirmed(submissionContent.outline_confirmed);
-      setDraftConfirmed(submissionContent.draft_confirmed);
-    } catch (e) {
-      console.error(e);
+    const draftingStage = assignmentProgress.stages.find(stage => {
+      return stage.stage_type === 'drafting';
+    });
+    if (draftingStage?.submission) {
+      setDraftConfirmed(draftingStage.submission.is_final || false);
+    }
+
+    // 3. Init essay and title
+    if (
+      !!currentStage?.submission &&
+      (currentStage.stage_type === 'drafting' ||
+        currentStage.stage_type === 'revising')
+    ) {
+      const currentContent = currentStage.submission
+        ?.content as AssignmentDraftingContent;
+      setTitle(currentContent.title);
+      setEssay(currentContent.essay);
     }
   }, [assignmentProgress, currentStage, setGoalContent]);
+
+  const nextStageType = useMemo(() => {
+    if (!assignmentProgress) {
+      return null;
+    }
+    return (
+      assignmentProgress.stages[assignmentProgress.current_stage + 1]
+        ?.stage_type || null
+    );
+  }, [assignmentProgress]);
 
   const value = useMemo(
     () => ({
       assignmentProgress,
-      isLoading,
-      error,
       currentStage,
-      assignment,
-      teacherGrade,
       title,
       setTitle,
       outline,
@@ -81,22 +97,18 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       setDraftConfirmed,
       goalContent,
       setGoalContent,
-      readonly,
+      nextStageType,
     }),
     [
-      assignment,
       assignmentProgress,
       currentStage,
       draftConfirmed,
-      error,
       essay,
       goalContent,
-      isLoading,
       outline,
       outlineConfirmed,
-      readonly,
-      teacherGrade,
       title,
+      nextStageType,
     ],
   );
 

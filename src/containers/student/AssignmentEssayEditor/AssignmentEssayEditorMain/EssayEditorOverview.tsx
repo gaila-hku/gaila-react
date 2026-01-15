@@ -17,6 +17,7 @@ import Divider from 'components/display/Divider';
 
 import AssignmentGoalChecker from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/AssignmentGoalChecker';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import type {
   Assignment,
@@ -33,7 +34,8 @@ type Props = {
 };
 
 const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
-  const { goalContent, readonly } = useAssignmentEssayEditorProvider();
+  const { readonly } = useAssignmentSubmissionProvider();
+  const { goalContent } = useAssignmentEssayEditorProvider();
 
   const wordCountDisplay = useMemo(() => {
     let display = '';

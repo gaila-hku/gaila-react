@@ -15,6 +15,7 @@ import DashboardInsights from 'containers/common/Dashboard/DashboardInsights';
 import DashboardPlagiarismDetector from 'containers/common/Dashboard/DashboardPlagiarismDetector';
 import DashboardPromptChart from 'containers/common/Dashboard/DashboardPromptChart';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import { apiGetAssignmentStudentAnalytics } from 'api/assignment';
 import { apiSaveTraceData } from 'api/trace-data';
@@ -36,7 +37,8 @@ const DASHBOARD_SECTIONS = [
 ];
 
 const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
-  const { essay, assignmentProgress, currentStage, assignment, goalContent } =
+  const { assignment } = useAssignmentSubmissionProvider();
+  const { essay, assignmentProgress, currentStage, goalContent } =
     useAssignmentEssayEditorProvider();
   const { mutateAsync: saveTraceData } = useMutation(apiSaveTraceData);
   const {

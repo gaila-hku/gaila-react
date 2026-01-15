@@ -8,6 +8,7 @@ import type {
   AssignmentOptions,
   AssignmentProgress,
   AssignmentRecentSubmissionListingItem,
+  AssignmentStage,
   AssignmentSubmission,
   AssignmentSubmissionDetails,
   AssignmentSubmissionListingItem,
@@ -74,11 +75,9 @@ export interface AssignmentCreatePayload {
   tips?: string[];
   enrolled_class_ids?: number[];
   enrolled_student_ids?: number[];
-  stages: {
-    stage_type: string;
-    enabled: boolean;
+  stages: (Omit<AssignmentStage, 'id' | 'order_index' | 'tools'> & {
     tools: { key: string; enabled: boolean }[];
-  }[];
+  })[];
 }
 
 export const apiCreateAssignment = (

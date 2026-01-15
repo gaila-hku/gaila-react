@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import clsx from 'clsx';
 import dayjs from 'dayjs';
@@ -23,8 +23,8 @@ import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssay
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import type {
-  AssignmentEssayContent,
   AssignmentGoalContent,
+  AssignmentWritingContent,
 } from 'types/assignment';
 import getWordCount from 'utils/helper/getWordCount';
 
@@ -34,11 +34,18 @@ type WordCountStatus = {
 };
 
 function AssignmentEssayEditorMain() {
-  const { assignmentProgress, currentStage, saveSubmission, isSaving } =
-    useAssignmentSubmissionProvider();
   const {
     assignment,
     teacherGrade,
+    assignmentProgress,
+    currentStage,
+    saveSubmission,
+    isSaving,
+    readonly,
+    outliningEnabled,
+    revisingEnabled,
+  } = useAssignmentSubmissionProvider();
+  const {
     title,
     outline,
     setOutline,
@@ -50,7 +57,7 @@ function AssignmentEssayEditorMain() {
     setDraftConfirmed,
     goalContent,
     setGoalContent,
-    readonly,
+    nextStageType,
   } = useAssignmentEssayEditorProvider();
 
   const { alertMsg } = useAlert();
@@ -63,7 +70,6 @@ function AssignmentEssayEditorMain() {
     color: '',
     text: '',
   });
-  const [editOutlineModalOpen, setEditOutlineModalOpen] = useState(false);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
 
   const updateWordCountStatus = useCallback(
@@ -113,25 +119,9 @@ function AssignmentEssayEditorMain() {
     ],
   );
 
-  // Init title, outline, word count
-  useEffect(() => {
-    if (!assignmentProgress || !currentStage?.submission) {
-      return;
-    }
-
-    try {
-      const submissionContent = currentStage.submission
-        .content as AssignmentEssayContent;
-      setOutline(submissionContent.outline);
-      updateWordCountStatus(submissionContent.essay);
-    } catch (e) {
-      console.error(e);
-    }
-  }, [assignmentProgress, currentStage, setOutline, updateWordCountStatus]);
-
   const saveSubmissionContent = useCallback(
     (
-      newContent: Partial<AssignmentEssayContent>,
+      newContent: Partial<AssignmentWritingContent>,
       isFinal: boolean,
       alertMsg?: string,
     ) => {
@@ -207,13 +197,16 @@ function AssignmentEssayEditorMain() {
     }
     setOutlineConfirmed(true);
     saveSubmissionContent(
-      { outline_confirmed: true },
-      false,
-      'You have saved your outline. You can now draft your essay.',
+      {},
+      true,
+      nextStageType === 'drafting'
+        ? 'You have saved your outline. You can now draft your essay.'
+        : '',
     );
   }, [
     assignmentProgress,
     currentStage,
+    nextStageType,
     saveSubmissionContent,
     setOutlineConfirmed,
   ]);
@@ -255,17 +248,17 @@ function AssignmentEssayEditorMain() {
     }
     setDraftConfirmed(true);
     saveSubmissionContent(
-      { draft_confirmed: true },
-      assignment?.config?.revision_enabled ? false : true,
-      assignment?.config?.revision_enabled
+      {},
+      true,
+      nextStageType === 'revising'
         ? 'You are now at the revision stage. Use various tools to aid your revision.'
         : '',
     );
   }, [
-    assignment?.config?.revision_enabled,
     assignmentProgress,
     checkWordCountAndAlert,
     currentStage,
+    nextStageType,
     saveSubmissionContent,
     setDraftConfirmed,
   ]);
@@ -279,18 +272,13 @@ function AssignmentEssayEditorMain() {
 
   const activeWritingStep: 'outline' | 'draft' | 'revision' = useMemo(() => {
     let currentStep: 'outline' | 'draft' | 'revision' = 'draft';
-    if (!outlineConfirmed && assignment?.config?.outline_enabled) {
+    if (!outlineConfirmed && outliningEnabled) {
       currentStep = 'outline';
-    } else if (draftConfirmed && assignment?.config?.revision_enabled) {
+    } else if (draftConfirmed && revisingEnabled) {
       currentStep = 'revision';
     }
     return currentStep;
-  }, [
-    assignment?.config?.outline_enabled,
-    assignment?.config?.revision_enabled,
-    draftConfirmed,
-    outlineConfirmed,
-  ]);
+  }, [draftConfirmed, outlineConfirmed, outliningEnabled, revisingEnabled]);
 
   const bottomButton = useMemo(() => {
     const buttonClass = 'w-full gap-2';
@@ -316,7 +304,7 @@ function AssignmentEssayEditorMain() {
             size="lg"
           >
             <CheckCircle className="h-4 w-4" />
-            {assignment?.config?.revision_enabled
+            {revisingEnabled
               ? 'Confirm Draft & Start Revising'
               : 'Submit Essay'}
           </Button>
@@ -335,12 +323,12 @@ function AssignmentEssayEditorMain() {
     }
   }, [
     activeWritingStep,
-    assignment?.config?.revision_enabled,
     handleConfirmDraft,
     handleConfirmOutline,
     handleFinalSave,
     isSaving,
     readonly,
+    revisingEnabled,
   ]);
 
   if (!assignmentProgress || !currentStage || !assignment) {
@@ -399,7 +387,7 @@ function AssignmentEssayEditorMain() {
           />
 
           {/* Outline editor */}
-          {assignment.config?.outline_enabled && (
+          {outliningEnabled && (
             <Card
               classes={{
                 description: '-mt-2 mb-2',
@@ -423,26 +411,12 @@ function AssignmentEssayEditorMain() {
                 onChange={setOutline}
                 value={outline}
               />
-              {outlineConfirmed && (
-                <>
-                  <Button
-                    className="mt-3 ml-auto"
-                    onClick={() => setEditOutlineModalOpen(true)}
-                  >
-                    Edit Outline
-                  </Button>
-                  <EssayEditorOutlineEditModal
-                    open={editOutlineModalOpen}
-                    saveSubmissionContent={saveSubmissionContent}
-                    setOpen={setEditOutlineModalOpen}
-                  />
-                </>
-              )}
+              {outlineConfirmed && <EssayEditorOutlineEditModal />}
             </Card>
           )}
 
           {/* Essay Editor */}
-          {(!assignment.config?.outline_enabled || outlineConfirmed) && (
+          {(!outliningEnabled || outlineConfirmed) && (
             <Card title="Essay Content">
               {teacherGrade ? (
                 <div className="text-xs text-purple-600">

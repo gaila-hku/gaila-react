@@ -15,8 +15,9 @@ import SubmissionDetailsReminder from 'containers/teacher/SubmissionDetails/Subm
 
 import { apiViewAssignmentSubmission } from 'api/assignment';
 import type {
-  AssignmentEssayContent,
+  AssignmentDraftingContent,
   AssignmentGoalContent,
+  AssignmentRevisingContent,
 } from 'types/assignment';
 import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
 import getUserName from 'utils/helper/getUserName';
@@ -78,10 +79,16 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
   }, [submissionDetails]);
 
   const submittedEssay = useMemo(() => {
-    const writingSubmission = submissionDetails?.submissions.find(
-      s => s.stage_type === 'writing',
+    const revisingSubmission = submissionDetails?.submissions.find(
+      s => s.stage_type === 'revising',
     );
-    return (writingSubmission?.content as AssignmentEssayContent)?.essay;
+    if (revisingSubmission?.content) {
+      return (revisingSubmission.content as AssignmentRevisingContent).essay;
+    }
+    const draftingSubmission = submissionDetails?.submissions.find(
+      s => s.stage_type === 'drafting',
+    );
+    return (draftingSubmission?.content as AssignmentDraftingContent)?.essay;
   }, [submissionDetails]);
 
   const plagiarisedPercentage = useMemo(() => {
@@ -147,11 +154,10 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
         </Card>
 
         <SubmissionDetailsAnalytics
-          analytics={submissionDetails.analytics}
-          assignment={submissionDetails.assignment}
           essay={submittedEssay}
           goalContent={submittedGoalContent}
           studentId={studentId}
+          submissionDetails={submissionDetails}
         />
       </div>
 

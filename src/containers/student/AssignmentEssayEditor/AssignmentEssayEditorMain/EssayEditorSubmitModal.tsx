@@ -11,8 +11,8 @@ import EssayEditorGoalChecker from 'containers/student/AssignmentEssayEditor/Ass
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
 import type {
-  AssignmentEssayContent,
   AssignmentGoalContent,
+  AssignmentWritingContent,
 } from 'types/assignment';
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
 
   onChangeGoals: (goals: AssignmentGoalContent) => void;
   saveSubmissionContent: (
-    newContent: Partial<AssignmentEssayContent>,
+    newContent: Partial<AssignmentWritingContent>,
     isFinal: boolean,
   ) => void;
 };

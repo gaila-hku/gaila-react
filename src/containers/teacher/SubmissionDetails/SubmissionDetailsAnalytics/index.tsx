@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { PieChartIcon } from 'lucide-react';
 
@@ -12,26 +12,43 @@ import PromptHistory from 'containers/teacher/SubmissionDetails/SubmissionDetail
 import RevisionExplanationHistory from 'containers/teacher/SubmissionDetails/SubmissionDetailsAnalytics/RevisionExplanationHistory';
 
 import type {
-  Assignment,
-  AssignmentAnalytics,
   AssignmentGoalContent,
+  AssignmentSubmissionDetails,
 } from 'types/assignment';
 
 type Props = {
-  analytics: AssignmentAnalytics;
-  assignment: Assignment;
+  submissionDetails: AssignmentSubmissionDetails;
   essay: string;
   goalContent: AssignmentGoalContent;
   studentId: number;
 };
 
 const SubmissionDetailsAnalytics = ({
-  analytics,
-  assignment,
+  submissionDetails,
   essay,
   goalContent,
   studentId,
 }: Props) => {
+  const assignment = useMemo(
+    () => submissionDetails.assignment,
+    [submissionDetails],
+  );
+
+  const analytics = useMemo(
+    () => submissionDetails.analytics,
+    [submissionDetails],
+  );
+
+  const explanationEnabled = useMemo(() => {
+    const revisingStage = submissionDetails.stages.find(
+      stage => stage.stage_type === 'revising',
+    );
+    if (!revisingStage) {
+      return false;
+    }
+    return revisingStage.config.revision_tool_ask_explanation;
+  }, [submissionDetails.stages]);
+
   return (
     <Card
       classes={{ description: '-mt-2 mb-2' }}
@@ -85,7 +102,7 @@ const SubmissionDetailsAnalytics = ({
               />
             ),
           },
-          ...(assignment.config?.revision_tool_ask_explanation
+          ...(explanationEnabled
             ? [
                 {
                   key: 'revision_explanations',

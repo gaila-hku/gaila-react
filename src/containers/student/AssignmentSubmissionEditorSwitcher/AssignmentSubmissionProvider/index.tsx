@@ -46,19 +46,29 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
       return null;
     }
 
-    return assignmentProgress.stages[currentStageIndex];
+    return assignmentProgress.stages.filter(s => s.enabled)[currentStageIndex];
   }, [assignmentProgress, currentStageIndex]);
 
   const { mutate: saveSubmission, isLoading: isSaving } = useMutation(
     apiSaveAssignmentSubmission,
     {
       onSuccess: async (res, req) => {
-        const currentContent =
-          currentStage?.stage_type === 'goal_setting'
-            ? 'Goals'
-            : currentStage?.stage_type === 'writing'
-              ? 'Essay'
-              : 'Reflections';
+        let currentContent = 'Progress';
+        switch (currentStage?.stage_type) {
+          case 'goal_setting':
+            currentContent = 'Goals';
+            break;
+          case 'outlining':
+            currentContent = 'Outline';
+            break;
+          case 'drafting':
+          case 'revising':
+            currentContent = 'Draft';
+            break;
+          case 'reflection':
+            currentContent = 'Reflections';
+            break;
+        }
 
         if (req.refetchProgress) {
           queryClient.invalidateQueries([apiViewAssignmentProgress.queryKey]);
@@ -86,7 +96,24 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
     const grade = currentStage.grade;
     return [assignmentProgress.assignment, grade];
   }, [assignmentProgress, currentStage]);
-  const readonly = !!teacherGrade || assignmentProgress?.is_finished || false;
+
+  const readonly =
+    !!teacherGrade ||
+    assignmentProgress?.is_finished ||
+    currentStage?.submission?.is_final ||
+    false;
+
+  const [outliningEnabled, revisingEnabled] = useMemo(
+    () => [
+      assignmentProgress?.stages.some(
+        stage => stage.stage_type === 'outlining' && stage.enabled,
+      ) || false,
+      assignmentProgress?.stages.some(
+        stage => stage.stage_type === 'revising' && stage.enabled,
+      ) || false,
+    ],
+    [assignmentProgress?.stages],
+  );
 
   const value = useMemo(
     () => ({
@@ -100,6 +127,8 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
       error,
       saveSubmission,
       isSaving,
+      outliningEnabled,
+      revisingEnabled,
     }),
     [
       assignment,
@@ -108,7 +137,9 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
       error,
       isLoading,
       isSaving,
+      outliningEnabled,
       readonly,
+      revisingEnabled,
       saveSubmission,
       teacherGrade,
     ],

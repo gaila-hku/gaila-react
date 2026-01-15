@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 
 import dayjs from 'dayjs';
 import { FileText, Save } from 'lucide-react';
@@ -11,12 +11,12 @@ import TextInput from 'components/input/TextInput';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type { AssignmentEssayContent } from 'types/assignment';
+import type { AssignmentWritingContent } from 'types/assignment';
 
 type Props = {
   wordCountStatus: { color: string; text: string };
   saveSubmissionContent: (
-    newContent: Partial<AssignmentEssayContent>,
+    newContent: Partial<AssignmentWritingContent>,
     isFinal: boolean,
     alertMsg?: string,
   ) => void;
@@ -26,23 +26,9 @@ const EssayEditorHeader = ({
   wordCountStatus,
   saveSubmissionContent,
 }: Props) => {
-  const { currentStage, isSaving } = useAssignmentSubmissionProvider();
-  const { readonly, assignment, outlineConfirmed, title, setTitle } =
+  const { readonly, assignment, isSaving } = useAssignmentSubmissionProvider();
+  const { outlineConfirmed, title, setTitle } =
     useAssignmentEssayEditorProvider();
-
-  useEffect(() => {
-    if (!currentStage?.submission) {
-      return;
-    }
-
-    try {
-      const submissionContent = currentStage.submission
-        .content as AssignmentEssayContent;
-      setTitle(submissionContent.title);
-    } catch (e) {
-      console.error(e);
-    }
-  }, [currentStage?.submission, setTitle]);
 
   const onTitleBlur = useCallback(
     (e: React.FocusEvent<HTMLInputElement>) => {

@@ -6,29 +6,27 @@ import { GripVertical } from 'lucide-react';
 
 import Button from 'components/input/Button';
 
+import AssignmentEditorFormDraftingStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormDraftingStageInput';
 import AssignmentEditorFormGoalStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormGoalStageInput';
+import AssignmentEditorFormLanguageStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormLanguageStageInput';
+import AssignmentEditorFormOutlineStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormOutlineStageInput';
+import AssignmentEditorFormReadingStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormReadingStageInput';
 import AssignmentEditorFormReflectionStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormReflectionStageInput';
-import AssignmentEditorFormWritingStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormWritingStageInput';
+import AssignmentEditorFormRevisingStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/AssignmentEditorFormRevisingStageInput';
 
-import type { Assignment, AssignmentStageEditType } from 'types/assignment';
+import type { AssignmentStageEditType } from 'types/assignment';
+import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
 
 type Props = {
   stage: AssignmentStageEditType;
-  stageIndex: number;
-  onStageChange: (
-    stageIndex: number,
-    stage: AssignmentStageEditType | null,
-  ) => void;
-  formDataConfigValue: Assignment['config'];
-  onFormDataChange: (field: string, value: any) => void;
+  index: number;
+  onStageChange: (stage: AssignmentStageEditType | null) => void;
 };
 
 const AssignmentEditorFormStageInputItem = ({
   stage,
-  stageIndex,
+  index,
   onStageChange,
-  formDataConfigValue,
-  onFormDataChange,
 }: Props) => {
   const {
     attributes,
@@ -36,10 +34,10 @@ const AssignmentEditorFormStageInputItem = ({
     setNodeRef: setDraggableNodeRef,
     transform,
   } = useDraggable({
-    id: `stage-item-draggable-${stageIndex}`,
+    id: `stage-item-draggable-${index}`,
   });
   const { isOver, setNodeRef: setDroppableNodeRef } = useDroppable({
-    id: `stage-item-droppable-${stageIndex}`,
+    id: `stage-item-droppable-${index}`,
   });
   const draggableStyle = transform
     ? {
@@ -47,50 +45,29 @@ const AssignmentEditorFormStageInputItem = ({
       }
     : undefined;
 
-  const stageTitle = useMemo(() => {
-    switch (stage.stage_type) {
-      case 'goal_setting':
-        return 'Goal Setting';
-      case 'writing':
-        return 'Writing';
-      case 'reflection':
-        return 'Reflection';
-    }
-  }, [stage.stage_type]);
-
   const stageInputElement = useMemo(() => {
+    const props = { onStageChange, stage };
     switch (stage.stage_type) {
+      case 'reading':
+        return <AssignmentEditorFormReadingStageInput {...props} />;
+      case 'language_preparation':
+        return <AssignmentEditorFormLanguageStageInput {...props} />;
       case 'goal_setting':
-        return (
-          <AssignmentEditorFormGoalStageInput
-            onStageChange={stage => onStageChange(stageIndex, stage)}
-            stage={stage}
-          />
-        );
-      case 'writing':
-        return (
-          <AssignmentEditorFormWritingStageInput
-            formDataConfigValue={formDataConfigValue}
-            onFormDataChange={onFormDataChange}
-            onStageChange={stage => onStageChange(stageIndex, stage)}
-            stage={stage}
-          />
-        );
+        return <AssignmentEditorFormGoalStageInput {...props} />;
+      case 'outlining':
+        return <AssignmentEditorFormOutlineStageInput {...props} />;
+      case 'drafting':
+        return <AssignmentEditorFormDraftingStageInput {...props} />;
+      case 'revising':
+        return <AssignmentEditorFormRevisingStageInput {...props} />;
       case 'reflection':
-        return (
-          <AssignmentEditorFormReflectionStageInput
-            formDataConfigValue={formDataConfigValue}
-            onFormDataChange={onFormDataChange}
-            onStageChange={stage => onStageChange(stageIndex, stage)}
-            stage={stage}
-          />
-        );
+        return <AssignmentEditorFormReflectionStageInput {...props} />;
     }
-  }, [formDataConfigValue, onFormDataChange, onStageChange, stage, stageIndex]);
+  }, [onStageChange, stage]);
 
   const handleStageRemove = useCallback(() => {
-    onStageChange(stageIndex, null);
-  }, [onStageChange, stageIndex]);
+    onStageChange(null);
+  }, [onStageChange]);
 
   return (
     <>
@@ -100,7 +77,7 @@ const AssignmentEditorFormStageInputItem = ({
       >
         <div className="flex-1">
           <div className="flex justify-between items-start">
-            <h4>{stageTitle}</h4>
+            <h4>{getStageTypeLabel(stage)}</h4>
             <Button onClick={handleStageRemove} size="sm" variant="secondary">
               Remove
             </Button>

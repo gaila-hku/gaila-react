@@ -19,7 +19,8 @@ import {
 } from 'api/assignment';
 import { apiAskAutogradeAgent } from 'api/gpt';
 import type {
-  AssignmentEssayContent,
+  AssignmentDraftingContent,
+  AssignmentRevisingContent,
   AssignmentSubmissionDetails,
   RubricItem,
 } from 'types/assignment';
@@ -56,17 +57,32 @@ const SubmissionDetailsGrading = ({
 
   const { successMsg } = useAlert();
 
-  const [essaySubmissionId, essay, essaySubmissionGrade] = useMemo(() => {
-    const writingSubmission = submissions.find(
-      submission => submission.stage_type === 'writing',
-    );
-    if (!writingSubmission) return [null, '', null];
-    return [
-      writingSubmission.id,
-      (writingSubmission.content as AssignmentEssayContent).essay || '',
-      writingSubmission.grade,
-    ];
-  }, [submissions]);
+  const [essaySubmissionId, essay, essaySubmissionGrade, isSubmissionFinal] =
+    useMemo(() => {
+      const revisingSubmission = submissions.find(
+        submission => submission.stage_type === 'revising',
+      );
+      if (revisingSubmission) {
+        return [
+          revisingSubmission.id,
+          (revisingSubmission.content as AssignmentRevisingContent).essay || '',
+          revisingSubmission.grade,
+          revisingSubmission.is_final,
+        ];
+      }
+      const draftingSubmission = submissions.find(
+        submission => submission.stage_type === 'drafting',
+      );
+      if (draftingSubmission) {
+        return [
+          draftingSubmission.id,
+          (draftingSubmission.content as AssignmentDraftingContent).essay || '',
+          draftingSubmission.grade,
+          draftingSubmission.is_final,
+        ];
+      }
+      return [null, '', null, false];
+    }, [submissions]);
 
   useEffect(() => {
     if (!essaySubmissionGrade) {
@@ -82,11 +98,8 @@ const SubmissionDetailsGrading = ({
     if (essaySubmissionGrade) {
       return;
     }
-    const submissionNotFinal = !submissions.some(
-      submission => submission.stage_type === 'writing' && submission.is_final,
-    );
-    setLocked(submissionNotFinal);
-  }, [essaySubmissionGrade, submissions]);
+    setLocked(isSubmissionFinal);
+  }, [essaySubmissionGrade, isSubmissionFinal]);
 
   const handleAIAutoGrade = useCallback(async () => {
     const res = await askAutogradeAgent({

@@ -5,6 +5,7 @@ import { useMutation } from 'react-query';
 import TextInput from 'components/input/TextInput';
 
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import { apiSaveTraceData } from 'api/trace-data';
 
@@ -27,8 +28,8 @@ const EssayEditorInput = ({
   disabled: inputDisabled,
   disableAutoSave,
 }: Props) => {
-  const { readonly, assignment, currentStage } =
-    useAssignmentEssayEditorProvider();
+  const { readonly, assignment } = useAssignmentSubmissionProvider();
+  const { currentStage } = useAssignmentEssayEditorProvider();
   const { mutateAsync: saveTraceData } = useMutation(apiSaveTraceData);
 
   const onChange = useCallback(

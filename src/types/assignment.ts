@@ -14,9 +14,6 @@ export interface Assignment {
   instructions?: string;
   tips?: string[];
   config?: {
-    outline_enabled?: boolean;
-    revision_enabled?: boolean;
-    revision_tool_ask_explanation?: boolean;
     dashboard?: {
       enabled?: boolean;
       word_count?: boolean;
@@ -29,7 +26,6 @@ export interface Assignment {
       agent_usage?: boolean;
       writing_insights?: boolean;
     };
-    reflection_questions?: string[];
   };
   requirements?: {
     min_word_count?: number | null;
@@ -61,12 +57,72 @@ export interface AssignmentDetails extends Assignment {
   stages: AssignmentStage[];
 }
 
-export interface AssignmentStage {
+export type AssignmentStage =
+  | AssignmentStageReading
+  | AssignmentStageGoalSetting
+  | AssignmentStageLanguagePreparation
+  | AssignmentStageOutlining
+  | AssignmentStageDrafting
+  | AssignmentStageRevising
+  | AssignmentStageReflection;
+
+export interface AssignmentStageBase {
   id: number;
-  stage_type: string;
+  stage_type:
+    | 'reading'
+    | 'goal_setting'
+    | 'language_preparation'
+    | 'outlining'
+    | 'drafting'
+    | 'revising'
+    | 'reflection';
   enabled: boolean;
   order_index: number;
   tools: { id: number; key: string; enabled: boolean }[];
+  config: Record<string, unknown>;
+}
+
+export interface AssignmentStageReading extends AssignmentStageBase {
+  stage_type: 'reading';
+  config: {
+    readings?: string[];
+    annotation_enabled?: boolean;
+  };
+}
+
+export interface AssignmentStageGoalSetting extends AssignmentStageBase {
+  stage_type: 'goal_setting';
+}
+
+export interface AssignmentStageLanguagePreparation
+  extends AssignmentStageBase {
+  stage_type: 'language_preparation';
+  config: {
+    readings?: string[];
+    vocabulary_enabled: boolean;
+  };
+}
+
+export interface AssignmentStageOutlining extends AssignmentStageBase {
+  stage_type: 'outlining';
+}
+
+export interface AssignmentStageDrafting extends AssignmentStageBase {
+  stage_type: 'drafting';
+}
+
+export interface AssignmentStageRevising extends AssignmentStageBase {
+  stage_type: 'revising';
+  config: {
+    revision_tool_ask_explanation?: boolean;
+  };
+}
+
+export interface AssignmentStageReflection extends AssignmentStageBase {
+  stage_type: 'reflection';
+  config: {
+    reflection_questions?: string[];
+  };
 }
 
 export type AssignmentStageEditType = AssignmentCreatePayload['stages'][number];
@@ -95,13 +151,33 @@ export interface AssignmentGoal {
   }[];
 }
 
-export interface AssignmentEssayContent {
-  title: string;
-  outline: string;
-  essay: string;
-  outline_confirmed: boolean;
-  draft_confirmed: boolean;
+export interface AssignmentReadingContent {
+  annotations: {
+    start_index: number;
+    end_index: number;
+    type: 'highlight' | 'comment';
+    comment?: string;
+  }[];
 }
+
+export interface AssignmentOutliningContent {
+  outline: string;
+}
+
+export interface AssignmentDraftingContent {
+  title: string;
+  essay: string;
+}
+
+export interface AssignmentRevisingContent {
+  title: string;
+  essay: string;
+}
+
+export type AssignmentWritingContent =
+  | AssignmentOutliningContent
+  | AssignmentDraftingContent
+  | AssignmentRevisingContent;
 
 export interface AssignmentReflectionContent {
   reflections: { [key: string]: string };
@@ -113,8 +189,11 @@ export interface AssignmentSubmission {
   stage_id: number;
   student_id: number;
   content:
+    | AssignmentReadingContent
     | AssignmentGoalContent
-    | AssignmentEssayContent
+    | AssignmentOutliningContent
+    | AssignmentDraftingContent
+    | AssignmentRevisingContent
     | AssignmentReflectionContent;
   submitted_at?: number;
   is_final?: boolean;
@@ -183,10 +262,13 @@ export interface AssignmentSubmissionDetails {
   submissions: {
     id: number;
     stage_id: number;
-    stage_type: string;
+    stage_type: AssignmentStage['stage_type'];
     content:
+      | AssignmentReadingContent
       | AssignmentGoalContent
-      | AssignmentEssayContent
+      | AssignmentOutliningContent
+      | AssignmentDraftingContent
+      | AssignmentRevisingContent
       | AssignmentReflectionContent;
     submitted_at: number;
     is_final: boolean;

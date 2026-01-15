@@ -29,11 +29,23 @@ const AssignmentSubmissionEditorSwitcher = () => {
       );
     }
 
+    if (currentStage.stage_type === 'reading') {
+      return <>WIP</>;
+    }
+
     if (currentStage.stage_type === 'goal_setting') {
       return <AssignmentGoalEditor />;
     }
 
-    if (currentStage.stage_type === 'writing') {
+    if (currentStage.stage_type === 'language_preparation') {
+      return <>WIP</>;
+    }
+
+    if (
+      currentStage.stage_type === 'outlining' ||
+      currentStage.stage_type === 'drafting' ||
+      currentStage.stage_type === 'revising'
+    ) {
       return <AssignmentEssayEditor />;
     }
 

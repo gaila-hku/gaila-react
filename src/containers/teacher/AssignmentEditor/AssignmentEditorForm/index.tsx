@@ -191,7 +191,6 @@ const AssignmentEditorForm = ({
       <Divider />
 
       <AssignmentEditorFormStageInput
-        formDataConfigValue={formData.current.config}
         formDataStageValue={formData.current.stages}
         isEditing={isEditing}
         onFormDataChange={onFormDataChange}
