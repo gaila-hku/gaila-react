@@ -256,10 +256,11 @@ function AssignmentEssayEditorMain() {
     setDraftConfirmed(true);
     saveSubmissionContent(
       { draft_confirmed: true },
-      false,
+      assignment?.config?.revision_enabled ? false : true,
       'You are now at the revision stage. Use various tools to aid your revision.',
     );
   }, [
+    assignment?.config?.revision_enabled,
     assignmentProgress,
     checkWordCountAndAlert,
     currentStage,
