@@ -281,7 +281,7 @@ const SubmissionDetailsContent = ({
     }
     return uniq(tabKeys).map(tabKey => ({
       key: tabKey,
-      title: getStageTypeLabel({ stage_type: tabKey }),
+      title: getStageTypeLabel({ stage_type: tabKey }, true),
       content: renderSubmissionContent(tabKey),
     }));
   }, [renderSubmissionContent, stages]);

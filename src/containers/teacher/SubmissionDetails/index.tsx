@@ -59,7 +59,7 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
     }
     return (
       <Badge variant="primary">
-        Submitted {getStageTypeLabel(lastSubmittedStage)}
+        Submitted {getStageTypeLabel(lastSubmittedStage, true)}
       </Badge>
     );
   }, [submissionDetails]);

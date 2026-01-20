@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import clsx from 'clsx';
-import dayjs from 'dayjs';
 import { defaultsDeep } from 'lodash-es';
 import { CheckCircle } from 'lucide-react';
 
@@ -14,7 +13,7 @@ import ResizableSidebar from 'containers/common/ResizableSidebar';
 import EssayEditorAIChat from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorAIChat';
 import EssayEditorHeader from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorHeader';
 import EssayEditorInput from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorInput';
-import EssayEditorOutlineEditModal from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOutlineEditModal';
+import EssayEditorOutlineEditButton from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOutlineEditButton';
 import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOverview';
 import EssayEditorStageStepper from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorStageStepper';
 import EssayEditorSubmitModal from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorSubmitModal';
@@ -41,8 +40,6 @@ function AssignmentEssayEditorMain() {
     currentStage,
     saveSubmission,
     isSaving,
-    readonly,
-    outliningEnabled,
     revisingEnabled,
   } = useAssignmentSubmissionProvider();
   const {
@@ -58,12 +55,14 @@ function AssignmentEssayEditorMain() {
     goalContent,
     setGoalContent,
     nextStageType,
+    readonly,
+    readonlyMessage,
   } = useAssignmentEssayEditorProvider();
 
   const { alertMsg } = useAlert();
 
   const generalChatTool = currentStage?.tools.find(
-    tool => tool.key === 'writing_general',
+    tool => tool.key === currentStage.stage_type + '_general',
   );
 
   const [wordCountStatus, setWordCountStatus] = useState<WordCountStatus>({
@@ -270,63 +269,62 @@ function AssignmentEssayEditorMain() {
     setSubmitModalOpen(true);
   }, [checkWordCountAndAlert]);
 
-  const activeWritingStep: 'outline' | 'draft' | 'revision' = useMemo(() => {
-    let currentStep: 'outline' | 'draft' | 'revision' = 'draft';
-    if (!outlineConfirmed && outliningEnabled) {
-      currentStep = 'outline';
-    } else if (draftConfirmed && revisingEnabled) {
-      currentStep = 'revision';
-    }
-    return currentStep;
-  }, [draftConfirmed, outlineConfirmed, outliningEnabled, revisingEnabled]);
-
   const bottomButton = useMemo(() => {
-    const buttonClass = 'w-full gap-2';
-    switch (activeWritingStep) {
-      case 'outline':
+    const props = {
+      className: 'w-full gap-2',
+      disabled: readonly || isSaving,
+      size: 'lg' as const,
+    };
+    if (currentStage?.stage_type === 'outlining') {
+      if (nextStageType === 'drafting') {
         return (
-          <Button
-            className={buttonClass}
-            disabled={readonly || isSaving}
-            onClick={handleConfirmOutline}
-            size="lg"
-          >
+          <Button onClick={handleConfirmOutline} {...props}>
             <CheckCircle className="h-4 w-4" />
             Lock Outline & Start Drafting
           </Button>
         );
-      case 'draft':
+      }
+      return (
+        <Button onClick={handleConfirmOutline} {...props}>
+          <CheckCircle className="h-4 w-4" />
+          Next Stage
+        </Button>
+      );
+    }
+    if (currentStage?.stage_type === 'drafting') {
+      if (nextStageType === 'revising') {
         return (
-          <Button
-            className={buttonClass}
-            disabled={readonly || isSaving}
-            onClick={handleConfirmDraft}
-            size="lg"
-          >
+          <Button onClick={handleConfirmDraft} {...props}>
             <CheckCircle className="h-4 w-4" />
-            {revisingEnabled
-              ? 'Confirm Draft & Start Revising'
-              : 'Submit Essay'}
+            Confirm Draft & Start Revising
           </Button>
         );
-      case 'revision':
-        return (
-          <Button
-            className={buttonClass}
-            disabled={readonly || isSaving}
-            onClick={() => handleFinalSave()}
-          >
-            <CheckCircle className="h-4 w-4" />
-            Finish Revising & Submit Essay
-          </Button>
-        );
+      }
+      return (
+        <Button
+          onClick={revisingEnabled ? handleConfirmDraft : handleFinalSave}
+          {...props}
+        >
+          <CheckCircle className="h-4 w-4" />
+          Submit Essay
+        </Button>
+      );
+    }
+    if (currentStage?.stage_type === 'revising') {
+      return (
+        <Button onClick={handleFinalSave} {...props}>
+          <CheckCircle className="h-4 w-4" />
+          Finish Revising & Submit Essay
+        </Button>
+      );
     }
   }, [
-    activeWritingStep,
+    currentStage?.stage_type,
     handleConfirmDraft,
     handleConfirmOutline,
     handleFinalSave,
     isSaving,
+    nextStageType,
     readonly,
     revisingEnabled,
   ]);
@@ -340,45 +338,30 @@ function AssignmentEssayEditorMain() {
       {/* Graded Status Alert */}
       {readonly && (
         <Card
-          className={
-            teacherGrade
-              ? 'border-purple-200 bg-purple-50'
-              : 'border-green-200 bg-green-50'
-          }
           classes={{
+            root: readonlyMessage?.bgClass,
             title: clsx(
               'flex items-center gap-2 text-base',
-              teacherGrade ? 'text-purple-800' : 'text-green-800',
+              readonlyMessage?.textClass,
             ),
           }}
           title={
             <>
-              <CheckCircle className="h-5 w-5" />
-              {teacherGrade ? 'Essay Graded' : 'Essay Submitted'}
+              {readonlyMessage?.icon}
+              {readonlyMessage?.title}
             </>
           }
         >
-          {teacherGrade ? (
-            <p className="text-sm text-purple-800">
-              This essay has been graded by {teacherGrade.graded_by} on{' '}
-              {dayjs(teacherGrade.graded_at).format('DD MMM YYYY')}. You can
-              view your grade in the Requirements tab, but editing and tools are
-              now disabled. You can still use the AI Chat for learning purposes.
-            </p>
-          ) : (
-            <p className="text-sm text-green-800">
-              You have already submitted your essay. Your teacher will grade it
-              soon. While you wait, you can review your essay and use the AI
-              Chat for learning purposes.
-            </p>
-          )}
+          <p className={clsx('text-sm', readonlyMessage?.textClass)}>
+            {readonlyMessage?.longMessage}
+          </p>
         </Card>
       )}
 
       <ResizableSidebar>
         {/* Main Editor */}
         <div className="space-y-6">
-          <EssayEditorStageStepper activeWritingStep={activeWritingStep} />
+          <EssayEditorStageStepper />
 
           {/* Header with save buttons */}
           <EssayEditorHeader
@@ -387,7 +370,7 @@ function AssignmentEssayEditorMain() {
           />
 
           {/* Outline editor */}
-          {outliningEnabled && (
+          {currentStage.stage_type === 'outlining' ? (
             <Card
               classes={{
                 description: '-mt-2 mb-2',
@@ -395,13 +378,9 @@ function AssignmentEssayEditorMain() {
               description="Create a structured outline for your essay. This will help guide your writing in the next stage."
               title="Outline Your Essay"
             >
-              {teacherGrade ? (
-                <div className="text-xs text-purple-600">
-                  This essay has been graded and can no longer be edited.
-                </div>
-              ) : readonly ? (
-                <div className="text-xs text-green-600">
-                  You have submitted your essay.
+              {readonly ? (
+                <div className={clsx('text-xs', readonlyMessage?.textClass)}>
+                  {readonlyMessage?.shortMessage}
                 </div>
               ) : null}
               <EssayEditorInput
@@ -411,30 +390,35 @@ function AssignmentEssayEditorMain() {
                 onChange={setOutline}
                 value={outline}
               />
-              {outlineConfirmed && <EssayEditorOutlineEditModal />}
+              {outlineConfirmed && <EssayEditorOutlineEditButton />}
             </Card>
-          )}
-
-          {/* Essay Editor */}
-          {(!outliningEnabled || outlineConfirmed) && (
-            <Card title="Essay Content">
-              {teacherGrade ? (
-                <div className="text-xs text-purple-600">
-                  This essay has been graded and can no longer be edited.
-                </div>
-              ) : readonly ? (
-                <div className="text-xs text-green-600">
-                  You have submitted your essay.
-                </div>
-              ) : null}
-              <EssayEditorInput
-                handleAutoSave={handleAutoSave}
-                minHeight={600}
-                onChange={setEssay}
-                updateWordCountStatus={updateWordCountStatus}
-                value={essay}
-              />
-            </Card>
+          ) : (
+            <>
+              {outlineConfirmed && (
+                <Card title="Outline">
+                  <EssayEditorInput
+                    disabled
+                    onChange={setOutline}
+                    value={outline}
+                  />
+                  <EssayEditorOutlineEditButton />
+                </Card>
+              )}
+              <Card title="Essay Content">
+                {readonly ? (
+                  <div className={clsx('text-xs', readonlyMessage?.textClass)}>
+                    {readonlyMessage?.shortMessage}
+                  </div>
+                ) : null}
+                <EssayEditorInput
+                  handleAutoSave={handleAutoSave}
+                  minHeight={600}
+                  onChange={setEssay}
+                  updateWordCountStatus={updateWordCountStatus}
+                  value={essay}
+                />
+              </Card>
+            </>
           )}
 
           {bottomButton}
@@ -453,7 +437,6 @@ function AssignmentEssayEditorMain() {
                   assignment={assignment}
                   grade={teacherGrade}
                   onChangeGoals={onChangeGoals}
-                  readonly={readonly}
                 />
               ),
             },

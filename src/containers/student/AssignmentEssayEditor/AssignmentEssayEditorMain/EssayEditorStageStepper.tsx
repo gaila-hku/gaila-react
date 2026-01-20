@@ -6,21 +6,22 @@ import Stepper from '@mui/material/Stepper';
 
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-type Props = { activeWritingStep: 'outline' | 'draft' | 'revision' };
-
-const EssayEditorStageStepper = ({ activeWritingStep }: Props) => {
-  const { outliningEnabled, revisingEnabled } =
+const EssayEditorStageStepper = () => {
+  const { outliningEnabled, revisingEnabled, currentStage } =
     useAssignmentSubmissionProvider();
 
   const activeStep = useMemo(() => {
+    if (!currentStage) {
+      return 0;
+    }
     return [
-      ...(outliningEnabled ? ['outline'] : []),
-      'draft',
-      ...(revisingEnabled ? ['revision'] : []),
-    ].indexOf(activeWritingStep);
-  }, [activeWritingStep, outliningEnabled, revisingEnabled]);
+      ...(outliningEnabled ? ['outlining'] : []),
+      'drafting',
+      ...(revisingEnabled ? ['revising'] : []),
+    ].indexOf(currentStage?.stage_type);
+  }, [currentStage, outliningEnabled, revisingEnabled]);
 
-  if (!outliningEnabled && !revisingEnabled) {
+  if (!currentStage || (!outliningEnabled && !revisingEnabled)) {
     return null;
   }
 

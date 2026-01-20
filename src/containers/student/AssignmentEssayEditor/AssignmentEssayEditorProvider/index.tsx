@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { AlertTriangle } from 'lucide-react';
+
 import { Provider } from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/context';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
@@ -14,8 +16,14 @@ type Props = {
 };
 
 const AssignmentEssayEditorProvider = ({ children }: Props) => {
-  const { assignmentProgress, currentStage } =
-    useAssignmentSubmissionProvider();
+  const {
+    assignmentProgress,
+    currentStage,
+    readonly: providerReadonly,
+    readonlyMessage: providerReadonlyMessage,
+    outliningEnabled,
+    revisingEnabled,
+  } = useAssignmentSubmissionProvider();
 
   const [title, setTitle] = useState('');
   const [outline, setOutline] = useState('');
@@ -81,6 +89,57 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
     );
   }, [assignmentProgress]);
 
+  const [readonly, readonlyMessage] = useMemo(() => {
+    if (providerReadonly) {
+      return [true, providerReadonlyMessage];
+    }
+    if (
+      currentStage?.stage_type === 'drafting' &&
+      outliningEnabled &&
+      !outlineConfirmed
+    ) {
+      return [
+        true,
+        {
+          title: 'Outline Required',
+          longMessage:
+            'You must complete and confirm your outline before you can start drafting your essay.',
+          shortMessage: 'Please complete your outline first.',
+          icon: <AlertTriangle className="h-5 w-5" />,
+          bgClass: 'bg-red-50 border-red-200',
+          textClass: 'text-red-600',
+        },
+      ];
+    }
+    if (
+      currentStage?.stage_type === 'revising' &&
+      revisingEnabled &&
+      !draftConfirmed
+    ) {
+      return [
+        true,
+        {
+          title: 'Draft Required',
+          longMessage:
+            'You must complete and confirm your draft before you can start revising your essay.',
+          shortMessage: 'Please complete your draft first.',
+          icon: <AlertTriangle className="h-5 w-5" />,
+          bgClass: 'bg-red-50 border-red-200',
+          textClass: 'text-red-600',
+        },
+      ];
+    }
+    return [false, null];
+  }, [
+    currentStage?.stage_type,
+    draftConfirmed,
+    outlineConfirmed,
+    outliningEnabled,
+    providerReadonly,
+    providerReadonlyMessage,
+    revisingEnabled,
+  ]);
+
   const value = useMemo(
     () => ({
       assignmentProgress,
@@ -98,17 +157,21 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       goalContent,
       setGoalContent,
       nextStageType,
+      readonly,
+      readonlyMessage,
     }),
     [
       assignmentProgress,
       currentStage,
-      draftConfirmed,
-      essay,
-      goalContent,
-      outline,
-      outlineConfirmed,
       title,
+      outline,
+      essay,
+      outlineConfirmed,
+      draftConfirmed,
+      goalContent,
       nextStageType,
+      readonly,
+      readonlyMessage,
     ],
   );
 

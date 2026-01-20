@@ -7,6 +7,7 @@ import type {
   Assignment,
   AssignmentGrade,
   AssignmentProgress,
+  AssignmentReadonlyMessage,
   AssignmentSubmission,
 } from 'types/assignment';
 
@@ -18,6 +19,7 @@ export interface AssignmentSubmissionProviderType {
   assignment: Assignment | null;
   teacherGrade: AssignmentGrade | null;
   readonly: boolean;
+  readonlyMessage: AssignmentReadonlyMessage | null;
   setCurrentStageIndex: (index: number) => void;
   saveSubmission: UseMutateFunction<
     AssignmentSubmission,
@@ -39,6 +41,7 @@ const AssignmentSubmissionProviderContext =
     assignment: null,
     teacherGrade: null,
     readonly: false,
+    readonlyMessage: null,
     setCurrentStageIndex: () => {},
     saveSubmission: () => {},
     isSaving: false,

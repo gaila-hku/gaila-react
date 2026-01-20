@@ -3,6 +3,7 @@ import React from 'react';
 import type {
   AssignmentGoalContent,
   AssignmentProgress,
+  AssignmentReadonlyMessage,
   AssignmentStage,
 } from 'types/assignment';
 
@@ -22,6 +23,8 @@ export interface AssignmentEssayEditorProviderType {
   goalContent: AssignmentGoalContent | null;
   setGoalContent: (goals: AssignmentGoalContent | null) => void;
   nextStageType: AssignmentStage['stage_type'] | null;
+  readonly: boolean;
+  readonlyMessage: AssignmentReadonlyMessage | null;
 }
 
 const AssignmentEssayEditorProviderContext =
@@ -41,6 +44,8 @@ const AssignmentEssayEditorProviderContext =
     goalContent: null,
     setGoalContent: () => {},
     nextStageType: null,
+    readonly: false,
+    readonlyMessage: null,
   });
 
 export const { Provider, Consumer } = AssignmentEssayEditorProviderContext;

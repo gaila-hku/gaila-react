@@ -72,9 +72,17 @@ const AssignmentEditorFormStageInputItem = ({
   return (
     <>
       <div
-        className="p-4 border rounded-lg bg-muted/30 flex items-stretch"
+        className="p-4 pl-0 border rounded-lg bg-muted/30 flex items-stretch"
         style={draggableStyle}
       >
+        <div
+          className="flex items-center justify-center p-2 cursor-grab"
+          ref={setDraggableNodeRef}
+          {...listeners}
+          {...attributes}
+        >
+          <GripVertical className="w-4 h-4" />
+        </div>
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <h4>{getStageTypeLabel(stage)}</h4>

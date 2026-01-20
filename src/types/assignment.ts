@@ -327,3 +327,12 @@ export type AssignmentOptions = {
   id: number;
   title: string;
 }[];
+
+export type AssignmentReadonlyMessage = {
+  title: string;
+  longMessage: string;
+  shortMessage: string;
+  icon: React.ReactNode;
+  bgClass: string;
+  textClass: string;
+};

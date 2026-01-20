@@ -39,27 +39,28 @@ const AssignmentSubmissionStepper = () => {
     return <></>;
   }
 
-  const inactiveStages =
-    assignmentProgress.stages.filter(s => !s.enabled) || [];
+  const activeStages = assignmentProgress.stages.filter(s => s.enabled) || [];
   const stepperActiveStep = Math.max(
-    assignmentProgress.current_stage - inactiveStages.length,
+    assignmentProgress.current_stage -
+      (assignmentProgress.stages.length - activeStages.length),
     0,
   );
 
   return (
-    <Stepper activeStep={stepperActiveStep} className="basis-[1000px]">
-      {assignmentProgress.stages
-        .filter(s => s.enabled)
-        .map((stage, index) => (
-          <Step
-            className="!cursor-pointer"
-            key={stage.stage_type}
-            onClick={() => handleStepClick(index)}
-            sx={{ '& .Mui-disabled': { cursor: 'pointer' } }}
-          >
-            <StepLabel>{getStageTypeLabel(stage)}</StepLabel>
-          </Step>
-        ))}
+    <Stepper
+      activeStep={stepperActiveStep}
+      style={{ flexBasis: activeStages.length * 200 }}
+    >
+      {activeStages.map((stage, index) => (
+        <Step
+          className="!cursor-pointer"
+          key={stage.stage_type}
+          onClick={() => handleStepClick(index)}
+          sx={{ '& .Mui-disabled': { cursor: 'pointer' } }}
+        >
+          <StepLabel>{getStageTypeLabel(stage, true)}</StepLabel>
+        </Step>
+      ))}
     </Stepper>
   );
 };

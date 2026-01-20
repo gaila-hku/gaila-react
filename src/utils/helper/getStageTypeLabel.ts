@@ -1,4 +1,4 @@
-const getStageTypeLabel = (stage: { stage_type: string }) => {
+const getStageTypeLabel = (stage: { stage_type: string }, short?: boolean) => {
   switch (stage.stage_type) {
     case 'reading':
       return 'Reading';
@@ -7,11 +7,11 @@ const getStageTypeLabel = (stage: { stage_type: string }) => {
     case 'goal_setting':
       return 'Goal Setting';
     case 'outlining':
-      return 'Writing - Outlining';
+      return short ? 'Outlining' : 'Writing - Outlining';
     case 'drafting':
-      return 'Writing - Drafting';
+      return short ? 'Drafting' : 'Writing - Drafting';
     case 'revising':
-      return 'Writing - Revising';
+      return short ? 'Revising' : 'Writing - Revising';
     case 'writing':
       return 'Writing';
     case 'reflection':

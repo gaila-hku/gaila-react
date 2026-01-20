@@ -11,7 +11,7 @@ import EssayEditorInput from 'containers/student/AssignmentEssayEditor/Assignmen
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-const EssayEditorOutlineEditModal = () => {
+const EssayEditorOutlineEditButton = () => {
   const { saveSubmission, assignmentProgress } =
     useAssignmentSubmissionProvider();
   const { outline, setOutline } = useAssignmentEssayEditorProvider();
@@ -77,4 +77,4 @@ const EssayEditorOutlineEditModal = () => {
   );
 };
 
-export default EssayEditorOutlineEditModal;
+export default EssayEditorOutlineEditButton;

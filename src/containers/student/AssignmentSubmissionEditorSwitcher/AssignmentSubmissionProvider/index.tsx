@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import dayjs from 'dayjs';
 import { isNumber } from 'lodash-es';
+import { CheckCircle } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import useAlert from 'containers/common/AlertProvider/useAlert';
@@ -37,7 +39,10 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
     if (initStageIndex.current || !assignmentProgress) {
       return;
     }
-    setCurrentStageIndex(Math.max(assignmentProgress.current_stage, 0));
+    const currentStage =
+      assignmentProgress.stages[assignmentProgress.current_stage];
+    const enabledStages = assignmentProgress.stages.filter(s => s.enabled);
+    setCurrentStageIndex(enabledStages.indexOf(currentStage));
     initStageIndex.current = true;
   }, [assignmentProgress]);
 
@@ -97,11 +102,38 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
     return [assignmentProgress.assignment, grade];
   }, [assignmentProgress, currentStage]);
 
-  const readonly =
-    !!teacherGrade ||
-    assignmentProgress?.is_finished ||
-    currentStage?.submission?.is_final ||
-    false;
+  const [readonly, readonlyMessage] = useMemo(() => {
+    if (teacherGrade) {
+      return [
+        true,
+        {
+          title: 'Essay Graded',
+          longMessage: `This essay has been graded by ${teacherGrade.graded_by} on ${dayjs(teacherGrade.graded_at).format('DD MMM YYYY')}. You can view your grade in the Requirements tab, but editing and tools are now disabled. You can still use the AI Chat for learning purposes.`,
+          shortMessage:
+            'This essay has been graded and can no longer be edited.',
+          icon: <CheckCircle className="h-5 w-5" />,
+          bgClass: 'bg-purple-50 border-purple-200',
+          textClass: 'text-purple-600',
+        },
+      ];
+    }
+    if (assignmentProgress?.is_finished) {
+      return [
+        true,
+        {
+          title: 'Essay Submitted',
+          longMessage:
+            ' You have already submitted your essay. Your teacher will grade ir soon. While you wait, you can review your essay and use the AI Chat for learning purposes.',
+          shortMessage:
+            'This essay has been submitted and can no longer be edited.',
+          icon: <CheckCircle className="h-5 w-5" />,
+          bgClass: 'bg-green-50 border-green-200',
+          textClass: 'text-green-600',
+        },
+      ];
+    }
+    return [false, null];
+  }, [assignmentProgress?.is_finished, teacherGrade]);
 
   const [outliningEnabled, revisingEnabled] = useMemo(
     () => [
@@ -122,6 +154,7 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
       assignment,
       teacherGrade,
       readonly,
+      readonlyMessage,
       setCurrentStageIndex,
       isLoading,
       error,
@@ -139,6 +172,7 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
       isSaving,
       outliningEnabled,
       readonly,
+      readonlyMessage,
       revisingEnabled,
       saveSubmission,
       teacherGrade,

@@ -26,8 +26,8 @@ const EssayEditorHeader = ({
   wordCountStatus,
   saveSubmissionContent,
 }: Props) => {
-  const { readonly, assignment, isSaving } = useAssignmentSubmissionProvider();
-  const { outlineConfirmed, title, setTitle } =
+  const { assignment, isSaving } = useAssignmentSubmissionProvider();
+  const { outlineConfirmed, title, setTitle, readonly } =
     useAssignmentEssayEditorProvider();
 
   const onTitleBlur = useCallback(

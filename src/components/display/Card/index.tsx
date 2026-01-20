@@ -78,6 +78,8 @@ function Card({
     [children, classes?.children, classes?.footer, footer],
   );
 
+  console.log(classes);
+
   return (
     <div
       className={clsx(

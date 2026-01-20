@@ -28,8 +28,8 @@ const EssayEditorInput = ({
   disabled: inputDisabled,
   disableAutoSave,
 }: Props) => {
-  const { readonly, assignment } = useAssignmentSubmissionProvider();
-  const { currentStage } = useAssignmentEssayEditorProvider();
+  const { assignment } = useAssignmentSubmissionProvider();
+  const { readonly, currentStage } = useAssignmentEssayEditorProvider();
   const { mutateAsync: saveTraceData } = useMutation(apiSaveTraceData);
 
   const onChange = useCallback(
