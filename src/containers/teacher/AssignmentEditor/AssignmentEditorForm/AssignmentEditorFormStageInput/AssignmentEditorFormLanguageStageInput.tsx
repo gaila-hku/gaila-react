@@ -62,15 +62,23 @@ const AssignmentEditorFormLanguageStageInput = ({
     newReadings.push(readingInput.trim());
     setReadings(newReadings);
     setReadingInput('');
-  }, [readingInput, readings]);
+    onStageChange({
+      ...stage,
+      config: { ...stage.config, readings: newReadings },
+    });
+  }, [onStageChange, readingInput, readings, stage]);
 
   const onRemoveReading = useCallback(
     (index: number) => {
       const newReadings = [...readings];
       newReadings.splice(index, 1);
       setReadings(newReadings);
+      onStageChange({
+        ...stage,
+        config: { ...stage.config, readings: newReadings },
+      });
     },
-    [readings],
+    [onStageChange, readings, stage],
   );
 
   const onToggleAnnotation = useCallback(
