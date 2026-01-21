@@ -32,8 +32,7 @@ const AssignmentSubmissionEditorSwitcher = () => {
     }
 
     if (currentStage.stage_type === 'reading') {
-      // return <AssignmentReadingViewer />;
-      return <>WIP</>;
+      return <AssignmentReadingViewer />;
     }
 
     if (currentStage.stage_type === 'goal_setting') {
@@ -41,8 +40,7 @@ const AssignmentSubmissionEditorSwitcher = () => {
     }
 
     if (currentStage.stage_type === 'language_preparation') {
-      // return <AssignmentLanguageViewer />;
-      return <>WIP</>;
+      return <AssignmentLanguageViewer />;
     }
 
     if (

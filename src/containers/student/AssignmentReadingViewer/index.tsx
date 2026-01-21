@@ -6,11 +6,13 @@ import React, {
   useState,
 } from 'react';
 
-import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
+import dayjs from 'dayjs';
 import {
   BookOpen,
   CheckCircle,
+  ChevronLeft,
+  ChevronRight,
   Highlighter,
   Sparkles,
   StickyNote,
@@ -18,25 +20,29 @@ import {
   X,
 } from 'lucide-react';
 
+import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Divider from 'components/display/Divider';
 import Button from 'components/input/Button';
 import Clickable from 'components/input/Clickable';
 import TextInput from 'components/input/TextInput';
 
+import {
+  getIndicesFromRange,
+  highlightAnnotation,
+} from 'containers/student/AssignmentReadingViewer/utils';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type { AssignmentStageReading } from 'types/assignment';
+import type {
+  AssignmentReadingContent,
+  AssignmentStageReading,
+} from 'types/assignment';
 
-interface Annotation {
-  id: string;
-  text: string;
-  note: string;
-  color: string;
-}
+type Annotation = AssignmentReadingContent['annotations'][number];
 
 const AssignmentReadingViewer = () => {
-  const { currentStage } = useAssignmentSubmissionProvider();
+  const { assignment, currentStage, saveSubmission } =
+    useAssignmentSubmissionProvider();
 
   const readings = useMemo(() => {
     if (!currentStage) {
@@ -47,13 +53,23 @@ const AssignmentReadingViewer = () => {
 
   const [modelTextGenerated, setModelTextGenerated] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
 
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [selectedText, setSelectedText] = useState('');
   const [showAnnotationDialog, setShowAnnotationDialog] = useState(false);
+  const [dialogPosition, setDialogPosition] = useState({
+    top: 0,
+    left: 0,
+    placement: 'below',
+  });
+
   const [annotationNote, setAnnotationNote] = useState('');
   const [selectedColor, setSelectedColor] = useState('#fef08a'); // yellow
-  const [selectionRange, setSelectionRange] = useState<Range | null>(null);
+  const [selectionIndices, setSelectionIndices] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
 
   const highlightColors = [
@@ -64,13 +80,75 @@ const AssignmentReadingViewer = () => {
     { name: 'Purple', value: '#e9d5ff' },
   ];
 
+  // Init annotations from submission
+  useEffect(() => {
+    if (currentStage?.submission?.content) {
+      const content = currentStage.submission
+        .content as AssignmentReadingContent;
+      setAnnotations(content.annotations || []);
+      setModelTextGenerated(content.model_text_generated || false);
+    }
+  }, [currentStage]);
+
   const handleGenerateText = useCallback(() => {
     setIsGenerating(true);
     setTimeout(() => {
+      if (!assignment || !currentStage) {
+        return;
+      }
       setModelTextGenerated(true);
       setIsGenerating(false);
+      saveSubmission({
+        assignment_id: assignment.id,
+        stage_id: currentStage.id,
+        content: { model_text_generated: true, annotations: [] },
+        is_final: currentStage.submission?.is_final || false,
+      });
     }, 2000);
-  }, []);
+  }, [assignment, currentStage, saveSubmission]);
+
+  const handlePreviousText = useCallback(() => {
+    setCurrentTextIndex(index => {
+      if (index == 0) {
+        return readings.length - 1;
+      }
+      return index - 1;
+    });
+  }, [readings.length]);
+
+  const handleNextText = useCallback(() => {
+    setCurrentTextIndex(index => {
+      if (index == readings.length - 1) {
+        return 0;
+      }
+      return index + 1;
+    });
+  }, [readings.length]);
+
+  const rebuildHighlights = useCallback(() => {
+    if (!textContainerRef.current) return;
+
+    const container = textContainerRef.current;
+
+    // Clear existing highlights
+    const existingHighlights = container.querySelectorAll(
+      '.annotation-highlight',
+    );
+    existingHighlights.forEach(highlight => {
+      const parent = highlight.parentNode;
+      if (parent) {
+        while (highlight.firstChild) {
+          parent.insertBefore(highlight.firstChild, highlight);
+        }
+        parent.removeChild(highlight);
+      }
+    });
+
+    // Rebuild highlights from annotations
+    annotations.forEach(annotation => {
+      highlightAnnotation(annotation, container);
+    });
+  }, [annotations]);
 
   const handleTextSelection = useCallback(() => {
     const selection = window.getSelection();
@@ -81,84 +159,81 @@ const AssignmentReadingViewer = () => {
     const selectedStr = selection.toString().trim();
 
     if (textContainerRef.current?.contains(range.commonAncestorContainer)) {
+      const indices = getIndicesFromRange(range, textContainerRef.current);
       setSelectedText(selectedStr);
-      setSelectionRange(range);
+      setSelectionIndices(indices);
       setShowAnnotationDialog(true);
+      const rect = range.getBoundingClientRect();
+      const containerRect = textContainerRef.current?.getBoundingClientRect();
+      if (containerRect) {
+        const top = rect.top - containerRect.top;
+        const left = rect.left - containerRect.left;
+        const placement = top < containerRect.height / 2 ? 'above' : 'below';
+        setDialogPosition({ top, left, placement });
+      }
     }
   }, []);
 
-  const applyHighlight = useCallback(
-    (range: Range, color: string, id: string) => {
-      const span = document.createElement('span');
-      span.style.backgroundColor = color;
-      span.style.cursor = 'pointer';
-      span.style.borderRadius = '2px';
-      span.setAttribute('data-annotation-id', id);
-      span.className = 'annotation-highlight';
+  useEffect(() => {
+    rebuildHighlights();
+  }, [currentTextIndex, rebuildHighlights]);
 
-      try {
-        range.surroundContents(span);
-      } catch (e) {
-        console.error(e);
-        // If surroundContents fails (e.g., partial selection), use a different approach
-        const contents = range.extractContents();
-        span.appendChild(contents);
-        range.insertNode(span);
+  const saveAnnotations = useCallback(
+    (inputAnnotations: Annotation[], isFinal: boolean) => {
+      if (!assignment || !currentStage) {
+        return;
       }
+      saveSubmission({
+        assignment_id: assignment.id,
+        stage_id: currentStage.id,
+        content: {
+          annotations: inputAnnotations,
+          model_text_generated: modelTextGenerated,
+        },
+        is_final: isFinal,
+        changeStage: isFinal,
+      });
     },
-    [],
+    [assignment, currentStage, modelTextGenerated, saveSubmission],
   );
 
   const handleAddAnnotation = useCallback(() => {
-    if (selectedText && selectionRange) {
+    if (selectedText && selectionIndices) {
       const newAnnotation: Annotation = {
-        id: Date.now().toString(),
+        id: dayjs().valueOf(),
         text: selectedText,
         note: annotationNote,
         color: selectedColor,
+        startIndex: selectionIndices.start,
+        endIndex: selectionIndices.end,
       };
 
-      setAnnotations([...annotations, newAnnotation]);
+      const newAnnotations = [...annotations, newAnnotation];
+      setAnnotations(newAnnotations);
+      saveAnnotations(newAnnotations, false);
 
-      // Apply highlight to the selected text
-      applyHighlight(selectionRange, selectedColor, newAnnotation.id);
-
-      // Reset
       setSelectedText('');
       setAnnotationNote('');
       setShowAnnotationDialog(false);
-      setSelectionRange(null);
+      setSelectionIndices(null);
       window.getSelection()?.removeAllRanges();
     }
   }, [
     annotationNote,
     annotations,
-    applyHighlight,
+    saveAnnotations,
     selectedColor,
     selectedText,
-    selectionRange,
+    selectionIndices,
   ]);
 
   const handleDeleteAnnotation = useCallback(
-    (id: string) => {
-      // Remove from state
-      setAnnotations(annotations.filter(a => a.id !== id));
-
-      // Remove highlight from DOM
-      const highlight = textContainerRef.current?.querySelector(
-        `[data-annotation-id="${id}"]`,
-      );
-      if (highlight) {
-        const parent = highlight.parentNode;
-        if (parent) {
-          while (highlight.firstChild) {
-            parent.insertBefore(highlight.firstChild, highlight);
-          }
-          parent.removeChild(highlight);
-        }
-      }
+    (id: number) => {
+      const updatedAnnotations = annotations.filter(a => a.id !== id);
+      setAnnotations(updatedAnnotations);
+      saveAnnotations(updatedAnnotations, false);
     },
-    [annotations],
+    [annotations, saveAnnotations],
   );
 
   const handleCancelAnnotation = useCallback(() => {
@@ -171,11 +246,17 @@ const AssignmentReadingViewer = () => {
   useEffect(() => {
     const handleMouseUp = () => {
       // Small delay to ensure selection is complete
-      setTimeout(handleTextSelection, 10);
+      setTimeout(handleTextSelection, 100);
     };
 
+    // Add both mouse and touch event listeners
     document.addEventListener('mouseup', handleMouseUp);
-    return () => document.removeEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchend', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchend', handleMouseUp);
+    };
   }, [handleTextSelection]);
 
   return (
@@ -218,16 +299,37 @@ const AssignmentReadingViewer = () => {
                       />
                     ))}
                   </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <Badge variant="secondary">
+                      Text {currentTextIndex + 1} of {readings.length}
+                    </Badge>
+                    <div className="flex gap-2">
+                      <Button
+                        className="gap-1"
+                        disabled={currentTextIndex === 0}
+                        onClick={handlePreviousText}
+                        size="sm"
+                        variant="outline"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Previous
+                      </Button>
+                      <Button
+                        className="gap-1"
+                        disabled={currentTextIndex === readings.length - 1}
+                        onClick={handleNextText}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
 
-                  <div className="min-h-[600px] pr-4 overflow-auto">
-                    <div
-                      className="select-text"
-                      ref={textContainerRef}
-                      style={{ userSelect: 'text' }}
-                    >
-                      <p className="mb-4 leading-relaxed whitespace-pre-wrap">
-                        {readings[0]}
-                      </p>
+                  <div className="max-h-[500px] pr-4 overflow-auto whitespace-pre-line">
+                    <div className="select-text" ref={textContainerRef}>
+                      {readings[currentTextIndex]}
                     </div>
                   </div>
                 </>
@@ -251,7 +353,6 @@ const AssignmentReadingViewer = () => {
                   </Button>
                 </div>
               )}
-              -
             </Card>
           </div>
 
@@ -324,7 +425,7 @@ const AssignmentReadingViewer = () => {
                   <Divider className="my-4" />
                   <Button
                     className="w-full gap-2"
-                    // onClick={onComplete}
+                    onClick={() => saveAnnotations(annotations, true)}
                     size="lg"
                   >
                     <CheckCircle className="h-4 w-4" />
@@ -339,77 +440,74 @@ const AssignmentReadingViewer = () => {
 
       {/* Annotation Dialog */}
       {showAnnotationDialog && (
-        <Modal onClose={handleCancelAnnotation} open={showAnnotationDialog}>
-          <div
-            className={clsx(
-              'absolute top-1/2 left-1/2 -translate-1/2 w-[600px]',
-              'bg-white p-4 rounded-lg flex flex-col gap-4',
-            )}
-          >
-            <div className="flex justify-between">
-              <div className="space-y-2">
-                <div className="text-lg leading-none font-semibold">
-                  Add Annotation
-                </div>
-                <div className="text-muted-foreground text-sm">
-                  Selected text: &quot;{selectedText.substring(0, 50)}
-                  {selectedText.length > 50 ? '...' : ''}&quot;
+        <div
+          className={clsx(
+            'absolute w-[400px]',
+            'bg-white border-4 p-4 rounded-lg flex flex-col gap-4',
+          )}
+          style={{
+            top:
+              dialogPosition.placement === 'below'
+                ? `${dialogPosition.top + 390}px`
+                : `${dialogPosition.top + 90}px`,
+            left: `${Math.max(20, Math.min(dialogPosition.left, window.innerWidth - 420))}px`,
+          }}
+        >
+          <div>
+            <div className="flex items-start gap-2">
+              <div className="flex-1">
+                <label className="text-sm font-medium mb-2 block">
+                  Highlight Color
+                </label>
+                <div className="flex gap-2">
+                  {highlightColors.map(color => (
+                    <button
+                      className={`w-10 h-10 rounded border-2 transition-all ${
+                        selectedColor === color.value
+                          ? 'border-primary ring-2 ring-primary/20 scale-110'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                      key={color.value}
+                      onClick={() => setSelectedColor(color.value)}
+                      style={{ backgroundColor: color.value }}
+                      title={color.name}
+                    />
+                  ))}
                 </div>
               </div>
               <Clickable onClick={handleCancelAnnotation}>
                 <X />
               </Clickable>
             </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Highlight Color
-              </label>
-              <div className="flex gap-2">
-                {highlightColors.map(color => (
-                  <button
-                    className={`w-10 h-10 rounded border-2 transition-all ${
-                      selectedColor === color.value
-                        ? 'border-primary ring-2 ring-primary/20 scale-110'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                    key={color.value}
-                    onClick={() => setSelectedColor(color.value)}
-                    style={{ backgroundColor: color.value }}
-                    title={color.name}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Add Note (Optional)
-              </label>
-              <TextInput
-                multiline
-                onChange={e => setAnnotationNote(e.target.value)}
-                placeholder="Why is this passage important? What did you notice about the structure or language?"
-                rows={4}
-                value={annotationNote}
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                className="flex-1"
-                onClick={handleCancelAnnotation}
-                variant="outline"
-              >
-                Cancel
-              </Button>
-              <Button className="flex-1 gap-2" onClick={handleAddAnnotation}>
-                <Highlighter className="h-4 w-4" />
-                Add Annotation
-              </Button>
-            </div>
           </div>
-        </Modal>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              Add Note (Optional)
+            </label>
+            <TextInput
+              multiline
+              onChange={e => setAnnotationNote(e.target.value)}
+              placeholder="Why is this passage important? What did you notice about the structure or language?"
+              rows={2}
+              value={annotationNote}
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              className="flex-1"
+              onClick={handleCancelAnnotation}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button className="flex-1 gap-2" onClick={handleAddAnnotation}>
+              <Highlighter className="h-4 w-4" />
+              Add Annotation
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -153,11 +153,14 @@ export interface AssignmentGoal {
 
 export interface AssignmentReadingContent {
   annotations: {
-    start_index: number;
-    end_index: number;
-    type: 'highlight' | 'comment';
-    comment?: string;
+    id: number;
+    text: string;
+    note: string;
+    color: string;
+    startIndex: number;
+    endIndex: number;
   }[];
+  model_text_generated?: boolean;
 }
 
 export interface AssignmentOutliningContent {
