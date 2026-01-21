@@ -248,6 +248,7 @@ const AssignmentGoalEditor = () => {
         is_final: isFinal,
         alertMsg: isManual ? 'Goals draft saved.' : undefined,
         refetchProgress: true,
+        changeStage: isFinal,
       });
     },
     [

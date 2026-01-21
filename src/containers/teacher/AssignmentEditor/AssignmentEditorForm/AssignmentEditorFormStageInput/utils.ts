@@ -114,27 +114,30 @@ const validateStageOrder = (
   }
 
   if (
-    goalSettingIndex > outliningIndex ||
-    goalSettingIndex > draftingIndex ||
-    goalSettingIndex > revisingIndex ||
-    goalSettingIndex > reflectionIndex
+    (goalSettingIndex > outliningIndex && outliningIndex !== -4) ||
+    (goalSettingIndex > draftingIndex && draftingIndex !== -3) ||
+    (goalSettingIndex > revisingIndex && revisingIndex !== -2) ||
+    (goalSettingIndex > reflectionIndex && reflectionIndex !== -1)
   ) {
     return 'Goal Setting must come before writing or reflection stages';
   }
 
   if (
-    outliningIndex > draftingIndex ||
-    outliningIndex > revisingIndex ||
-    outliningIndex > reflectionIndex
+    (outliningIndex > draftingIndex && draftingIndex !== -3) ||
+    (outliningIndex > revisingIndex && revisingIndex !== -2) ||
+    (outliningIndex > reflectionIndex && reflectionIndex !== -1)
   ) {
     return 'Outlining must come before drafting, revising or reflection stages';
   }
 
-  if (draftingIndex > revisingIndex || draftingIndex > reflectionIndex) {
+  if (
+    (draftingIndex > revisingIndex && revisingIndex !== -2) ||
+    (draftingIndex > reflectionIndex && reflectionIndex !== -1)
+  ) {
     return 'Drafting must come before revising or reflection stages';
   }
 
-  if (revisingIndex > reflectionIndex) {
+  if (revisingIndex > reflectionIndex && reflectionIndex !== -1) {
     return 'Revising must come before reflection stages';
   }
 

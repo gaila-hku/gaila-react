@@ -75,11 +75,15 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
             break;
         }
 
+        if (req.changeStage) {
+          initStageIndex.current = false;
+        }
+
         if (req.refetchProgress) {
           queryClient.invalidateQueries([apiViewAssignmentProgress.queryKey]);
         }
 
-        if (res.is_final) {
+        if (res.is_final && req.stage_id === currentStage?.id) {
           successMsg(`${currentContent} submitted.`);
           await queryClient.invalidateQueries([
             apiViewAssignmentProgress.queryKey,

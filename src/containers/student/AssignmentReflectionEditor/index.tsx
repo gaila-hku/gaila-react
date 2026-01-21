@@ -70,6 +70,7 @@ const AssignmentReflectionEditor = () => {
         content: { reflections },
         is_final: isFinal,
         alertMsg: isManual ? 'Reflections draft saved.' : undefined,
+        changeStage: isFinal,
       });
     },
     [alertMsg, assignmentProgress, currentStage, reflections, saveSubmission],

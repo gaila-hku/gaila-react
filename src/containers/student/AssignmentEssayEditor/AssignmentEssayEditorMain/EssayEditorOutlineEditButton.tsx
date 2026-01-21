@@ -38,7 +38,7 @@ const EssayEditorOutlineEditButton = () => {
       stage_id: outlineStage.id,
       content: { outline: outlineInputValue },
       is_final: true,
-      refetchProgress: true,
+      changeStage: false,
     });
   }, [assignmentProgress, setOutline, outlineInputValue, saveSubmission]);
 

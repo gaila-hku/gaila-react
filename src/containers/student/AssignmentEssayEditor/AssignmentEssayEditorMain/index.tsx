@@ -50,9 +50,7 @@ function AssignmentEssayEditorMain() {
     setEssay,
     outlineConfirmed,
     setOutlineConfirmed,
-    draftConfirmed,
     setDraftConfirmed,
-    goalContent,
     setGoalContent,
     nextStageType,
     readonly,
@@ -130,11 +128,7 @@ function AssignmentEssayEditorMain() {
 
       const content = defaultsDeep(newContent, {
         title: title,
-        outline: outline,
         essay: essay,
-        goals: goalContent,
-        outline_confirmed: outlineConfirmed,
-        draft_confirmed: draftConfirmed,
       });
 
       saveSubmission({
@@ -142,20 +136,11 @@ function AssignmentEssayEditorMain() {
         stage_id: currentStage.id,
         content: content,
         is_final: isFinal,
+        changeStage: isFinal,
         alertMsg,
       });
     },
-    [
-      assignmentProgress,
-      currentStage,
-      draftConfirmed,
-      essay,
-      goalContent,
-      outline,
-      outlineConfirmed,
-      saveSubmission,
-      title,
-    ],
+    [assignmentProgress, currentStage, essay, saveSubmission, title],
   );
 
   const handleAutoSave = useCallback(() => {
@@ -183,8 +168,9 @@ function AssignmentEssayEditorMain() {
         assignment_id: assignmentProgress.assignment.id,
         stage_id: goalStage.id,
         content: newContent,
-        is_final: false,
+        is_final: goalStage?.submission?.is_final || false,
         refetchProgress: true,
+        changeStage: false,
       });
     },
     [assignmentProgress, saveSubmission, setGoalContent],
