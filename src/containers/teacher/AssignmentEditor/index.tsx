@@ -13,6 +13,7 @@ import Loading from 'components/display/Loading';
 import Button from 'components/input/Button';
 
 import AIChatBox from 'containers/common/AIChatBox';
+import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import AssignmentEditorForm from 'containers/teacher/AssignmentEditor/AssignmentEditorForm';
 
@@ -222,10 +223,9 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
         </div>
       </Card>
       <div className="col-span-2 h-fit sticky top-[80px]">
-        <AIChatBox
-          firstMessage="Hi! I'm your AI writing assistant. I can help you polish topics and rubrics for your assignment. What would you like help with?"
-          toolId={1}
-        />
+        <AIChatBoxProvider toolId={1}>
+          <AIChatBox firstMessage="Hi! I'm your AI writing assistant. I can help you polish topics and rubrics for your assignment. What would you like help with?" />
+        </AIChatBoxProvider>
       </div>
     </div>
   );

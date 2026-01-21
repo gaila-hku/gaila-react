@@ -30,6 +30,7 @@ type Props = {
   maxHeightUncollapsed?: number;
   className?: string;
   footer?: React.ReactNode;
+  style?: React.CSSProperties;
 };
 
 function Card({
@@ -46,6 +47,7 @@ function Card({
   maxHeightUncollapsed = 1000,
   classes,
   className,
+  style,
 }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
 
@@ -78,8 +80,6 @@ function Card({
     [children, classes?.children, classes?.footer, footer],
   );
 
-  console.log(classes);
-
   return (
     <div
       className={clsx(
@@ -88,6 +88,7 @@ function Card({
         classes?.root,
       )}
       data-slot="card"
+      style={style}
     >
       {hasHeader && (
         <div

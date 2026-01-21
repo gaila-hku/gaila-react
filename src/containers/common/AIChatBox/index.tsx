@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import dayjs from 'dayjs';
 import { Bot, Send } from 'lucide-react';
-import { useMutation } from 'react-query';
 
 import Card from 'components/display/Card';
 import ErrorMessage from 'components/display/ErrorMessage';
@@ -11,21 +10,18 @@ import Loading from 'components/display/Loading';
 import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 
+import useAIChatBox from 'containers/common/AIChatBox/AIChatBoxContext/useAIChatBox';
 import LoadingMessage from 'containers/common/AIChatBox/LoadingMessage';
 import {
-  type ChatMessage,
-  gptResponseToChatMessage,
   renderChatMessage,
   renderGptLog,
 } from 'containers/common/AIChatBox/utils';
-import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
-import { apiAskGpt, apiGetGptChatLogs } from 'api/gpt';
+import { apiGetGptChatLogs } from 'api/gpt';
 import type { GptLog } from 'types/gpt';
 import tuple from 'utils/types/tuple';
 
 type Props = {
-  toolId: number;
   chatName?: string;
   description?: string;
   firstMessage?: string;
@@ -34,17 +30,21 @@ type Props = {
 };
 
 const AIChatBox = ({
-  toolId,
   chatName,
   description,
   firstMessage,
   suggestedPrompts,
   placeholder,
 }: Props) => {
-  const { essay } = useAssignmentEssayEditorProvider();
-
-  const { mutateAsync: sendQuestion, isLoading: isAgentTyping } =
-    useMutation(apiAskGpt);
+  const {
+    toolId,
+    sendMessage,
+    isAgentTyping,
+    chatInput,
+    setChatInput,
+    newChatMessages,
+    setNewChatMessages,
+  } = useAIChatBox();
 
   const { data, isLoading, endReached, setPages, setPageLimit, error } =
     useInfiniteListing<GptLog>({
@@ -55,9 +55,6 @@ const AIChatBox = ({
       ]),
       pageLimit: 1,
     });
-
-  const [newChatMessages, setNewChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState('');
 
   const chatInit = useRef(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -78,7 +75,7 @@ const AIChatBox = ({
       ]);
     }
     chatInit.current = true;
-  }, [data.length, firstMessage, isLoading]);
+  }, [data.length, firstMessage, isLoading, setNewChatMessages]);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
@@ -110,31 +107,6 @@ const AIChatBox = ({
       }
     };
   }, [endReached, isLoading, setPageLimit, setPages]);
-
-  const handleSendMessage = useCallback(async () => {
-    if (!chatInput.trim()) {
-      return;
-    }
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: chatInput,
-      timestamp: dayjs(),
-    };
-
-    setNewChatMessages(prev => [...prev, userMessage]);
-    setChatInput('');
-
-    const gptResponse = await sendQuestion({
-      question: chatInput,
-      assignment_tool_id: toolId,
-      essay,
-    });
-    setNewChatMessages(prev => [
-      ...prev,
-      gptResponseToChatMessage(gptResponse),
-    ]);
-  }, [chatInput, essay, sendQuestion, toolId]);
 
   const handlePromptClick = (promptText: string) => {
     setChatInput(promptText);
@@ -196,7 +168,7 @@ const AIChatBox = ({
             onKeyDown={e => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleSendMessage();
+                sendMessage();
               }
             }}
             placeholder={placeholder || 'Ask anything...'}
@@ -204,7 +176,7 @@ const AIChatBox = ({
           />
           <Button
             disabled={!chatInput.trim() || isAgentTyping}
-            onClick={handleSendMessage}
+            onClick={() => sendMessage()}
             size="icon"
           >
             <Send className="h-4 w-4" />

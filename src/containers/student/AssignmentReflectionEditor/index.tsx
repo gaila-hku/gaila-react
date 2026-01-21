@@ -14,6 +14,7 @@ import TextInput from 'components/input/TextInput';
 import Tabs from 'components/navigation/Tabs';
 
 import AIChatBox from 'containers/common/AIChatBox';
+import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
 import AssignmentReflectionEditorDashboard from 'containers/student/AssignmentReflectionEditor/AssignmentReflectionEditorDashboard';
@@ -218,13 +219,14 @@ const AssignmentReflectionEditor = () => {
                     key: 'chat',
                     title: 'AI Chat',
                     content: (
-                      <AIChatBox
-                        chatName="Reflection Assistant"
-                        description="Ask me anything about reflecting on writing goals"
-                        firstMessage="Hello! I'm your Reflection Assistant. I'm here to help you think deeply about your writing process. Feel free to ask me questions about writing evaluations, best writing practices, and ways to improve for your next essay."
-                        placeholder="Ask about reflections..."
-                        toolId={generalChatTool.id}
-                      />
+                      <AIChatBoxProvider toolId={generalChatTool.id}>
+                        <AIChatBox
+                          chatName="Reflection Assistant"
+                          description="Ask me anything about reflecting on writing goals"
+                          firstMessage="Hello! I'm your Reflection Assistant. I'm here to help you think deeply about your writing process. Feel free to ask me questions about writing evaluations, best writing practices, and ways to improve for your next essay."
+                          placeholder="Ask about reflections..."
+                        />
+                      </AIChatBoxProvider>
                     ),
                   },
                 ]

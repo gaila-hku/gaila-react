@@ -16,6 +16,7 @@ import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 
 import AIChatBox from 'containers/common/AIChatBox';
+import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
 import GOAL_SECTIONS from 'containers/student/AssignmentGoalEditor/goalSections';
@@ -488,13 +489,14 @@ const AssignmentGoalEditor = () => {
 
         {!!generalChatTool && (
           <div className="h-fit sticky top-[80px]">
-            <AIChatBox
-              chatName="Goal Setting Assistant"
-              description="Ask me anything about setting effective writing goals"
-              firstMessage="Hi! I'm here to help you set effective writing goals. Feel free to ask me questions about setting goals, writing strategies, or how to use AI tools effectively in your essay writing process."
-              placeholder="Ask about goal setting strategies..."
-              toolId={generalChatTool.id}
-            />
+            <AIChatBoxProvider toolId={generalChatTool.id}>
+              <AIChatBox
+                chatName="Goal Setting Assistant"
+                description="Ask me anything about setting effective writing goals"
+                firstMessage="Hi! I'm here to help you set effective writing goals. Feel free to ask me questions about setting goals, writing strategies, or how to use AI tools effectively in your essay writing process."
+                placeholder="Ask about goal setting strategies..."
+              />
+            </AIChatBoxProvider>
           </div>
         )}
       </ResizableSidebar>

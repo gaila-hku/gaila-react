@@ -5,6 +5,8 @@ import Loading from 'components/display/Loading';
 
 import AssignmentEssayEditor from 'containers/student/AssignmentEssayEditor';
 import AssignmentGoalEditor from 'containers/student/AssignmentGoalEditor';
+import AssignmentLanguageViewer from 'containers/student/AssignmentLanguageViewer';
+import AssignmentReadingViewer from 'containers/student/AssignmentReadingViewer';
 import AssignmentReflectionEditor from 'containers/student/AssignmentReflectionEditor';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 import usePageTracking from 'containers/student/AssignmentSubmissionEditorSwitcher/usePageTracking';
@@ -30,7 +32,7 @@ const AssignmentSubmissionEditorSwitcher = () => {
     }
 
     if (currentStage.stage_type === 'reading') {
-      return <>WIP</>;
+      return <AssignmentReadingViewer />;
     }
 
     if (currentStage.stage_type === 'goal_setting') {
@@ -38,7 +40,7 @@ const AssignmentSubmissionEditorSwitcher = () => {
     }
 
     if (currentStage.stage_type === 'language_preparation') {
-      return <>WIP</>;
+      return <AssignmentLanguageViewer />;
     }
 
     if (
