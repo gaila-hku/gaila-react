@@ -1,11 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 
-import dayjs from 'dayjs';
 import { Bot, Send } from 'lucide-react';
 
 import Card from 'components/display/Card';
 import ErrorMessage from 'components/display/ErrorMessage';
-import useInfiniteListing from 'components/display/InfiniteList/useInfiniteListing';
 import Loading from 'components/display/Loading';
 import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
@@ -17,14 +15,9 @@ import {
   renderGptLog,
 } from 'containers/common/AIChatBox/utils';
 
-import { apiGetGptChatLogs } from 'api/gpt';
-import type { GptLog } from 'types/gpt';
-import tuple from 'utils/types/tuple';
-
 type Props = {
   chatName?: string;
   description?: string;
-  firstMessage?: string;
   suggestedPrompts?: { icon: any; text: string; category: string }[];
   placeholder?: string;
 };
@@ -32,57 +25,31 @@ type Props = {
 const AIChatBox = ({
   chatName,
   description,
-  firstMessage,
   suggestedPrompts,
   placeholder,
 }: Props) => {
   const {
-    toolId,
     sendMessage,
+    apiMessages,
+    isLoading,
+    endReached,
+    setPages,
+    setPageLimit,
+    error,
     isAgentTyping,
     chatInput,
     setChatInput,
     newChatMessages,
-    setNewChatMessages,
   } = useAIChatBox();
 
-  const { data, isLoading, endReached, setPages, setPageLimit, error } =
-    useInfiniteListing<GptLog>({
-      queryFn: apiGetGptChatLogs,
-      queryKey: tuple([
-        apiGetGptChatLogs.queryKey,
-        { assignment_tool_id: toolId, page: 1, limit: 10 },
-      ]),
-      pageLimit: 1,
-    });
-
-  const chatInit = useRef(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
-
-  // Add first message if no data
-  useEffect(() => {
-    if (chatInit.current || isLoading) {
-      return;
-    }
-    if (!data.length && firstMessage) {
-      setNewChatMessages([
-        {
-          id: 'first_message',
-          role: 'assistant',
-          content: firstMessage,
-          timestamp: dayjs(),
-        },
-      ]);
-    }
-    chatInit.current = true;
-  }, [data.length, firstMessage, isLoading, setNewChatMessages]);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
-  }, [newChatMessages, data, isAgentTyping]);
+  }, [apiMessages, newChatMessages, isAgentTyping]);
 
   // Load new messages when scrolled to top
   useEffect(() => {
@@ -133,7 +100,9 @@ const AIChatBox = ({
         ref={chatScrollRef}
       >
         {isLoading && <Loading />}
-        {data.reverse().map(log => renderGptLog(log))}
+        {Array.from(apiMessages)
+          .reverse()
+          .map(log => renderGptLog(log))}
         {newChatMessages.map(message => renderChatMessage(message))}
         {isAgentTyping && <LoadingMessage />}
       </div>

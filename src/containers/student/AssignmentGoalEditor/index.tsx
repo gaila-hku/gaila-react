@@ -490,11 +490,13 @@ const AssignmentGoalEditor = () => {
 
         {!!generalChatTool && (
           <div className="h-fit sticky top-[80px]">
-            <AIChatBoxProvider toolId={generalChatTool.id}>
+            <AIChatBoxProvider
+              firstMessage="Hi! I'm here to help you set effective writing goals. Feel free to ask me questions about setting goals, writing strategies, or how to use AI tools effectively in your essay writing process."
+              toolId={generalChatTool.id}
+            >
               <AIChatBox
                 chatName="Goal Setting Assistant"
                 description="Ask me anything about setting effective writing goals"
-                firstMessage="Hi! I'm here to help you set effective writing goals. Feel free to ask me questions about setting goals, writing strategies, or how to use AI tools effectively in your essay writing process."
                 placeholder="Ask about goal setting strategies..."
               />
             </AIChatBoxProvider>

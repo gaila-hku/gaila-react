@@ -220,11 +220,13 @@ const AssignmentReflectionEditor = () => {
                     key: 'chat',
                     title: 'AI Chat',
                     content: (
-                      <AIChatBoxProvider toolId={generalChatTool.id}>
+                      <AIChatBoxProvider
+                        firstMessage="Hello! I'm your Reflection Assistant. I'm here to help you think deeply about your writing process. Feel free to ask me questions about writing evaluations, best writing practices, and ways to improve for your next essay."
+                        toolId={generalChatTool.id}
+                      >
                         <AIChatBox
                           chatName="Reflection Assistant"
                           description="Ask me anything about reflecting on writing goals"
-                          firstMessage="Hello! I'm your Reflection Assistant. I'm here to help you think deeply about your writing process. Feel free to ask me questions about writing evaluations, best writing practices, and ways to improve for your next essay."
                           placeholder="Ask about reflections..."
                         />
                       </AIChatBoxProvider>

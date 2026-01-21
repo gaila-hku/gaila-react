@@ -223,8 +223,11 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
         </div>
       </Card>
       <div className="col-span-2 h-fit sticky top-[80px]">
-        <AIChatBoxProvider toolId={1}>
-          <AIChatBox firstMessage="Hi! I'm your AI writing assistant. I can help you polish topics and rubrics for your assignment. What would you like help with?" />
+        <AIChatBoxProvider
+          firstMessage="Hi! I'm your AI writing assistant. I can help you polish topics and rubrics for your assignment. What would you like help with?"
+          toolId={1}
+        >
+          <AIChatBox />
         </AIChatBoxProvider>
       </div>
     </div>

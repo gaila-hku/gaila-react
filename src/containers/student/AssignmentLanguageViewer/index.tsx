@@ -166,7 +166,10 @@ Notice how "comprehensive" adds precision. Similar academic adjectives:
           Strengthen your language skills with sample texts and vocabulary tools
         </p>
 
-        <AIChatBoxProvider toolId={-1}>
+        <AIChatBoxProvider
+          firstMessage="Hi! I'm here to help you set effective writing goals. Feel free to ask me questions about setting goals, writing strategies, or how to use AI tools effectively in your essay writing process."
+          toolId={-1}
+        >
           <ResizableSidebar initWidth={500}>
             <div>
               <Card
@@ -317,7 +320,6 @@ Notice how "comprehensive" adds precision. Similar academic adjectives:
             <AIChatBox
               chatName="Language Assistant"
               description="Ask questions about vocabulary, grammar, and language patterns"
-              firstMessage="Hi! I'm here to help you set effective writing goals. Feel free to ask me questions about setting goals, writing strategies, or how to use AI tools effectively in your essay writing process."
               placeholder="Hello! I'm here to help you with language preparation for your essay. I can help you understand vocabulary, provide examples, and discuss language patterns. What would you like to know?"
             />
           </ResizableSidebar>

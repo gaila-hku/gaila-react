@@ -11,9 +11,11 @@ type Props = {
 
 const EssayEditorAIChat = ({ toolId }: Props) => {
   return (
-    <AIChatBoxProvider toolId={toolId}>
+    <AIChatBoxProvider
+      firstMessage="Hi! I'm your AI writing assistant. I can help you improve your essay, check grammar, generate ideas, or create an outline. What would you like help with?"
+      toolId={toolId}
+    >
       <AIChatBox
-        firstMessage="Hi! I'm your AI writing assistant. I can help you improve your essay, check grammar, generate ideas, or create an outline. What would you like help with?"
         suggestedPrompts={[
           {
             icon: Sparkles,

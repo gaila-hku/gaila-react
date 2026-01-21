@@ -1,7 +1,15 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import dayjs from 'dayjs';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
+
+import useInfiniteListing from 'components/display/InfiniteList/useInfiniteListing';
 
 import { Provider } from 'containers/common/AIChatBox/AIChatBoxContext/context';
 import {
@@ -9,20 +17,66 @@ import {
   gptResponseToChatMessage,
 } from 'containers/common/AIChatBox/utils';
 
-import { apiAskGpt } from 'api/gpt';
+import { apiAskGpt, apiGetGptChatLogs } from 'api/gpt';
+import type { GptLog } from 'types/gpt';
+import tuple from 'utils/types/tuple';
 
 type Props = {
-  essay?: string;
   toolId: number;
+  essay?: string;
+  firstMessage?: string;
   children: React.ReactNode;
 };
 
-const AIChatBoxProvider = ({ essay, toolId, children }: Props) => {
+const AIChatBoxProvider = ({
+  toolId,
+  essay,
+  firstMessage,
+  children,
+}: Props) => {
+  const queryClient = useQueryClient();
   const { mutateAsync: sendQuestion, isLoading: isAgentTyping } =
     useMutation(apiAskGpt);
 
   const [chatInput, setChatInput] = useState('');
   const [newChatMessages, setNewChatMessages] = useState<ChatMessage[]>([]);
+
+  const { data, isLoading, endReached, setPages, setPageLimit, error } =
+    useInfiniteListing<GptLog>({
+      queryFn: apiGetGptChatLogs,
+      queryKey: tuple([
+        apiGetGptChatLogs.queryKey,
+        { assignment_tool_id: toolId, page: 1, limit: 10 },
+      ]),
+      pageLimit: 1,
+    });
+
+  const chatInit = useRef(false);
+  // Add first message if no data
+  useEffect(() => {
+    if (chatInit.current || isLoading) {
+      return;
+    }
+    if (!data.length && firstMessage) {
+      setNewChatMessages([
+        {
+          id: 'first_message',
+          role: 'assistant',
+          content: firstMessage,
+          timestamp: dayjs(),
+        },
+      ]);
+    }
+    chatInit.current = true;
+  }, [data, firstMessage, isLoading, setNewChatMessages]);
+
+  // Refetch when toolId changes
+  useEffect(() => {
+    chatInit.current = false;
+    setNewChatMessages([]);
+    setChatInput('');
+    queryClient.invalidateQueries([apiGetGptChatLogs.queryKey]);
+  }, [queryClient, toolId]);
 
   const handleSendMessage = useCallback(
     async (inputQuestion?: string) => {
@@ -57,13 +111,31 @@ const AIChatBoxProvider = ({ essay, toolId, children }: Props) => {
     () => ({
       toolId,
       sendMessage: handleSendMessage,
+      apiMessages: data,
+      isLoading,
+      endReached,
+      setPages,
+      setPageLimit,
+      error,
       isAgentTyping,
       chatInput,
       setChatInput,
       newChatMessages,
       setNewChatMessages,
     }),
-    [chatInput, handleSendMessage, isAgentTyping, newChatMessages, toolId],
+    [
+      chatInput,
+      data,
+      endReached,
+      error,
+      handleSendMessage,
+      isAgentTyping,
+      isLoading,
+      newChatMessages,
+      setPageLimit,
+      setPages,
+      toolId,
+    ],
   );
 
   return <Provider value={value}>{children}</Provider>;
