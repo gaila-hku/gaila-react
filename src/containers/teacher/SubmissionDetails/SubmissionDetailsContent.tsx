@@ -274,8 +274,7 @@ const SubmissionDetailsContent = ({
         stage.enabled
       ) {
         tabKeys.push('writing');
-      }
-      if (stage.enabled) {
+      } else if (stage.enabled) {
         tabKeys.push(stage.stage_type);
       }
     }
