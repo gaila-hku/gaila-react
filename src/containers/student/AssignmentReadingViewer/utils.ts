@@ -1,3 +1,5 @@
+import type { AssignmentReadingContent } from 'types/assignment';
+
 const getIndicesFromRange = (range: Range, container: HTMLDivElement) => {
   const preCaretRange = range.cloneRange();
   preCaretRange.selectNodeContents(container);
@@ -7,7 +9,10 @@ const getIndicesFromRange = (range: Range, container: HTMLDivElement) => {
   return { start, end };
 };
 
-const highlightAnnotation = (annotation: any, container: HTMLDivElement) => {
+const highlightAnnotation = (
+  annotation: AssignmentReadingContent['annotations'][number],
+  container: HTMLDivElement,
+) => {
   // Find and wrap the text with the same indices
   let charCount = 0;
   let startNode: Node | null = null;
@@ -30,20 +35,20 @@ const highlightAnnotation = (annotation: any, container: HTMLDivElement) => {
 
     if (
       startNode === null &&
-      annotation.startIndex < nodeEnd &&
-      annotation.startIndex >= nodeStart
+      annotation.start_index < nodeEnd &&
+      annotation.start_index >= nodeStart
     ) {
       startNode = currentNode;
-      startOffset = annotation.startIndex - nodeStart;
+      startOffset = annotation.start_index - nodeStart;
     }
 
     if (
       endNode === null &&
-      annotation.endIndex <= nodeEnd &&
-      annotation.endIndex > nodeStart
+      annotation.end_index <= nodeEnd &&
+      annotation.end_index > nodeStart
     ) {
       endNode = currentNode;
-      endOffset = annotation.endIndex - nodeStart;
+      endOffset = annotation.end_index - nodeStart;
     }
 
     charCount += nodeText.length;
@@ -60,7 +65,6 @@ const highlightAnnotation = (annotation: any, container: HTMLDivElement) => {
     span.style.backgroundColor = annotation.color;
     span.style.cursor = 'pointer';
     span.style.borderRadius = '2px';
-    span.setAttribute('data-annotation-id', annotation.id);
     span.className = 'annotation-highlight';
 
     try {

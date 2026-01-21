@@ -90,6 +90,12 @@ const AssignmentReadingViewer = () => {
     }
   }, [currentStage]);
 
+  const currentTextAnnotations = useMemo(() => {
+    return annotations.filter(
+      annotation => annotation.text_index == currentTextIndex,
+    );
+  }, [annotations, currentTextIndex]);
+
   const handleGenerateText = useCallback(() => {
     setIsGenerating(true);
     setTimeout(() => {
@@ -145,10 +151,10 @@ const AssignmentReadingViewer = () => {
     });
 
     // Rebuild highlights from annotations
-    annotations.forEach(annotation => {
+    currentTextAnnotations.forEach(annotation => {
       highlightAnnotation(annotation, container);
     });
-  }, [annotations]);
+  }, [currentTextAnnotations]);
 
   const handleTextSelection = useCallback(() => {
     const selection = window.getSelection();
@@ -204,8 +210,9 @@ const AssignmentReadingViewer = () => {
         text: selectedText,
         note: annotationNote,
         color: selectedColor,
-        startIndex: selectionIndices.start,
-        endIndex: selectionIndices.end,
+        start_index: selectionIndices.start,
+        end_index: selectionIndices.end,
+        text_index: currentTextIndex,
       };
 
       const newAnnotations = [...annotations, newAnnotation];
@@ -221,6 +228,7 @@ const AssignmentReadingViewer = () => {
   }, [
     annotationNote,
     annotations,
+    currentTextIndex,
     saveAnnotations,
     selectedColor,
     selectedText,
@@ -364,7 +372,7 @@ const AssignmentReadingViewer = () => {
                 title: 'flex items-center gap-2',
                 description: '-mt-2 mb-2',
               }}
-              description={`${annotations.length} note${annotations.length === 1 ? '' : 's'} added`}
+              description={`${currentTextAnnotations.length} note${currentTextAnnotations.length === 1 ? '' : 's'} added`}
               title={
                 <>
                   <StickyNote className="h-5 w-5 text-primary" />
@@ -373,7 +381,7 @@ const AssignmentReadingViewer = () => {
               }
             >
               <div className="h-[calc(100vh-360px)] pr-4 overflow-auto">
-                {annotations.length === 0 ? (
+                {currentTextAnnotations.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <StickyNote className="h-8 w-8 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground">
@@ -385,7 +393,7 @@ const AssignmentReadingViewer = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {annotations.map(annotation => (
+                    {currentTextAnnotations.map(annotation => (
                       <Card
                         className="border-l-4 !p-4"
                         key={annotation.id}

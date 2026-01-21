@@ -157,8 +157,9 @@ export interface AssignmentReadingContent {
     text: string;
     note: string;
     color: string;
-    startIndex: number;
-    endIndex: number;
+    start_index: number;
+    end_index: number;
+    text_index: number;
   }[];
   model_text_generated?: boolean;
 }
