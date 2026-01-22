@@ -10,6 +10,7 @@ import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
 import type { TeacherAssignmentListingItem } from 'types/assignment';
+import shortenString from 'utils/helper/shortenString';
 
 type Props = {
   assignment: TeacherAssignmentListingItem;
@@ -61,7 +62,7 @@ const AssignmentCard = ({ assignment }: Props) => {
         <>
           {getStatusBadge(assignment.status)}
           <div className="text-sm text-muted-foreground mt-2 line-clamp-2">
-            {assignment.description}
+            {shortenString(assignment.description, 100)}
           </div>
         </>
       }

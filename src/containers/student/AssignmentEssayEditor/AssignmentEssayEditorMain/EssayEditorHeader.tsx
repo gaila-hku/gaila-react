@@ -26,7 +26,8 @@ const EssayEditorHeader = ({
   wordCountStatus,
   saveSubmissionContent,
 }: Props) => {
-  const { assignment, isSaving } = useAssignmentSubmissionProvider();
+  const { assignment, isSaving, outliningEnabled } =
+    useAssignmentSubmissionProvider();
   const { outlineConfirmed, title, setTitle, readonly } =
     useAssignmentEssayEditorProvider();
 
@@ -75,7 +76,7 @@ const EssayEditorHeader = ({
     >
       {!!assignment.requirements?.title && (
         <TextInput
-          className="text-base sm:text-lg font-semibold"
+          className="text-base sm:text-lg font-semibold !mb-4"
           disabled={readonly}
           label="Essay Title"
           onBlur={onTitleBlur}
@@ -83,8 +84,8 @@ const EssayEditorHeader = ({
           value={title}
         />
       )}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-4">
-        {outlineConfirmed && (
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+        {(!outliningEnabled || outlineConfirmed) && (
           <Badge
             className={`px-2 py-1 text-xs sm:text-sm ${wordCountStatus.color}`}
             variant="outline"

@@ -20,6 +20,7 @@ import {
 } from 'containers/student/StudentHome/utils';
 
 import { apiGetAssignments } from 'api/assignment';
+import shortenString from 'utils/helper/shortenString';
 import tuple from 'utils/types/tuple';
 
 export function StudentHome() {
@@ -227,7 +228,7 @@ export function StudentHome() {
                 root: 'hover:shadow-md transition-shadow',
                 status: getStatusClass(assignment.status),
               }}
-              description={assignment.description}
+              description={shortenString(assignment.description, 100)}
               footer={
                 <Button
                   className="flex-1 gap-2 text-sm"

@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import clsx from 'clsx';
 import { defaultsDeep } from 'lodash-es';
@@ -40,6 +46,7 @@ function AssignmentEssayEditorMain() {
     currentStage,
     saveSubmission,
     isSaving,
+    outliningEnabled,
     revisingEnabled,
   } = useAssignmentSubmissionProvider();
   const {
@@ -115,6 +122,15 @@ function AssignmentEssayEditorMain() {
       assignment?.requirements?.min_word_count,
     ],
   );
+
+  const initWordStatus = useRef(false);
+  useEffect(() => {
+    if (initWordStatus.current) {
+      return;
+    }
+    updateWordCountStatus(essay);
+    initWordStatus.current = true;
+  }, [updateWordCountStatus, essay]);
 
   const saveSubmissionContent = useCallback(
     (
@@ -412,7 +428,10 @@ function AssignmentEssayEditorMain() {
 
         {/* Sidebar with Tabs */}
         <Tabs
-          className="sticky top-[137px] bottom-0"
+          className={clsx([
+            'sticky bottom-0',
+            outliningEnabled || revisingEnabled ? 'top-[137px]' : 'top-[80px]',
+          ])}
           classes={{ panel: 'overflow-auto max-h-[calc(100vh-233px)]' }}
           tabs={[
             {
@@ -426,11 +445,17 @@ function AssignmentEssayEditorMain() {
                 />
               ),
             },
-            {
-              key: 'tools',
-              title: 'Tools',
-              content: <EssayEditorTools />,
-            },
+            ...(currentStage.tools.some(
+              tool => tool.id !== generalChatTool?.id && tool.enabled,
+            )
+              ? [
+                  {
+                    key: 'tools',
+                    title: 'Tools',
+                    content: <EssayEditorTools />,
+                  },
+                ]
+              : []),
             ...(generalChatTool
               ? [
                   {
