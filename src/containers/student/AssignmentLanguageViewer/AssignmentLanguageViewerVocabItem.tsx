@@ -5,7 +5,9 @@ import Button from 'components/input/Button';
 
 import useAIChatBox from 'containers/common/AIChatBox/AIChatBoxContext/useAIChatBox';
 
-type Props = { item: any };
+import type { VocabGenerateItem } from 'types/gpt';
+
+type Props = { item: VocabGenerateItem };
 
 const AssignmentLanguageViewerVocabItem = ({ item }: Props) => {
   const { sendMessage } = useAIChatBox();
@@ -22,13 +24,13 @@ const AssignmentLanguageViewerVocabItem = ({ item }: Props) => {
   );
 
   return (
-    <Card className="border-l-4 border-l-primary !py-2" key={item.id}>
+    <Card className="border-l-4 border-l-primary !py-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-medium">{item.word}</p>
+        <p className="font-medium">{item.text}</p>
         <div className="flex gap-2">
           <Button
             className="text-xs"
-            onClick={() => handleVocabAction(item.word, 'definition')}
+            onClick={() => handleVocabAction(item.text, 'definition')}
             size="sm"
             variant="outline"
           >
@@ -36,7 +38,7 @@ const AssignmentLanguageViewerVocabItem = ({ item }: Props) => {
           </Button>
           <Button
             className="text-xs"
-            onClick={() => handleVocabAction(item.word, 'example')}
+            onClick={() => handleVocabAction(item.text, 'example')}
             size="sm"
             variant="outline"
           >

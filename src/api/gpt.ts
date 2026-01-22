@@ -148,3 +148,8 @@ export const apiGetRevisionExplanationListing = async ({
   return res;
 };
 apiGetRevisionExplanationListing.queryKey = '/gpt/revision-explanation-listing';
+
+export const apiGenerateVocab = (payload: {
+  assignment_tool_id: number;
+}): Promise<GptLog> =>
+  callAPIHandler('post', '/gpt/generate-vocab', payload, true);
