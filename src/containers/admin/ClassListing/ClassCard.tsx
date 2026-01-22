@@ -16,7 +16,7 @@ type Props = {
 
 const ClassCard = ({ classItem, setEditingClass }: Props) => {
   return (
-    <Card>
+    <Card className="h-fit">
       <div className="flex justify-between items-start">
         <div className="flex items-start gap-3">
           <div className="p-2 bg-primary/10 rounded-lg">

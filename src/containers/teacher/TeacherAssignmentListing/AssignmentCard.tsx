@@ -55,7 +55,7 @@ const AssignmentCard = ({ assignment }: Props) => {
   return (
     <Card
       classes={{
-        root: 'hover:shadow-md transition-shadow',
+        root: 'hover:shadow-md transition-shadow h-fit',
         children: 'space-y-4',
       }}
       description={

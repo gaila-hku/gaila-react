@@ -176,7 +176,7 @@ export function StudentHome() {
         )}
       </Card>
 
-      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 h-fit">
         <InfiniteList
           emptyPlaceholder={
             hasFilter ? (
@@ -225,7 +225,7 @@ export function StudentHome() {
             <Card
               badgeText={getBadgeText(assignment.type)}
               classes={{
-                root: 'hover:shadow-md transition-shadow',
+                root: 'hover:shadow-md transition-shadow h-fit',
                 status: getStatusClass(assignment.status),
               }}
               description={shortenString(assignment.description, 100)}
