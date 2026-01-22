@@ -432,7 +432,14 @@ function AssignmentEssayEditorMain() {
             'sticky bottom-0',
             outliningEnabled || revisingEnabled ? 'top-[137px]' : 'top-[80px]',
           ])}
-          classes={{ panel: 'overflow-auto max-h-[calc(100vh-233px)]' }}
+          classes={{
+            panel: clsx([
+              'overflow-auto',
+              outliningEnabled || revisingEnabled
+                ? 'h-[calc(100vh-210px)]'
+                : 'h-[calc(100vh-152px)]',
+            ]),
+          }}
           tabs={[
             {
               key: 'overview',

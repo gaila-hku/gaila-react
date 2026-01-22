@@ -33,7 +33,7 @@ const AssignmentSubmitPage = () => {
     <AuthPageWrapper isStudentPage>
       <AssignmentSubmissionProvider assignmentId={assignmentId}>
         <StudentHeader />
-        <div className="px-6 py-4 max-w-full mx-auto mb-10">
+        <div className="px-6 py-4 max-w-full mx-auto mb-4">
           {/* <Button className="gap-2 mb-4" onClick={onBack} variant="ghost">
             <ArrowLeft className="h-4 w-4" />
             Back to Assignments

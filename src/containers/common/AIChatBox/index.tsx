@@ -82,7 +82,7 @@ const AIChatBox = ({
   return (
     <Card
       classes={{
-        root: 'flex flex-col h-[calc(100vh-200px)] !p-4',
+        root: 'flex flex-col h-full !p-4',
         title: 'flex items-center gap-2 text-base -mb-2',
         children: 'flex flex-col flex-1 p-0 overflow-hidden',
         description: 'text-sm mb-2',
