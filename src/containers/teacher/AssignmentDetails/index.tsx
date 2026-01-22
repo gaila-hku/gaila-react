@@ -65,7 +65,11 @@ function AssignmentDetails({ assignmentId }: ViewAssignmentProps) {
     <div className="space-y-6">
       {/* Assignment Details */}
       <Card
-        classes={{ children: 'space-y-6', title: '-mb-2', description: 'mb-4' }}
+        classes={{
+          children: 'space-y-6',
+          title: '-mb-2',
+          description: 'mb-4 whitespace-pre-wrap',
+        }}
         description={assignment.description}
         title={assignment.title}
       >

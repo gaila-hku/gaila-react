@@ -68,7 +68,7 @@ const EssayEditorHeader = ({
             <FileText className="h-5 w-5" />
             {assignment.title}
           </div>
-          <div className="font-normal text-base text-muted-foreground">
+          <div className="font-normal text-base text-muted-foreground whitespace-pre-wrap">
             {assignment.description}
           </div>
         </>
