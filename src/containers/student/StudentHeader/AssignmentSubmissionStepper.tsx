@@ -40,10 +40,8 @@ const AssignmentSubmissionStepper = () => {
   }
 
   const activeStages = assignmentProgress.stages.filter(s => s.enabled) || [];
-  const stepperActiveStep = Math.max(
-    assignmentProgress.current_stage -
-      (assignmentProgress.stages.length - activeStages.length),
-    0,
+  const stepperActiveStep = activeStages.findIndex(
+    stage => stage.stage_type === currentStage?.stage_type,
   );
 
   return (

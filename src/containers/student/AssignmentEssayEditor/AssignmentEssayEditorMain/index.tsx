@@ -125,7 +125,7 @@ function AssignmentEssayEditorMain() {
 
   const initWordStatus = useRef(false);
   useEffect(() => {
-    if (initWordStatus.current) {
+    if (initWordStatus.current || !essay) {
       return;
     }
     updateWordCountStatus(essay);
@@ -142,10 +142,15 @@ function AssignmentEssayEditorMain() {
         return;
       }
 
-      const content = defaultsDeep(newContent, {
-        title: title,
-        essay: essay,
-      });
+      const content = defaultsDeep(
+        newContent,
+        currentStage.stage_type === 'outlining'
+          ? { outline: outline }
+          : {
+              title: title,
+              essay: essay,
+            },
+      );
 
       saveSubmission({
         assignment_id: assignmentProgress.assignment.id,
@@ -156,7 +161,7 @@ function AssignmentEssayEditorMain() {
         alertMsg,
       });
     },
-    [assignmentProgress, currentStage, essay, saveSubmission, title],
+    [assignmentProgress, currentStage, essay, outline, saveSubmission, title],
   );
 
   const handleAutoSave = useCallback(() => {

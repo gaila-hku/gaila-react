@@ -49,32 +49,6 @@ const AssignmentGoalEditor = () => {
 
   const [goalValue, setGoalValue] = useState(defaultGoals);
 
-  const handleAddGoal = useCallback(
-    (category: 'writing_goals' | 'ai_goals') => {
-      setGoalValue(prev => ({
-        ...prev,
-        [category]: [
-          ...prev[category],
-          { goalText: '', strategies: [{ text: '' }] },
-        ],
-      }));
-    },
-    [],
-  );
-
-  const handleRemoveGoal = useCallback(
-    (category: 'writing_goals' | 'ai_goals', index: number) => {
-      if (goalValue[category].length <= 1) {
-        return;
-      }
-      setGoalValue({
-        ...goalValue,
-        [category]: goalValue[category].filter((_, i) => i !== index),
-      });
-    },
-    [goalValue],
-  );
-
   const handleChangeGoalText = useCallback(
     (category: 'writing_goals' | 'ai_goals', index: number, value: string) => {
       setGoalValue(prev => ({
@@ -85,44 +59,6 @@ const AssignmentGoalEditor = () => {
       }));
     },
     [],
-  );
-
-  const handleAddStrategy = useCallback(
-    (category: 'writing_goals' | 'ai_goals', goalIndex: number) => {
-      setGoalValue(prev => ({
-        ...prev,
-        [category]: prev[category].map((g, i) =>
-          i === goalIndex
-            ? { ...g, strategies: [...g.strategies, { text: '' }] }
-            : g,
-        ),
-      }));
-    },
-    [],
-  );
-
-  const handleRemoveStrategy = useCallback(
-    (
-      category: 'writing_goals' | 'ai_goals',
-      goalIndex: number,
-      strategyIndex: number,
-    ) => {
-      if (goalValue[category][goalIndex].strategies.length <= 1) {
-        return;
-      }
-      setGoalValue({
-        ...goalValue,
-        [category]: goalValue[category].map((g, i) =>
-          i === goalIndex
-            ? {
-                ...g,
-                strategies: g.strategies.filter((_, j) => j !== strategyIndex),
-              }
-            : g,
-        ),
-      });
-    },
-    [goalValue],
   );
 
   const handleChangeStrategyText = useCallback(
@@ -218,18 +154,19 @@ const AssignmentGoalEditor = () => {
   }, [assignmentProgress, currentStage, goalValue, readonly, saveSubmission]);
 
   const handleSubmit = useCallback(
-    (isFinal: boolean, isManual?: boolean) => {
+    (isFinal: boolean, isManual?: boolean, inputGoals?: typeof goalValue) => {
       if (!assignmentProgress || !currentStage || readonly) {
         return;
       }
 
-      const isGoalsEmpty = [
-        ...goalValue.writing_goals,
-        ...goalValue.ai_goals,
-      ].every(goal => !goal.goalText.trim());
+      const goals = inputGoals ?? goalValue;
+
+      const isGoalsEmpty = [...goals.writing_goals, ...goals.ai_goals].every(
+        goal => !goal.goalText.trim(),
+      );
       const isStrategiesEmpty = [
-        ...goalValue.writing_goals,
-        ...goalValue.ai_goals,
+        ...goals.writing_goals,
+        ...goals.ai_goals,
       ].some(goal => goal.strategies.every(strategy => !strategy.text.trim()));
 
       if (isFinal && isGoalsEmpty) {
@@ -244,7 +181,7 @@ const AssignmentGoalEditor = () => {
       saveSubmission({
         assignment_id: assignmentProgress.assignment.id,
         stage_id: currentStage.id,
-        content: goalValue,
+        content: goals,
         is_final: isFinal,
         alertMsg: isManual ? 'Goals draft saved.' : undefined,
         refetchProgress: true,
@@ -259,6 +196,78 @@ const AssignmentGoalEditor = () => {
       readonly,
       saveSubmission,
     ],
+  );
+
+  const handleAddGoal = useCallback(
+    (category: 'writing_goals' | 'ai_goals') => {
+      const newGoals = {
+        ...goalValue,
+        [category]: [
+          ...goalValue[category],
+          { goalText: '', strategies: [{ text: '' }] },
+        ],
+      };
+      setGoalValue(newGoals);
+      handleSubmit(false, false, newGoals);
+    },
+    [goalValue, handleSubmit],
+  );
+
+  const handleRemoveGoal = useCallback(
+    (category: 'writing_goals' | 'ai_goals', index: number) => {
+      if (goalValue[category].length <= 1) {
+        return;
+      }
+      const newGoals = {
+        ...goalValue,
+        [category]: goalValue[category].filter((_, i) => i !== index),
+      };
+      setGoalValue(newGoals);
+      handleSubmit(false, false, newGoals);
+    },
+    [goalValue, handleSubmit],
+  );
+
+  const handleAddStrategy = useCallback(
+    (category: 'writing_goals' | 'ai_goals', goalIndex: number) => {
+      const newGoals = {
+        ...goalValue,
+        [category]: goalValue[category].map((g, i) =>
+          i === goalIndex
+            ? { ...g, strategies: [...g.strategies, { text: '' }] }
+            : g,
+        ),
+      };
+      setGoalValue(newGoals);
+      handleSubmit(false, false, newGoals);
+    },
+    [goalValue, handleSubmit],
+  );
+
+  const handleRemoveStrategy = useCallback(
+    (
+      category: 'writing_goals' | 'ai_goals',
+      goalIndex: number,
+      strategyIndex: number,
+    ) => {
+      if (goalValue[category][goalIndex].strategies.length <= 1) {
+        return;
+      }
+      const newGoals = {
+        ...goalValue,
+        [category]: goalValue[category].map((g, i) =>
+          i === goalIndex
+            ? {
+                ...g,
+                strategies: g.strategies.filter((_, j) => j !== strategyIndex),
+              }
+            : g,
+        ),
+      };
+      setGoalValue(newGoals);
+      handleSubmit(false, false, newGoals);
+    },
+    [goalValue, handleSubmit],
   );
 
   const onInputBlur = useCallback(
