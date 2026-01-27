@@ -9,10 +9,10 @@ import SwitchInput from 'components/input/SwitchInput';
 import TextInput from 'components/input/TextInput';
 
 import type { AssignmentFormData } from 'containers/teacher/AssignmentEditor';
+import AssignmentEditorFormChecklistInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormChecklistInput';
 import AssignmentEditorFormDashboardInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormDashboardInput';
 import AssignmentEditorFormRubricsInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormRubricsInput';
 import AssignmentEditorFormStageInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput';
-import AssignmentEditorFormTipsInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormTipsInput';
 import StudentEnrollInput from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/StudentEnrollInput';
 
 import type { ClassOption } from 'types/class';
@@ -133,8 +133,8 @@ const AssignmentEditorForm = ({
 
       <Divider />
 
-      <AssignmentEditorFormTipsInput
-        formDataValue={formData.current.tips || []}
+      <AssignmentEditorFormChecklistInput
+        formDataValue={formData.current.checklist || []}
         onFormDataChange={onFormDataChange}
       />
 

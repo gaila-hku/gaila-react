@@ -12,7 +12,7 @@ export interface Assignment {
   due_date?: number | null;
   type?: string;
   instructions?: string;
-  tips?: string[];
+  checklist?: string[];
   config?: {
     dashboard?: {
       enabled?: boolean;

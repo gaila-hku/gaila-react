@@ -10,71 +10,71 @@ type Props = {
   onFormDataChange: (field: string, value: any) => void;
 };
 
-const AssignmentEditorFormTipsInput = ({
+const AssignmentEditorFormChecklistInput = ({
   formDataValue,
   onFormDataChange,
 }: Props) => {
-  const [tips, setTips] = useState<string[]>(['']);
+  const [checklist, setChecklist] = useState<string[]>(['']);
 
-  const handleAddTipsItem = useCallback(() => {
-    const newTips = [...tips, ''];
-    setTips(newTips);
-    onFormDataChange('tips', newTips);
-  }, [onFormDataChange, tips]);
+  const handleAddChecklistItem = useCallback(() => {
+    const newChecklist = [...checklist, ''];
+    setChecklist(newChecklist);
+    onFormDataChange('checklist', newChecklist);
+  }, [onFormDataChange, checklist]);
 
-  const handleRemoveTipsItem = useCallback(
+  const handleRemoveChecklistItem = useCallback(
     (index: number) => {
-      const newTips = tips.filter((_, i) => i !== index);
-      setTips(newTips);
-      onFormDataChange('tips', newTips);
+      const newChecklist = checklist.filter((_, i) => i !== index);
+      setChecklist(newChecklist);
+      onFormDataChange('checklist', newChecklist);
     },
-    [onFormDataChange, tips],
+    [onFormDataChange, checklist],
   );
 
-  const handleTipsChange = useCallback(
+  const handleChecklistChange = useCallback(
     (index: number, value: string) => {
-      const newTips = [...tips];
-      newTips[index] = value;
-      setTips(newTips);
-      onFormDataChange('tips', newTips);
+      const newChecklist = [...checklist];
+      newChecklist[index] = value;
+      setChecklist(newChecklist);
+      onFormDataChange('checklist', newChecklist);
     },
-    [onFormDataChange, tips],
+    [onFormDataChange, checklist],
   );
 
   useEffect(() => {
-    setTips(formDataValue);
+    setChecklist(formDataValue);
   }, [formDataValue]);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium">Writing tips for students</h4>
+        <h4 className="font-medium">Writing checklist for students</h4>
         <Button
           className="gap-2"
-          onClick={handleAddTipsItem}
+          onClick={handleAddChecklistItem}
           size="sm"
           variant="outline"
         >
           <Plus className="h-4 w-4" />
-          Add Tips
+          Add Item
         </Button>
       </div>
 
       <div className="space-y-4">
-        {tips.map((tip, index) => (
+        {checklist.map((tip, index) => (
           <div className="flex gap-2 items-start" key={index}>
             <div className="flex-1 space-y-2 flex gap-2 items-center">
               <CircleCheckBig className="mb-0" color="green" />
               <TextInput
                 className="flex-1"
-                onChange={e => handleTipsChange(index, e.target.value)}
+                onChange={e => handleChecklistChange(index, e.target.value)}
                 placeholder="e.g. Use active voice in a speech / Start with a compelling hook / Refer to textbook P. 124"
                 value={tip}
               />
             </div>
             <Button
-              disabled={tips.length === 1}
-              onClick={() => handleRemoveTipsItem(index)}
+              disabled={checklist.length === 1}
+              onClick={() => handleRemoveChecklistItem(index)}
               size="icon"
               variant="ghost"
             >
@@ -87,4 +87,4 @@ const AssignmentEditorFormTipsInput = ({
   );
 };
 
-export default AssignmentEditorFormTipsInput;
+export default AssignmentEditorFormChecklistInput;

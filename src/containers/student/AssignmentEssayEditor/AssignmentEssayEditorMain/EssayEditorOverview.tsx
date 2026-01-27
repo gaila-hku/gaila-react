@@ -274,7 +274,7 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
         </Card>
       )}
 
-      {!!assignment.tips?.length && (
+      {!!assignment.checklist?.length && (
         <Card
           classes={{
             children: 'space-y-2',
@@ -284,11 +284,11 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
           title={
             <>
               <AlertCircle className="h-4 w-4" />
-              Writing Tips
+              Writing Checklist
             </>
           }
         >
-          {assignment.tips.map((tip, index) => (
+          {assignment.checklist.map((tip, index) => (
             <div className="flex items-start gap-2 text-sm" key={index}>
               <CheckCircle className="h-3 w-3 text-green-500 mt-1 flex-shrink-0" />
               <span className="text-muted-foreground">{tip}</span>

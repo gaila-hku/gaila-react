@@ -49,7 +49,7 @@ const defaultData: AssignmentFormData = {
     { criteria: 'Grammar', description: '', max_points: 7 },
     { criteria: 'Organization', description: '', max_points: 7 },
   ],
-  tips: [''],
+  checklist: [''],
   config: {
     dashboard: {
       enabled: true,
@@ -125,7 +125,7 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
     if (assignmentData) {
       formData.current = {
         ...assignmentData,
-        tips: assignmentData.tips || defaultData.tips,
+        checklist: assignmentData.checklist || defaultData.checklist,
         rubrics: assignmentData.rubrics || defaultData.rubrics,
         requirements: assignmentData.requirements || defaultData.requirements,
       };
@@ -156,9 +156,9 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
       rubrics: isObjEmpty(formData.current.rubrics)
         ? undefined
         : formData.current.rubrics,
-      tips: isObjEmpty(formData.current.tips)
+      checklist: isObjEmpty(formData.current.checklist)
         ? undefined
-        : formData.current.tips?.filter(s => !!s),
+        : formData.current.checklist?.filter(s => !!s),
       enrolled_class_ids: formData.current.enrolled_classes.map(c => c.id),
       enrolled_student_ids: formData.current.enrolled_students.map(c => c.id),
     };
