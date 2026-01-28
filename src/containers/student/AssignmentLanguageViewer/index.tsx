@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
-import { Book, List } from 'lucide-react';
+import { Book, CheckCircle, List } from 'lucide-react';
 
+import Button from 'components/input/Button';
 import Tabs from 'components/navigation/Tabs';
 
 import AIChatBox from 'containers/common/AIChatBox';
@@ -14,7 +15,8 @@ import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmis
 import type { AssignmentStageLanguagePreparation } from 'types/assignment';
 
 export const AssignmentLanguageViewer = () => {
-  const { currentStage } = useAssignmentSubmissionProvider();
+  const { assignment, currentStage, saveSubmission } =
+    useAssignmentSubmissionProvider();
 
   const vocabEnabled = (currentStage as AssignmentStageLanguagePreparation)
     .config.vocabulary_enabled;
@@ -22,6 +24,19 @@ export const AssignmentLanguageViewer = () => {
   const generalChatTool = currentStage?.tools.find(tool => {
     return tool.key === 'language_general';
   });
+
+  const handleToNextStage = useCallback(() => {
+    if (!assignment || !currentStage) {
+      return;
+    }
+    saveSubmission({
+      assignment_id: assignment.id,
+      stage_id: currentStage.id,
+      content: { generated_vocabs: [] },
+      is_final: true,
+      changeStage: true,
+    });
+  }, [assignment, currentStage, saveSubmission]);
 
   const tabs = useMemo(
     () => [
@@ -84,6 +99,14 @@ export const AssignmentLanguageViewer = () => {
             ) : (
               tabs[0]?.content || <></>
             )}
+            <Button
+              className="w-full gap-2 mt-4"
+              onClick={handleToNextStage}
+              size="lg"
+            >
+              <CheckCircle className="h-4 w-4" />
+              Continue to Next Stage
+            </Button>
           </div>
 
           {generalChatTool && (

@@ -164,6 +164,10 @@ export interface AssignmentReadingContent {
   model_text_generated?: boolean;
 }
 
+export interface AssignmentLanguagePreparationContent {
+  generated_vocabs: string[];
+}
+
 export interface AssignmentOutliningContent {
   outline: string;
 }
@@ -195,6 +199,7 @@ export interface AssignmentSubmission {
   content:
     | AssignmentReadingContent
     | AssignmentGoalContent
+    | AssignmentLanguagePreparationContent
     | AssignmentOutliningContent
     | AssignmentDraftingContent
     | AssignmentRevisingContent
