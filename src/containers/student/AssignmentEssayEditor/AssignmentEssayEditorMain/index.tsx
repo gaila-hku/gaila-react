@@ -156,7 +156,7 @@ function AssignmentEssayEditorMain() {
         assignment_id: assignmentProgress.assignment.id,
         stage_id: currentStage.id,
         content: content,
-        is_final: isFinal,
+        is_final: isFinal || currentStage.submission?.is_final || false,
         changeStage: isFinal,
         alertMsg,
       });
