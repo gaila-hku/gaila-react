@@ -13,9 +13,15 @@ type Props = {
   error?: unknown;
   message?: string;
   className?: string;
+  backToHome?: boolean;
 };
 
-const ErrorComponent = ({ error, message, className }: Props) => {
+const ErrorComponent = ({
+  error,
+  message,
+  className,
+  backToHome = true,
+}: Props) => {
   const navigate = useNavigate();
 
   const onClick = useCallback(() => {
@@ -42,7 +48,7 @@ const ErrorComponent = ({ error, message, className }: Props) => {
         contact admin with the following error message:{' '}
         <span className="text-red-400">{errorMessage}</span>
       </div>
-      <Button onClick={onClick}>Back to Home</Button>
+      {!!backToHome && <Button onClick={onClick}>Back to Home</Button>}
     </div>
   );
 };

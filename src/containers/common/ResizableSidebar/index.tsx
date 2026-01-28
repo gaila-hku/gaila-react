@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 
 import Box from '@mui/material/Box';
+import clsx from 'clsx';
 
 import Clickable from 'components/input/Clickable';
 
@@ -16,6 +17,7 @@ type Props = {
   minWidth?: number;
   maxWidth?: number;
   reverse?: boolean;
+  className?: string;
 };
 
 const ResizableSidebar = ({
@@ -24,6 +26,7 @@ const ResizableSidebar = ({
   minWidth = 250,
   maxWidth = 600,
   reverse,
+  className,
 }: Props) => {
   const [sidebarWidth, setSidebarWidth] = useState(initWidth);
   const isResizing = useRef(false);
@@ -65,7 +68,7 @@ const ResizableSidebar = ({
   if (Children.count(children) < 2) return children;
 
   return (
-    <div className="relative flex h-full">
+    <div className={clsx(className, 'relative flex h-full')}>
       <Box
         sx={{
           width: reverse ? sidebarWidth : `calc(100% - ${sidebarWidth}px)`,

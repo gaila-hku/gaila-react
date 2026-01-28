@@ -41,13 +41,13 @@ const AssignmentReflectionEditorDashboard = ({ assignmentId }: Props) => {
     }
     const reviseSubmission = assignmentProgress.stages.find(
       stage => stage.stage_type === 'revising',
-    ) as AssignmentRevisingContent | undefined;
+    )?.submission?.content as AssignmentRevisingContent | undefined;
     if (reviseSubmission) {
       return reviseSubmission.essay;
     }
     const draftSubmission = assignmentProgress.stages.find(
       stage => stage.stage_type === 'drafting',
-    ) as AssignmentDraftingContent | undefined;
+    )?.submission?.content as AssignmentDraftingContent | undefined;
     return draftSubmission?.essay || '';
   }, [assignmentProgress]);
 

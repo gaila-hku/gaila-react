@@ -153,3 +153,17 @@ export const apiGenerateVocab = (payload: {
   assignment_tool_id: number;
 }): Promise<GptLog> =>
   callAPIHandler('post', '/gpt/generate-vocab', payload, true);
+
+export interface GenerateDashboardResponse {
+  usage_data: {
+    annotations: { text: string; color: string; note: string }[];
+    generatedVocabs: string[];
+    checklist: string[];
+  };
+  gpt_log: GptLog;
+}
+
+export const apiGenerateDashboard = (payload: {
+  assignment_tool_id: number;
+}): Promise<GenerateDashboardResponse> =>
+  callAPIHandler('post', '/gpt/generate-dashboard', payload, true);

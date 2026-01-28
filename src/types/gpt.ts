@@ -111,3 +111,33 @@ export interface VocabGenerateItem {
 export interface VocabGenerateResult {
   items: VocabGenerateItem[];
 }
+
+export interface DashboardGenerateReferenceItem {
+  text: string;
+  explanation: string;
+  referenced: boolean;
+}
+
+export interface DashboardGenerateResult {
+  reading: {
+    total_annotations: number;
+    annotations: DashboardGenerateReferenceItem[];
+    suggestions: string;
+  };
+  language: {
+    total_vocabularies: number;
+    vocabs: DashboardGenerateReferenceItem[];
+    suggestions: string;
+  };
+  outline: {
+    total_outline_points: number;
+    outline_points: DashboardGenerateReferenceItem[];
+    suggestions: string;
+  };
+  checklist: {
+    total_checklist_items: number;
+    checklist_items: DashboardGenerateReferenceItem[];
+    suggestions: string;
+  };
+  overall_suggestion: string;
+}
