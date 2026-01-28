@@ -72,10 +72,20 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       (currentStage.stage_type === 'drafting' ||
         currentStage.stage_type === 'revising')
     ) {
-      const currentContent = currentStage.submission
-        ?.content as AssignmentDraftingContent;
-      setTitle(currentContent.title);
-      setEssay(currentContent.essay);
+      const currentContent = currentStage.submission?.content as
+        | AssignmentDraftingContent
+        | undefined;
+      setTitle(currentContent?.title || '');
+      setEssay(currentContent?.essay || '');
+    } else if (
+      !currentStage?.submission &&
+      currentStage?.stage_type === 'revising'
+    ) {
+      const draftingContent = draftingStage?.submission?.content as
+        | AssignmentDraftingContent
+        | undefined;
+      setTitle(draftingContent?.title || '');
+      setEssay(draftingContent?.essay || '');
     }
   }, [assignmentProgress, currentStage, setGoalContent]);
 
