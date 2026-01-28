@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 
-import { startCase } from 'lodash-es';
 import { Info } from 'lucide-react';
 import {
   Bar,
@@ -13,6 +12,8 @@ import {
   YAxis,
 } from 'recharts';
 
+import { getAgentName } from 'containers/common/Dashboard/utils';
+
 import type { AgentUsageDataItem } from 'types/assignment';
 
 type Props = {
@@ -24,7 +25,7 @@ const DashboardAgentUsage = ({ usageData }: Props) => {
     return usageData
       .sort((a, b) => b.agent_uses - a.agent_uses)
       .map(item => ({
-        agentType: startCase(item.agent_type),
+        agentType: getAgentName(item.agent_type),
         'Agent uses': item.agent_uses,
         'Follow-up prompts': item.prompts,
         color: '#3b82f6',
@@ -39,11 +40,11 @@ const DashboardAgentUsage = ({ usageData }: Props) => {
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            margin={{ top: 5, bottom: 5 }}
           >
             <CartesianGrid horizontal={false} strokeDasharray="3 3" />
             <XAxis type="number" />
-            <YAxis dataKey="agentType" type="category" width={80} />
+            <YAxis dataKey="agentType" type="category" width={120} />
             <RechartsTooltip
               formatter={value => `${value} time${value === 1 ? '' : 's'}`}
             />
