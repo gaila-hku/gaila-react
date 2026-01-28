@@ -273,8 +273,19 @@ function AssignmentEssayEditorMain() {
     if (!checkWordCountAndAlert()) {
       return;
     }
-    setSubmitModalOpen(true);
-  }, [checkWordCountAndAlert]);
+    const isGoalSettingEnabled = assignmentProgress?.stages.some(
+      stage => stage.enabled && stage.stage_type === 'goal_setting',
+    );
+    if (isGoalSettingEnabled) {
+      setSubmitModalOpen(true);
+    } else {
+      saveSubmissionContent({}, true);
+    }
+  }, [
+    assignmentProgress?.stages,
+    checkWordCountAndAlert,
+    saveSubmissionContent,
+  ]);
 
   const bottomButton = useMemo(() => {
     const props = {
