@@ -437,7 +437,7 @@ const AssignmentReadingViewer = () => {
                     size="lg"
                   >
                     <CheckCircle className="h-4 w-4" />
-                    Continue to Writing Stage
+                    Continue to Next Stage
                   </Button>
                 </>
               )}
