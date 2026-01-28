@@ -297,7 +297,8 @@ export interface AssignmentSubmissionDetails {
 export interface AssignmentAnalytics {
   agent_usage: AgentUsageDataItem[];
   prompt_data: PromptAnalytics;
-  plagiarised_segments: PlagiarisedSegment[];
+  outline_plagiarised_segments: PlagiarisedSegment[];
+  essay_plagiarised_segments: PlagiarisedSegment[];
 }
 
 export interface AgentUsageDataItem {

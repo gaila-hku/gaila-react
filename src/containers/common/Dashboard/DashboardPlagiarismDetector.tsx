@@ -4,63 +4,85 @@ import clsx from 'clsx';
 import { AlertTriangle, NotebookPen } from 'lucide-react';
 
 import Card from 'components/display/Card';
+import Divider from 'components/display/Divider';
 
-import type { AssignmentAnalytics } from 'types/assignment';
+import type { PlagiarisedSegment } from 'types/assignment';
 
 type Props = {
-  plagiarisedSegments: AssignmentAnalytics['plagiarised_segments'];
+  outline: string;
+  outlinePlagiarisedSegments: PlagiarisedSegment[];
   essay: string;
+  essayPlagiarisedSegments: PlagiarisedSegment[];
 };
 
-const DashboardPlagiarismDetector = ({ plagiarisedSegments, essay }: Props) => {
+const DashboardPlagiarismDetector = ({
+  outline,
+  outlinePlagiarisedSegments,
+  essayPlagiarisedSegments,
+  essay,
+}: Props) => {
   const getCopyingPercentage = useCallback(() => {
-    const essayLength = essay.length;
-
-    if (essayLength === 0) {
+    const totalLength = outline.length + essay.length;
+    if (totalLength === 0) {
       return 0;
     }
-    const plagiarisedLength = plagiarisedSegments.reduce(
+
+    const outlinePlagiarisedLength = outlinePlagiarisedSegments.reduce(
+      (total, segment) => total + segment.sequence.length,
+      0,
+    );
+    const essayPlagiarisedLength = essayPlagiarisedSegments.reduce(
       (total, segment) => total + segment.sequence.length,
       0,
     );
 
-    return (plagiarisedLength / essayLength) * 100;
-  }, [essay, plagiarisedSegments]);
-
-  const renderSegments = useCallback(() => {
-    let lastIndex = 0;
-    const segments = plagiarisedSegments.flatMap(segment => {
-      const normalSegment = {
-        content: essay.slice(lastIndex, segment.offset),
-        type: 'normal',
-      };
-      lastIndex = segment.offset + segment.sequence.length;
-      const plagiarisedSegment = {
-        content: segment.sequence,
-        type: segment.type,
-      };
-      return [normalSegment, plagiarisedSegment];
-    });
-    segments.push({
-      content: essay.slice(lastIndex),
-      type: 'normal',
-    });
     return (
-      <>
-        {segments.map((segment, index) => (
-          <span
-            className={clsx(
-              segment.type === 'pasted' && 'bg-yellow-300',
-              segment.type === 'repeated' && 'bg-yellow-100',
-            )}
-            key={index}
-          >
-            {segment.content}
-          </span>
-        ))}
-      </>
+      ((outlinePlagiarisedLength + essayPlagiarisedLength) / totalLength) * 100
     );
-  }, [essay, plagiarisedSegments]);
+  }, [
+    essay.length,
+    essayPlagiarisedSegments,
+    outline.length,
+    outlinePlagiarisedSegments,
+  ]);
+
+  const renderSegments = useCallback(
+    (text: string, plagiarisedSegments: PlagiarisedSegment[]) => {
+      let lastIndex = 0;
+      const segments = plagiarisedSegments.flatMap(segment => {
+        const normalSegment = {
+          content: text.slice(lastIndex, segment.offset),
+          type: 'normal',
+        };
+        lastIndex = segment.offset + segment.sequence.length;
+        const plagiarisedSegment = {
+          content: segment.sequence,
+          type: segment.type,
+        };
+        return [normalSegment, plagiarisedSegment];
+      });
+      segments.push({
+        content: text.slice(lastIndex),
+        type: 'normal',
+      });
+      return (
+        <>
+          {segments.map((segment, index) => (
+            <span
+              className={clsx(
+                segment.type === 'pasted' && 'bg-yellow-300',
+                segment.type === 'repeated' && 'bg-yellow-100',
+              )}
+              key={index}
+            >
+              {segment.content}
+            </span>
+          ))}
+        </>
+      );
+    },
+    [],
+  );
 
   return (
     <Card
@@ -96,7 +118,19 @@ const DashboardPlagiarismDetector = ({ plagiarisedSegments, essay }: Props) => {
           </div>
         </div>
       </div>
-      <div className="whitespace-pre-wrap">{renderSegments()}</div>
+      {!!outline && (
+        <>
+          <div className="flex font-medium text-md">Outline</div>
+          <p className="whitespace-pre-wrap">
+            {renderSegments(outline, outlinePlagiarisedSegments)}
+          </p>
+          <Divider className="!my-4" />
+        </>
+      )}
+      <div className="flex font-medium text-md">Essay</div>
+      <p className="whitespace-pre-wrap">
+        {renderSegments(essay, essayPlagiarisedSegments)}
+      </p>
     </Card>
   );
 };

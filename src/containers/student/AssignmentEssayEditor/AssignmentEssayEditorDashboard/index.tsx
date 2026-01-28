@@ -38,7 +38,7 @@ const DASHBOARD_SECTIONS = [
 
 const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
   const { assignment } = useAssignmentSubmissionProvider();
-  const { essay, assignmentProgress, currentStage, goalContent } =
+  const { outline, essay, assignmentProgress, currentStage, goalContent } =
     useAssignmentEssayEditorProvider();
   const { mutateAsync: saveTraceData } = useMutation(apiSaveTraceData);
   const {
@@ -138,7 +138,9 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
         return (
           <DashboardPlagiarismDetector
             essay={essay}
-            plagiarisedSegments={analytics.plagiarised_segments}
+            essayPlagiarisedSegments={analytics.essay_plagiarised_segments}
+            outline={outline}
+            outlinePlagiarisedSegments={analytics.outline_plagiarised_segments}
           />
         );
       case 'prompt_category':
@@ -185,6 +187,7 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
     error,
     essay,
     goalContent,
+    outline,
   ]);
 
   if (isLoading) {

@@ -15,11 +15,8 @@ import GOAL_SECTIONS from 'containers/student/AssignmentGoalEditor/goalSections'
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
 
 import type {
-  AssignmentDraftingContent,
   AssignmentGoalContent,
-  AssignmentOutliningContent,
   AssignmentReflectionContent,
-  AssignmentRevisingContent,
   AssignmentStage,
   AssignmentSubmissionDetails,
   PlagiarisedSegment,
@@ -29,21 +26,27 @@ import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
 type Props = {
   stages: AssignmentStage[];
   submissions: AssignmentSubmissionDetails['submissions'];
-  plagiarisedSegments: PlagiarisedSegment[];
+  outline: string;
+  essay: string;
+  outlinePlagiarisedSegments: PlagiarisedSegment[];
+  essayPlagiarisedSegments: PlagiarisedSegment[];
   plagiarisedPercentage: number | null;
 };
 
 const SubmissionDetailsContent = ({
   stages,
   submissions,
-  plagiarisedSegments,
+  outline,
+  essay,
+  outlinePlagiarisedSegments,
+  essayPlagiarisedSegments,
   plagiarisedPercentage,
 }: Props) => {
   const [highlightChatGPT, setHighlightChatGPT] = useState(false);
 
   const highlightText = useCallback(
-    (essay: string) => {
-      if (!highlightChatGPT) return essay;
+    (text: string, plagiarisedSegments: PlagiarisedSegment[]) => {
+      if (!highlightChatGPT) return text;
 
       let lastIndex = 0;
       const parts: JSX.Element[] = [];
@@ -53,7 +56,7 @@ const SubmissionDetailsContent = ({
         if (lastIndex < segment.offset) {
           parts.push(
             <span key={`normal-${idx}`}>
-              {essay.substring(lastIndex, segment.offset)}
+              {text.substring(lastIndex, segment.offset)}
             </span>,
           );
         }
@@ -70,21 +73,18 @@ const SubmissionDetailsContent = ({
       });
 
       // Add remaining text
-      if (lastIndex < essay.length) {
-        parts.push(<span key="normal-end">{essay.substring(lastIndex)}</span>);
+      if (lastIndex < text.length) {
+        parts.push(<span key="normal-end">{text.substring(lastIndex)}</span>);
       }
 
       return parts;
     },
-    [highlightChatGPT, plagiarisedSegments],
+    [highlightChatGPT],
   );
 
   const renderSubmissionContent = useCallback(
     (stage_type: string) => {
       if (stage_type === 'writing') {
-        let outline = '';
-        let essay = '';
-        let lastSubmittedAt = 0;
         const outliningSubmission = submissions.find(
           submission => submission.stage_type === 'outlining',
         );
@@ -101,24 +101,11 @@ const SubmissionDetailsContent = ({
         ) {
           return <Empty text="No submission found" />;
         }
-        if (outliningSubmission) {
-          const outlineContent =
-            outliningSubmission.content as AssignmentOutliningContent;
-          outline = outlineContent.outline;
-          lastSubmittedAt = outliningSubmission.submitted_at;
-        }
-        if (draftingSubmission) {
-          const draftingContent =
-            draftingSubmission.content as AssignmentDraftingContent;
-          essay = draftingContent.essay;
-          lastSubmittedAt = draftingSubmission.submitted_at;
-        }
-        if (revisingSubmission) {
-          const revisingContent =
-            revisingSubmission.content as AssignmentRevisingContent;
-          essay = revisingContent.essay;
-          lastSubmittedAt = revisingSubmission.submitted_at;
-        }
+        const lastSubmittedAt = Math.max(
+          outliningSubmission?.submitted_at || 0,
+          draftingSubmission?.submitted_at || 0,
+          revisingSubmission?.submitted_at || 0,
+        );
         const wordCount = essay
           ?.trim()
           .split(/\s+/)
@@ -133,11 +120,6 @@ const SubmissionDetailsContent = ({
               <span>{wordCount || 0} words</span>
             </div>
 
-            <Divider />
-            <div className="flex font-medium text-md">Outline</div>
-            <p className="whitespace-pre-wrap">{outline}</p>
-            <Divider />
-            <div className="flex font-medium text-md">Essay</div>
             <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div className="flex items-center gap-2">
                 <Bot className="h-4 w-4 text-muted-foreground" />
@@ -160,11 +142,17 @@ const SubmissionDetailsContent = ({
                 </span>
               </div>
             )}
-            <div className="prose max-w-none">
-              <p className="whitespace-pre-wrap">
-                {highlightText(essay) || '-'}
-              </p>
-            </div>
+
+            <Divider />
+            <div className="flex font-medium text-md">Outline</div>
+            <p className="whitespace-pre-wrap">
+              {highlightText(outline, outlinePlagiarisedSegments) || '-'}
+            </p>
+            <Divider />
+            <div className="flex font-medium text-md">Essay</div>
+            <p className="whitespace-pre-wrap">
+              {highlightText(essay, essayPlagiarisedSegments) || '-'}
+            </p>
           </div>
         );
       }
@@ -258,7 +246,16 @@ const SubmissionDetailsContent = ({
         );
       }
     },
-    [highlightChatGPT, highlightText, plagiarisedPercentage, submissions],
+    [
+      essay,
+      essayPlagiarisedSegments,
+      highlightChatGPT,
+      highlightText,
+      outline,
+      outlinePlagiarisedSegments,
+      plagiarisedPercentage,
+      submissions,
+    ],
   );
 
   const tabs = useMemo(() => {

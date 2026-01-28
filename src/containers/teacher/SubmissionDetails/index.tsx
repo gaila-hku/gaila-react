@@ -17,6 +17,7 @@ import { apiViewAssignmentSubmission } from 'api/assignment';
 import type {
   AssignmentDraftingContent,
   AssignmentGoalContent,
+  AssignmentOutliningContent,
   AssignmentRevisingContent,
 } from 'types/assignment';
 import getStageTypeLabel from 'utils/helper/getStageTypeLabel';
@@ -78,6 +79,15 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
     return writingSubmission?.content as AssignmentGoalContent;
   }, [submissionDetails]);
 
+  const submittedOutline = useMemo(() => {
+    const outliningSubmission = submissionDetails?.submissions.find(
+      s => s.stage_type === 'outlining',
+    );
+    return (
+      (outliningSubmission?.content as AssignmentOutliningContent).outline || ''
+    );
+  }, [submissionDetails]);
+
   const submittedEssay = useMemo(() => {
     const revisingSubmission = submissionDetails?.submissions.find(
       s => s.stage_type === 'revising',
@@ -88,28 +98,36 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
     const draftingSubmission = submissionDetails?.submissions.find(
       s => s.stage_type === 'drafting',
     );
-    return (draftingSubmission?.content as AssignmentDraftingContent)?.essay;
+    return (
+      (draftingSubmission?.content as AssignmentDraftingContent)?.essay || ''
+    );
   }, [submissionDetails]);
 
   const plagiarisedPercentage = useMemo(() => {
-    if (!submittedEssay) {
-      return null;
-    }
-
-    if (!submissionDetails?.analytics.plagiarised_segments.length) {
+    const totalLength = submittedEssay.length + submittedOutline.length;
+    if (totalLength === 0 || !submissionDetails) {
       return 0;
     }
 
-    const plagiarsedLength =
-      submissionDetails.analytics.plagiarised_segments.reduce(
+    const outlinePlagiarsedLength =
+      submissionDetails.analytics.outline_plagiarised_segments.reduce(
         (acc, segment) => {
           return acc + segment.sequence.length;
         },
         0,
       );
+    const essayPlagiarsedLength =
+      submissionDetails.analytics.essay_plagiarised_segments.reduce(
+        (acc, segment) => {
+          return acc + segment.sequence.length;
+        },
+        outlinePlagiarsedLength,
+      );
 
-    return Math.round((plagiarsedLength / submittedEssay.length) * 100);
-  }, [submissionDetails?.analytics.plagiarised_segments, submittedEssay]);
+    return Math.round(
+      ((essayPlagiarsedLength + outlinePlagiarsedLength) / totalLength) * 100,
+    );
+  }, [submissionDetails, submittedEssay.length, submittedOutline.length]);
 
   if (isLoading) {
     return <Loading />;
@@ -144,10 +162,15 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
           }
         >
           <SubmissionDetailsContent
-            plagiarisedPercentage={plagiarisedPercentage}
-            plagiarisedSegments={
-              submissionDetails.analytics.plagiarised_segments
+            essay={submittedEssay}
+            essayPlagiarisedSegments={
+              submissionDetails.analytics.essay_plagiarised_segments
             }
+            outline={submittedOutline}
+            outlinePlagiarisedSegments={
+              submissionDetails.analytics.outline_plagiarised_segments
+            }
+            plagiarisedPercentage={plagiarisedPercentage}
             stages={submissionDetails.stages}
             submissions={submissionDetails.submissions}
           />

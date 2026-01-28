@@ -15,6 +15,7 @@ import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmis
 import { apiGetAssignmentStudentAnalytics } from 'api/assignment';
 import type {
   AssignmentDraftingContent,
+  AssignmentOutliningContent,
   AssignmentRevisingContent,
 } from 'types/assignment';
 import tuple from 'utils/types/tuple';
@@ -34,6 +35,16 @@ const AssignmentReflectionEditorDashboard = ({ assignmentId }: Props) => {
     tuple([apiGetAssignmentStudentAnalytics.queryKey, assignmentId]),
     apiGetAssignmentStudentAnalytics,
   );
+
+  const outline = useMemo(() => {
+    if (!assignmentProgress) {
+      return '';
+    }
+    const outlineSubmission = assignmentProgress.stages.find(
+      stage => stage.stage_type === 'outlining',
+    )?.submission?.content as AssignmentOutliningContent | undefined;
+    return outlineSubmission?.outline || '';
+  }, [assignmentProgress]);
 
   const essay = useMemo(() => {
     if (!assignmentProgress) {
@@ -84,7 +95,9 @@ const AssignmentReflectionEditorDashboard = ({ assignmentId }: Props) => {
       {dashboardConfig?.copying_detector && (
         <DashboardPlagiarismDetector
           essay={essay}
-          plagiarisedSegments={analytics.plagiarised_segments}
+          essayPlagiarisedSegments={analytics.essay_plagiarised_segments}
+          outline={outline}
+          outlinePlagiarisedSegments={analytics.outline_plagiarised_segments}
         />
       )}
       {(dashboardConfig?.prompt_category_nature ||
