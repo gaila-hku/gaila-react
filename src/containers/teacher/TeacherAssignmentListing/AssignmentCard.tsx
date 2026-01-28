@@ -47,7 +47,7 @@ const AssignmentCard = ({ assignment }: Props) => {
   const maxScore = useMemo(() => {
     if (!assignment.rubrics) return null;
     return assignment.rubrics.reduce(
-      (acc, rubric) => acc + rubric.max_points,
+      (acc, rubric) => acc + (rubric.max_points || 0),
       0,
     );
   }, [assignment.rubrics]);

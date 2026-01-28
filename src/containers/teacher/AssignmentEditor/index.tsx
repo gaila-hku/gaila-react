@@ -25,7 +25,6 @@ import {
   apiViewAssignment,
 } from 'api/assignment';
 import type { AssignmentDetails } from 'types/assignment';
-import isObjEmpty from 'utils/helper/isObjEmpty';
 import tuple from 'utils/types/tuple';
 
 interface AssignmentCreatorProps {
@@ -153,12 +152,7 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
         enrolled_classes: undefined,
         enrolled_students: undefined,
       },
-      rubrics: isObjEmpty(formData.current.rubrics)
-        ? undefined
-        : formData.current.rubrics,
-      checklist: isObjEmpty(formData.current.checklist)
-        ? undefined
-        : formData.current.checklist?.filter(s => !!s),
+      checklist: formData.current.checklist?.filter(s => !!s),
       enrolled_class_ids: formData.current.enrolled_classes.map(c => c.id),
       enrolled_student_ids: formData.current.enrolled_students.map(c => c.id),
     };

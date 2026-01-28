@@ -21,7 +21,7 @@ const AssignmentEditorFormRubricsInput = ({
   const handleAddRubricItem = useCallback(() => {
     const newRubrics = [
       ...rubrics,
-      { criteria: '', description: '', max_points: 0 },
+      { criteria: '', description: '', max_points: null },
     ];
     setRubrics(newRubrics);
     onFormDataChange('rubrics', newRubrics);
@@ -39,11 +39,7 @@ const AssignmentEditorFormRubricsInput = ({
   const handleRubricChange = useCallback(
     (index: number, field: keyof RubricItem, value: string | number | null) => {
       const newRubrics = [...rubrics];
-      let newValue = value;
-      if (field === 'max_points' && newValue === null) {
-        newValue = 1;
-      }
-      newRubrics[index] = { ...newRubrics[index], [field]: newValue };
+      newRubrics[index] = { ...newRubrics[index], [field]: value };
       setRubrics(newRubrics);
       onFormDataChange('rubrics', newRubrics);
     },
@@ -108,7 +104,6 @@ const AssignmentEditorFormRubricsInput = ({
               />
             </div>
             <Button
-              disabled={rubrics.length === 1}
               onClick={() => handleRemoveRubricItem(index)}
               size="icon"
               variant="ghost"

@@ -48,7 +48,7 @@ function AssignmentDetails({ assignmentId }: ViewAssignmentProps) {
       return;
     }
     return assignment.rubrics.reduce(
-      (acc, rubric) => acc + rubric.max_points,
+      (acc, rubric) => acc + (rubric.max_points || 0),
       0,
     );
   }, [assignment]);
@@ -143,7 +143,9 @@ function AssignmentDetails({ assignmentId }: ViewAssignmentProps) {
                   key={index}
                 >
                   <span>{item.criteria}</span>
-                  <span className="font-medium">{item.max_points} points</span>
+                  <span className="font-medium">
+                    {item.max_points ? `${item.max_points} points` : 'N/A'}
+                  </span>
                 </div>
               ))}
             </div>

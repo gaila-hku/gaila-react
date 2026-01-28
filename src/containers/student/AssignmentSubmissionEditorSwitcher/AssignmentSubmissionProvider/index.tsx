@@ -99,12 +99,12 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
   );
 
   const [assignment, teacherGrade] = useMemo(() => {
-    if (!assignmentProgress || !currentStage) {
+    if (!assignmentProgress) {
       return [null, null];
     }
-    const grade = currentStage.grade;
+    const grade = assignmentProgress.stages.find(s => !!s.grade)?.grade || null;
     return [assignmentProgress.assignment, grade];
-  }, [assignmentProgress, currentStage]);
+  }, [assignmentProgress]);
 
   const [readonly, readonlyMessage] = useMemo(() => {
     if (teacherGrade) {

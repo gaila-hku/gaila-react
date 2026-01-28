@@ -84,7 +84,8 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
       s => s.stage_type === 'outlining',
     );
     return (
-      (outliningSubmission?.content as AssignmentOutliningContent).outline || ''
+      (outliningSubmission?.content as AssignmentOutliningContent)?.outline ||
+      ''
     );
   }, [submissionDetails]);
 
@@ -121,7 +122,7 @@ function SubmissionDetails({ assignmentId, studentId }: Props) {
         (acc, segment) => {
           return acc + segment.sequence.length;
         },
-        outlinePlagiarsedLength,
+        0,
       );
 
     return Math.round(

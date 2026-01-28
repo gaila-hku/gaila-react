@@ -38,7 +38,7 @@ export interface Assignment {
 export interface RubricItem {
   criteria: string;
   description: string;
-  max_points: number;
+  max_points: number | null;
 }
 
 export type AssignmentListingResponse = ListingResponse<

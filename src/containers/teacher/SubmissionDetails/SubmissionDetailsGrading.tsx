@@ -38,6 +38,7 @@ const SubmissionDetailsGrading = ({
   gradingToolId,
 }: Props) => {
   const queryClient = useQueryClient();
+  const { successMsg } = useAlert();
   const { mutateAsync: askAutogradeAgent, isLoading: isGeneratingGrade } =
     useMutation(apiAskAutogradeAgent);
   const { mutateAsync: saveGrading, isLoading: isSavingGrading } = useMutation(
@@ -45,6 +46,7 @@ const SubmissionDetailsGrading = ({
     {
       onSuccess: () => {
         queryClient.invalidateQueries([apiViewAssignmentSubmission.queryKey]);
+        successMsg('Grading saved successfully');
       },
     },
   );
@@ -54,8 +56,6 @@ const SubmissionDetailsGrading = ({
   >(rubrics.reduce((acc, item) => ({ ...acc, [item.criteria]: null }), {}));
   const [grade, setGrade] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
-
-  const { successMsg } = useAlert();
 
   const [essaySubmissionId, essay, essaySubmissionGrade, isSubmissionFinal] =
     useMemo(() => {
@@ -101,6 +101,10 @@ const SubmissionDetailsGrading = ({
     setLocked(isSubmissionFinal);
   }, [essaySubmissionGrade, isSubmissionFinal]);
 
+  const maxScore = useMemo(() => {
+    return rubrics.reduce((sum, item) => sum + (item.max_points || 0), 0);
+  }, [rubrics]);
+
   const handleAIAutoGrade = useCallback(async () => {
     const res = await askAutogradeAgent({
       assignment_tool_id: gradingToolId,
@@ -109,20 +113,25 @@ const SubmissionDetailsGrading = ({
     });
     const result = JSON.parse(res.gpt_answer) as AutoGradeResult;
 
-    setRubricScores(
-      result.criteria_scores.reduce(
-        (acc, item) => ({ ...acc, [item.criteria]: item.score }),
-        {},
-      ),
-    );
+    const rubricScores = {};
+    for (const rubric of rubrics) {
+      if (rubric.max_points) {
+        rubricScores[rubric.criteria] =
+          result.criteria_scores.find(item => item.criteria === rubric.criteria)
+            ?.score || 0;
+      }
+    }
+    setRubricScores(rubricScores);
     setFeedback(
       `${result.criteria_scores.map(item => `${item.criteria}:\n${item.feedback}`).join('\n\n')}\n\nOverall:\n${result.overall_feedback}`,
     );
-    setGrade(result.overall_score);
+    if (maxScore) {
+      setGrade(result.overall_score);
+    }
     successMsg(
       'AI grading completed! Review and adjust the rubric scores and feedback as needed.',
     );
-  }, [askAutogradeAgent, essay, gradingToolId, successMsg]);
+  }, [askAutogradeAgent, essay, gradingToolId, maxScore, rubrics, successMsg]);
 
   const handleRubricScoreChange = useCallback(
     (key: string, value: number | null) => {
@@ -137,21 +146,17 @@ const SubmissionDetailsGrading = ({
     [rubricScores],
   );
 
-  const maxScore = useMemo(() => {
-    return rubrics.reduce((sum, item) => sum + item.max_points, 0);
-  }, [rubrics]);
-
   const handleSaveGrading = useCallback(() => {
-    if (!essaySubmissionId || !isNumber(grade)) {
+    if (!essaySubmissionId || (maxScore > 0 && !isNumber(grade))) {
       return;
     }
     saveGrading({
       submission_id: essaySubmissionId,
-      overall_score: grade,
+      overall_score: grade || 0,
       rubrics_breakdown: rubricScores,
       overall_feedback: feedback,
     });
-  }, [essaySubmissionId, feedback, grade, rubricScores, saveGrading]);
+  }, [essaySubmissionId, feedback, grade, maxScore, rubricScores, saveGrading]);
 
   return (
     <Card classes={{ children: 'space-y-4' }} title="Grading">
@@ -196,26 +201,34 @@ const SubmissionDetailsGrading = ({
             >
               {item.criteria}
             </Label>
-            <NumberInput
-              disabled={locked}
-              id={`rubric-${item.criteria}`}
-              inputClass="!w-16"
-              max={item.max_points}
-              min={0}
-              onChange={value => handleRubricScoreChange(item.criteria, value)}
-              size="sm"
-              value={rubricScores[item.criteria]}
-            />
-            <span className="text-sm text-muted-foreground w-8">
-              / {item.max_points}
-            </span>
+            {item.max_points ? (
+              <>
+                <NumberInput
+                  disabled={locked}
+                  id={`rubric-${item.criteria}`}
+                  inputClass="!w-16"
+                  max={item.max_points}
+                  min={0}
+                  onChange={value =>
+                    handleRubricScoreChange(item.criteria, value)
+                  }
+                  size="sm"
+                  value={rubricScores[item.criteria]}
+                />
+                <span className="text-sm text-muted-foreground w-8">
+                  / {item.max_points}
+                </span>
+              </>
+            ) : (
+              <span className="text-sm text-muted-foreground">N/A</span>
+            )}
           </div>
         ))}
       </div>
 
       <Divider />
 
-      <div className="space-y-2">
+      {!!maxScore && (
         <div className="flex items-center gap-4">
           <Label className="flex-1" htmlFor="grade">
             Final Grade (%)
@@ -233,7 +246,7 @@ const SubmissionDetailsGrading = ({
             / {maxScore}
           </span>
         </div>
-      </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="feedback">Feedback</Label>
@@ -250,7 +263,7 @@ const SubmissionDetailsGrading = ({
 
       <Button
         className="w-full gap-2"
-        disabled={!isNumber(grade) || locked}
+        disabled={(maxScore > 0 && !isNumber(grade)) || locked}
         loading={isSavingGrading}
         onClick={handleSaveGrading}
       >

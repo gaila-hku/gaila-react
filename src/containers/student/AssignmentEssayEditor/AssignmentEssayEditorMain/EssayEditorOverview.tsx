@@ -63,7 +63,7 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
       return 0;
     }
     return assignment.rubrics?.reduce((acc, rubric) => {
-      return acc + rubric.max_points;
+      return acc + (rubric.max_points || 0);
     }, 0);
   }, [assignment.rubrics]);
 
@@ -99,45 +99,46 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
           }
         >
           {/* Overall Score */}
-          <div className="text-center p-3 bg-white rounded-lg border-2 border-purple-200">
-            <p className="text-xs text-muted-foreground mb-1">Final Score</p>
-            <p className="text-3xl font-bold text-purple-600">
-              {grade.overall_score}
-              {!!overallMaxPoints && (
+          {!!overallMaxPoints && (
+            <div className="text-center p-3 bg-white rounded-lg border-2 border-purple-200">
+              <p className="text-xs text-muted-foreground mb-1">Final Score</p>
+              <p className="text-3xl font-bold text-purple-600">
+                {grade.overall_score}
                 <span className="text-lg text-muted-foreground">
                   /{overallMaxPoints}
                 </span>
-              )}
-            </p>
-            {!!overallMaxPoints && (
+              </p>
               <Badge className="mt-2 bg-purple-600 text-xs">
                 {Math.round((grade.overall_score / overallMaxPoints) * 100)}%
               </Badge>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Criteria Breakdown */}
           <div className="max-h-[400px] overflow-auto">
             <div className="space-y-2 pr-4">
               {Object.entries(grade.rubrics_breakdown)?.map(
-                ([criterion, score]) => (
-                  <div
-                    className="p-2 bg-white border rounded text-xs space-y-1.5"
-                    key={criterion}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{criterion}</span>
-                      <Badge className="text-xs" variant="outline">
-                        {score}/
-                        {
-                          assignment.rubrics?.find(
-                            r => r.criteria === criterion,
-                          )?.max_points
-                        }
-                      </Badge>
+                ([criterion, score]) => {
+                  const rubricItem = assignment.rubrics?.find(
+                    r => r.criteria === criterion,
+                  );
+                  if (!rubricItem?.max_points) {
+                    return <></>;
+                  }
+                  return (
+                    <div
+                      className="p-2 bg-white border rounded text-xs space-y-1.5"
+                      key={criterion}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{criterion}</span>
+                        <Badge className="text-xs" variant="outline">
+                          {score}/{rubricItem.max_points}
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                ),
+                  );
+                },
               )}
 
               {/* Overall Feedback */}
@@ -256,7 +257,7 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
             >
               <span className="text-muted-foreground">{item.criteria}</span>
               <Badge className="text-xs" variant="outline">
-                {item.max_points}pts
+                {item.max_points ? `${item.max_points}pts` : 'N/A'}
               </Badge>
             </div>
           ))}
@@ -265,7 +266,7 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
             <span>Total</span>
             <Badge className="text-xs">
               {assignment.rubrics.reduce(
-                (total, item) => total + item.max_points,
+                (total, item) => total + (item.max_points || 0),
                 0,
               )}
               pts
