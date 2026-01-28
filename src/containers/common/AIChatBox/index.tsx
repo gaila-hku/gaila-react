@@ -20,6 +20,7 @@ type Props = {
   description?: string;
   suggestedPrompts?: { icon: any; text: string; category: string }[];
   placeholder?: string;
+  className?: string;
 };
 
 const AIChatBox = ({
@@ -27,6 +28,7 @@ const AIChatBox = ({
   description,
   suggestedPrompts,
   placeholder,
+  className,
 }: Props) => {
   const {
     sendMessage,
@@ -81,6 +83,7 @@ const AIChatBox = ({
 
   return (
     <Card
+      className={className}
       classes={{
         root: 'flex flex-col h-full !p-4',
         title: 'flex items-center gap-2 text-base -mb-2',

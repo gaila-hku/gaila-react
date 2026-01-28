@@ -227,7 +227,10 @@ function AssignmentEditor({ assignmentId, onBack }: AssignmentCreatorProps) {
           firstMessage="Hi! I'm your AI writing assistant. I can help you polish topics and rubrics for your assignment. What would you like help with?"
           toolId={1}
         >
-          <AIChatBox />
+          <AIChatBox
+            chatName="Assignment Create Assistant"
+            className="!h-[calc(100vh-140px)]"
+          />
         </AIChatBoxProvider>
       </div>
     </div>
