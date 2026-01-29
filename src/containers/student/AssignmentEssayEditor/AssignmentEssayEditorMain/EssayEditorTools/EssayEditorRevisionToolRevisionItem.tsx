@@ -19,6 +19,7 @@ type Props = {
   refetchExplanations: () => void;
   explanationItem: StudentRevisionExplanation | null;
   isExplanationLoading: boolean;
+  isRevisionAskExplanation: boolean;
 };
 
 const EssayEditorRevisionToolRevisionItem = ({
@@ -27,11 +28,9 @@ const EssayEditorRevisionToolRevisionItem = ({
   refetchExplanations,
   explanationItem,
   isExplanationLoading,
+  isRevisionAskExplanation,
 }: Props) => {
-  const { currentStage, essay, setEssay } = useAssignmentEssayEditorProvider();
-  const isRevisionAskExplanation =
-    currentStage?.stage_type === 'revising' &&
-    currentStage.config.revision_tool_ask_explanation;
+  const { essay, setEssay, readonly } = useAssignmentEssayEditorProvider();
 
   const [explanation, setExplanation] = useState('');
 
@@ -107,19 +106,30 @@ const EssayEditorRevisionToolRevisionItem = ({
       ) : explanationItem ? (
         <>
           <p className="text-xs mb-1">
-            You have already{' '}
+            You have{' '}
             {explanationItem.response_type === 'agree'
               ? 'accepted'
               : 'rejected'}{' '}
             the change!
           </p>{' '}
-          <p className="text-xs">Explanation: {explanationItem.explanation}</p>
+          {isRevisionAskExplanation ? (
+            <>
+              <p className="text-xs">Your explanation:</p>
+              <p className="text-xs mb-2">{explanationItem.explanation}</p>
+              <p className="text-xs">AI&apos;s explanation:</p>
+              <p className="text-xs">{revisionItem.explanation}</p>
+            </>
+          ) : (
+            <p className="text-xs">
+              Explanation: {explanationItem.explanation}
+            </p>
+          )}
         </>
       ) : isRevisionAskExplanation ? (
         <>
           <div className="text-xs mb-2">
-            AI proposed this fix. Do you agree with the change? What do you
-            think the explanation is?
+            Do you agree with this revision? What do you think the explanation
+            is?
           </div>
           <TextInput
             onChange={e => setExplanation(e.target.value)}
@@ -135,7 +145,7 @@ const EssayEditorRevisionToolRevisionItem = ({
               size="sm"
               variant="ghost"
             >
-              Reject
+              Disagree & Reject
             </Button>
             <Button
               disabled={!explanation}
@@ -143,20 +153,22 @@ const EssayEditorRevisionToolRevisionItem = ({
               onClick={() => handleAcceptRevision(revisionItem)}
               size="sm"
             >
-              Apply Changes
+              {readonly ? 'Agree & Submit' : 'Apply Changes'}
             </Button>
           </div>
         </>
       ) : (
         <>
           <div className="text-xs mt-2">{revisionItem.explanation}</div>
-          <Button
-            className="w-full mt-2"
-            loading={isSubmitting}
-            onClick={() => handleAcceptRevision(revisionItem)}
-          >
-            Apply
-          </Button>
+          {!readonly && (
+            <Button
+              className="w-full mt-2"
+              loading={isSubmitting}
+              onClick={() => handleAcceptRevision(revisionItem)}
+            >
+              Apply
+            </Button>
+          )}
         </>
       )}
     </div>

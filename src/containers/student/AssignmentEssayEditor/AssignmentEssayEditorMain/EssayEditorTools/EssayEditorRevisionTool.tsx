@@ -9,6 +9,8 @@ import Button from 'components/input/Button';
 import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 import EssayEditorRevisionToolRevisionItem from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorRevisionToolRevisionItem';
+import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import { apiAskRevisionAgent, apiGetRevisionExplanations } from 'api/gpt';
 import type { GptLog, RevisionResult } from 'types/gpt';
@@ -21,6 +23,14 @@ type Props = {
 };
 
 const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
+  const { currentStage } = useAssignmentSubmissionProvider();
+  const { readonly } = useAssignmentEssayEditorProvider();
+
+  const isRevisionAskExplanation =
+    (currentStage?.stage_type === 'revising' &&
+      currentStage.config.revision_tool_ask_explanation) ||
+    false;
+
   const { mutateAsync: askRevisionAgent, isLoading: isAgentLoading } =
     useMutation(apiAskRevisionAgent);
 
@@ -68,7 +78,7 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
     <Card
       classes={{
         title: 'flex items-center gap-2 text-base',
-        children: 'space-y-3',
+        children: 'space-y-2',
         root: '!p-4',
       }}
       collapsible
@@ -91,7 +101,30 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
       </Button>
 
       {!!revisionResult && (
-        <div className="space-y-1">
+        <div className="space-y-2">
+          {isRevisionAskExplanation && (
+            <ul className="text-xs list-disc list-outside pl-3 space-y-1">
+              <li>
+                AI has proposed the following revisions. For each item, tell us
+                if you agree with the suggestion
+              </li>
+              <li>
+                If you agree, think about why AI suggested the change. If not,
+                tell us why you disagree
+              </li>
+              {readonly ? (
+                <li className="text-rose-400">
+                  This assignment is currently readonly. You can no longer apply
+                  changes, but you may still submit your reaonsing.
+                </li>
+              ) : (
+                <li>
+                  You can apply or reject the changes in one click after giving
+                  your reason
+                </li>
+              )}
+            </ul>
+          )}
           {revisionResult.revision_items.map(item => (
             <EssayEditorRevisionToolRevisionItem
               explanationItem={
@@ -101,6 +134,7 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
                 ) || null
               }
               isExplanationLoading={isExplanationLoading}
+              isRevisionAskExplanation={isRevisionAskExplanation}
               key={item.aspect_id}
               refetchExplanations={fetchRevisionExplanations}
               revisionItem={item}
