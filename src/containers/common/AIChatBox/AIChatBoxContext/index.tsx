@@ -7,7 +7,11 @@ import React, {
 } from 'react';
 
 import dayjs from 'dayjs';
-import { useMutation, useQueryClient } from 'react-query';
+import {
+  type UseMutateAsyncFunction,
+  useMutation,
+  useQueryClient,
+} from 'react-query';
 
 import useInfiniteListing from 'components/display/InfiniteList/useInfiniteListing';
 
@@ -17,7 +21,11 @@ import {
   gptResponseToChatMessage,
 } from 'containers/common/AIChatBox/utils';
 
-import { apiAskGpt, apiGetGptChatLogs } from 'api/gpt';
+import {
+  type AskGptStructuredRequestData,
+  apiAskGpt,
+  apiGetGptChatLogs,
+} from 'api/gpt';
 import type { GptLog } from 'types/gpt';
 import tuple from 'utils/types/tuple';
 
@@ -25,6 +33,12 @@ type Props = {
   toolId: number;
   essay?: string;
   firstMessage?: string;
+  chatMutateFn?: UseMutateAsyncFunction<
+    GptLog,
+    unknown,
+    AskGptStructuredRequestData,
+    unknown
+  >;
   children: React.ReactNode;
 };
 
@@ -32,11 +46,12 @@ const AIChatBoxProvider = ({
   toolId,
   essay,
   firstMessage,
+  chatMutateFn = apiAskGpt,
   children,
 }: Props) => {
   const queryClient = useQueryClient();
   const { mutateAsync: sendQuestion, isLoading: isAgentTyping } =
-    useMutation(apiAskGpt);
+    useMutation(chatMutateFn);
 
   const [chatInput, setChatInput] = useState('');
   const [newChatMessages, setNewChatMessages] = useState<ChatMessage[]>([]);
@@ -98,6 +113,7 @@ const AIChatBoxProvider = ({
         question: question,
         assignment_tool_id: toolId,
         essay,
+        is_structured: false,
       });
       setNewChatMessages(prev => [
         ...prev,

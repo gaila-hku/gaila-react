@@ -14,6 +14,7 @@ import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssay
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import { apiGetLatestSturcturedGptLog } from 'api/gpt';
+import type { GptLog } from 'types/gpt';
 import tuple from 'utils/types/tuple';
 
 const EssayEditorTools = () => {
@@ -22,22 +23,39 @@ const EssayEditorTools = () => {
   const { essay, currentStage, outlineConfirmed, draftConfirmed } =
     useAssignmentEssayEditorProvider();
 
-  const tools = currentStage?.tools ?? [];
-  const ideationGuidingTool = tools.find(
-    tool => tool.key === 'ideation_guiding' && tool.enabled,
-  );
-  const outlineReviewTool = tools.find(
-    tool => tool.key === 'outline_review' && tool.enabled,
-  );
-  const dictionaryTool = tools.find(
-    tool => tool.key === 'dictionary' && tool.enabled,
-  );
-  const autoGradeTool = tools.find(
-    tool => tool.key === 'autograde' && tool.enabled,
-  );
-  const revisionTool = tools.find(
-    tool => tool.key === 'revision' && tool.enabled,
-  );
+  const [
+    tools,
+    ideationGuidingTool,
+    outlineReviewTool,
+    dictionaryTool,
+    autoGradeTool,
+    revisionTool,
+  ] = useMemo(() => {
+    const tools = currentStage?.tools ?? [];
+    const ideationGuidingTool = tools.find(
+      tool => tool.key === 'ideation_guiding' && tool.enabled,
+    );
+    const outlineReviewTool = tools.find(
+      tool => tool.key === 'outline_review' && tool.enabled,
+    );
+    const dictionaryTool = tools.find(
+      tool => tool.key === 'dictionary' && tool.enabled,
+    );
+    const autoGradeTool = tools.find(
+      tool => tool.key === 'autograde' && tool.enabled,
+    );
+    const revisionTool = tools.find(
+      tool => tool.key === 'revision' && tool.enabled,
+    );
+    return [
+      tools,
+      ideationGuidingTool,
+      outlineReviewTool,
+      dictionaryTool,
+      autoGradeTool,
+      revisionTool,
+    ];
+  }, [currentStage]);
 
   const { data, isLoading, error } = useQuery(
     tuple([
@@ -47,16 +65,18 @@ const EssayEditorTools = () => {
     apiGetLatestSturcturedGptLog,
   );
 
-  const getLatestResult = useCallback(
-    (toolId: number) => {
-      if (!data) {
-        return null;
-      }
-      const result = data.find(log => log.assignment_tool_id === toolId);
-      return result || null;
-    },
-    [data],
-  );
+  const latestResult = useMemo(() => {
+    if (!data) {
+      return {};
+    }
+    return data.reduce(
+      (obj, log) => {
+        obj[log.assignment_tool_id] = log;
+        return obj;
+      },
+      {} as Record<number, GptLog>,
+    );
+  }, [data]);
 
   const availableTools = useMemo(() => {
     return [
@@ -99,21 +119,21 @@ const EssayEditorTools = () => {
         case 'ideation_guiding':
           return (
             <EssayEditorIdeationGuidingTool
-              latestResult={getLatestResult(ideationGuidingTool!.id)}
+              latestResult={latestResult[ideationGuidingTool!.id] || null}
               toolId={ideationGuidingTool!.id}
             />
           );
         case 'outline_review':
           return (
             <EssayEditorOutlineReviewTool
-              latestResult={getLatestResult(outlineReviewTool!.id)}
+              latestResult={latestResult[outlineReviewTool!.id] || null}
               toolId={outlineReviewTool!.id}
             />
           );
         case 'dictionary':
           return (
             <EssayEditorDictionaryTool
-              latestResult={getLatestResult(dictionaryTool!.id)}
+              latestResult={latestResult[dictionaryTool!.id] || null}
               toolId={dictionaryTool!.id}
             />
           );
@@ -121,7 +141,7 @@ const EssayEditorTools = () => {
           return (
             <EssayEditorAutoGradeTool
               essay={essay}
-              latestResult={getLatestResult(autoGradeTool!.id)}
+              latestResult={latestResult[autoGradeTool!.id] || null}
               toolId={autoGradeTool!.id}
             />
           );
@@ -129,7 +149,7 @@ const EssayEditorTools = () => {
           return (
             <EssayEditorRevisionTool
               essay={essay}
-              latestLog={getLatestResult(revisionTool!.id)}
+              latestLog={latestResult[revisionTool!.id] || null}
               toolId={revisionTool!.id}
             />
           );
@@ -141,7 +161,7 @@ const EssayEditorTools = () => {
       autoGradeTool,
       dictionaryTool,
       essay,
-      getLatestResult,
+      latestResult,
       ideationGuidingTool,
       outlineReviewTool,
       revisionTool,

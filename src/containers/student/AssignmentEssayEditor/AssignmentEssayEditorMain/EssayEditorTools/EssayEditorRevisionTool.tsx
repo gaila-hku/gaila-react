@@ -6,6 +6,7 @@ import { useMutation, useQuery } from 'react-query';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
+import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 import EssayEditorRevisionToolRevisionItem from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools/EssayEditorRevisionToolRevisionItem';
 
@@ -57,6 +58,7 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
 
   useEffect(() => {
     if (!latestLog) {
+      setRevisionLog(null);
       return;
     }
     setRevisionLog(latestLog);
@@ -109,13 +111,16 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
       )}
 
       {!!revisionResult && (
-        <AIChatBoxMini
+        <AIChatBoxProvider
           chatMutateFn={apiAskRevisionAgent}
-          chatName="Ask Revision Agent"
           essay={essay}
-          firstMessage="Ask me about specific issues, how to fix them, or how to improve your essay!"
           toolId={toolId}
-        />
+        >
+          <AIChatBoxMini
+            chatName="Ask Revision Agent"
+            firstMessage="Ask me about specific issues, how to fix them, or how to improve your essay!"
+          />
+        </AIChatBoxProvider>
       )}
     </Card>
   );

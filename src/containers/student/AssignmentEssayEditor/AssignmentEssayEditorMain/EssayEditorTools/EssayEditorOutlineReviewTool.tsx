@@ -6,6 +6,7 @@ import { useMutation } from 'react-query';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
+import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 import useAlert from 'containers/common/AlertProvider/useAlert';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
@@ -43,6 +44,7 @@ const EssayEditorOutlineReviewTool = ({ toolId, latestResult }: Props) => {
 
   useEffect(() => {
     if (!latestResult) {
+      setIdeationReviewResult(null);
       return;
     }
     const result = JSON.parse(latestResult.gpt_answer) as OutlineReviewResult;
@@ -90,12 +92,15 @@ const EssayEditorOutlineReviewTool = ({ toolId, latestResult }: Props) => {
         </div>
       )}
       {ideationReviewResult && (
-        <AIChatBoxMini
+        <AIChatBoxProvider
           chatMutateFn={apiAskOutlineReviewAgent}
-          chatName="Ask Reviewing Agent"
-          firstMessage="Ask me about the outline comments!"
           toolId={toolId}
-        />
+        >
+          <AIChatBoxMini
+            chatName="Ask Reviewing Agent"
+            firstMessage="Ask me about the outline comments!"
+          />
+        </AIChatBoxProvider>
       )}
     </Card>
   );

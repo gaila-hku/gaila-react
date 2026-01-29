@@ -82,7 +82,7 @@ export const renderChatMessage = (message: ChatMessage, isMini?: boolean) => {
       <div
         className={clsx(
           'max-w-[85%] rounded-lg px-3 py-2',
-          isMini ? 'text-xs' : 'text-sm',
+          isMini ? 'text-[13px]' : 'text-sm',
           message.role === 'user' && 'bg-primary text-primary-foreground',
           message.role === 'assistant' && [
             'text-foreground',

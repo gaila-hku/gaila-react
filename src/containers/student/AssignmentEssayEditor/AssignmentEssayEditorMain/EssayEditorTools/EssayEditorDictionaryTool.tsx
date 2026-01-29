@@ -7,6 +7,7 @@ import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 
+import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 
 import { apiAskDictionaryAgent } from 'api/gpt';
@@ -42,6 +43,7 @@ const EssayEditorDictionaryTool = ({ toolId, latestResult }: Props) => {
 
   useEffect(() => {
     if (!latestResult) {
+      setDictionaryResult(null);
       return;
     }
     const result = JSON.parse(latestResult.gpt_answer) as DictionaryResult;
@@ -127,12 +129,12 @@ const EssayEditorDictionaryTool = ({ toolId, latestResult }: Props) => {
 
       {/* Dictionary Agent Chat */}
       {dictionaryResult && (
-        <AIChatBoxMini
-          chatMutateFn={askDictionaryAgent}
-          chatName="Ask Dictionary Agent"
-          firstMessage={`Ask me about synonyms, usage examples, formality, or anything related to "${dictionaryResult.original_word}"!`}
-          toolId={toolId}
-        />
+        <AIChatBoxProvider chatMutateFn={askDictionaryAgent} toolId={toolId}>
+          <AIChatBoxMini
+            chatName="Ask Dictionary Agent"
+            firstMessage={`Ask me about synonyms, usage examples, formality, or anything related to "${dictionaryResult.original_word}"!`}
+          />
+        </AIChatBoxProvider>
       )}
     </Card>
   );

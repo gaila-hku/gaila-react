@@ -7,6 +7,7 @@ import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
+import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 
 import { apiAskAutogradeAgent } from 'api/gpt';
@@ -38,6 +39,7 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
 
   useEffect(() => {
     if (!latestResult) {
+      setAutogradeResult(null);
       return;
     }
     const result = JSON.parse(latestResult.gpt_answer) as AutoGradeResult;
@@ -143,13 +145,16 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
         </div>
       )}
       {!!autogradeResult && (
-        <AIChatBoxMini
+        <AIChatBoxProvider
           chatMutateFn={apiAskAutogradeAgent}
-          chatName="Ask Autograde Agent"
           essay={essay}
-          firstMessage="Ask me about your scores, how to improve specific criteria, or clarify feedback!"
           toolId={toolId}
-        />
+        >
+          <AIChatBoxMini
+            chatName="Ask Autograde Agent"
+            firstMessage="Ask me about your scores, how to improve specific criteria, or clarify feedback!"
+          />
+        </AIChatBoxProvider>
       )}
     </Card>
   );

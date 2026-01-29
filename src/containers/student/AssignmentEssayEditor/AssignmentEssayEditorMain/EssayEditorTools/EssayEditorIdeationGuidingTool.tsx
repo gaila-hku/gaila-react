@@ -6,6 +6,7 @@ import { useMutation } from 'react-query';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
+import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import AIChatBoxMini from 'containers/common/AIChatBox/AIChatBoxMini';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
@@ -37,6 +38,7 @@ const EssayEditorIdeationGuidingTool = ({ toolId, latestResult }: Props) => {
 
   useEffect(() => {
     if (!latestResult) {
+      setIdeationScaffoldResult(null);
       return;
     }
     const result = JSON.parse(
@@ -86,12 +88,15 @@ const EssayEditorIdeationGuidingTool = ({ toolId, latestResult }: Props) => {
         </div>
       )}
       {ideationScaffoldResult && (
-        <AIChatBoxMini
+        <AIChatBoxProvider
           chatMutateFn={apiAskIdeationGuidingAgent}
-          chatName="Ask Ideation Agent"
-          firstMessage="Ask me about the generated questions, or how to use them!"
           toolId={toolId}
-        />
+        >
+          <AIChatBoxMini
+            chatName="Ask Ideation Agent"
+            firstMessage="Ask me about the generated questions, or how to use them!"
+          />
+        </AIChatBoxProvider>
       )}
     </Card>
   );
