@@ -25,6 +25,7 @@ export interface AssignmentEssayEditorProviderType {
   nextStageType: AssignmentStage['stage_type'] | null;
   readonly: boolean;
   readonlyMessage: AssignmentReadonlyMessage | null;
+  essayInit: boolean;
 }
 
 const AssignmentEssayEditorProviderContext =
@@ -46,6 +47,7 @@ const AssignmentEssayEditorProviderContext =
     nextStageType: null,
     readonly: false,
     readonlyMessage: null,
+    essayInit: false,
   });
 
 export const { Provider, Consumer } = AssignmentEssayEditorProviderContext;

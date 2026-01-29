@@ -31,6 +31,8 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
   const [outlineConfirmed, setOutlineConfirmed] = useState(false);
   const [draftConfirmed, setDraftConfirmed] = useState(false);
 
+  const [essayInit, setEssayInit] = useState(false);
+
   const [goalContent, setGoalContent] = useState<AssignmentGoalContent | null>(
     null,
   );
@@ -87,6 +89,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       setTitle(draftingContent?.title || '');
       setEssay(draftingContent?.essay || '');
     }
+    setEssayInit(true);
   }, [assignmentProgress, currentStage, setGoalContent]);
 
   const nextStageType = useMemo(() => {
@@ -169,6 +172,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       nextStageType,
       readonly,
       readonlyMessage,
+      essayInit,
     }),
     [
       assignmentProgress,
@@ -182,6 +186,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       nextStageType,
       readonly,
       readonlyMessage,
+      essayInit,
     ],
   );
 

@@ -47,7 +47,11 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
   }, [latestResult]);
 
   const scoreRatio = useMemo(() => {
-    if (!autogradeResult) {
+    if (
+      !autogradeResult ||
+      autogradeResult.overall_score === null ||
+      autogradeResult.max_score === null
+    ) {
       return 0;
     }
     return (autogradeResult.overall_score / autogradeResult.max_score) * 100;
@@ -82,33 +86,37 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
         <div className="max-h-[400px] overflow-auto">
           <div className="space-y-3 pr-4">
             {/* Overall Score */}
-            <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border-2 border-primary/20">
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground mb-1">
-                  Overall Score
-                </p>
-                <p className="text-2xl font-bold text-primary">
-                  {autogradeResult.overall_score}
-                  <span className="text-sm">/{autogradeResult.max_score}</span>
-                </p>
-                <Badge
-                  className="mt-2 text-xs"
-                  variant={
-                    scoreRatio >= 80
-                      ? 'primary'
+            {autogradeResult.overall_score !== null && (
+              <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border-2 border-primary/20">
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Overall Score
+                  </p>
+                  <p className="text-2xl font-bold text-primary">
+                    {autogradeResult.overall_score}
+                    <span className="text-sm">
+                      /{autogradeResult.max_score}
+                    </span>
+                  </p>
+                  <Badge
+                    className="mt-2 text-xs"
+                    variant={
+                      scoreRatio >= 80
+                        ? 'primary'
+                        : scoreRatio >= 60
+                          ? 'secondary'
+                          : 'destructive'
+                    }
+                  >
+                    {scoreRatio >= 80
+                      ? 'Excellent'
                       : scoreRatio >= 60
-                        ? 'secondary'
-                        : 'destructive'
-                  }
-                >
-                  {scoreRatio >= 80
-                    ? 'Excellent'
-                    : scoreRatio >= 60
-                      ? 'Good'
-                      : 'Needs Improvement'}
-                </Badge>
+                        ? 'Good'
+                        : 'Needs Improvement'}
+                  </Badge>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Criteria Breakdown */}
             <div className="space-y-2">
@@ -120,9 +128,11 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{criterion.criteria}</span>
-                    <Badge className="text-xs" variant="outline">
-                      {criterion.score}/{criterion.max_score}
-                    </Badge>
+                    {criterion.score !== null && (
+                      <Badge className="text-xs" variant="outline">
+                        {criterion.score}/{criterion.max_score}
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {criterion.feedback}

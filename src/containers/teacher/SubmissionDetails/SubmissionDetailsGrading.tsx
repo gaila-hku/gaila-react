@@ -160,7 +160,7 @@ const SubmissionDetailsGrading = ({
 
   return (
     <Card classes={{ children: 'space-y-4' }} title="Grading">
-      {locked && (
+      {!!locked && (
         <div className="border-purple-200 bg-purple-50 rounded-md py-2 px-3">
           <p className="text-sm text-purple-800">
             The student has not finalized their writing submission yet. Grading

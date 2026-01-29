@@ -55,13 +55,13 @@ export interface DictionaryResult {
 }
 
 export interface AutoGradeResult {
-  overall_score: number;
-  max_score: number;
+  overall_score: number | null;
+  max_score: number | null;
   overall_feedback: string;
   criteria_scores: {
     criteria: string;
-    score: number;
-    max_score: number;
+    score: number | null;
+    max_score: number | null;
     feedback: string;
   }[];
 }

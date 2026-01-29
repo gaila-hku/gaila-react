@@ -62,6 +62,7 @@ function AssignmentEssayEditorMain() {
     nextStageType,
     readonly,
     readonlyMessage,
+    essayInit,
   } = useAssignmentEssayEditorProvider();
 
   const { alertMsg } = useAlert();
@@ -125,12 +126,12 @@ function AssignmentEssayEditorMain() {
 
   const initWordStatus = useRef(false);
   useEffect(() => {
-    if (initWordStatus.current || !essay) {
+    if (initWordStatus.current || !essayInit) {
       return;
     }
     updateWordCountStatus(essay);
     initWordStatus.current = true;
-  }, [updateWordCountStatus, essay]);
+  }, [updateWordCountStatus, essay, essayInit]);
 
   const saveSubmissionContent = useCallback(
     (
