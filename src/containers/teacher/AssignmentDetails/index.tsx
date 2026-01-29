@@ -123,7 +123,7 @@ function AssignmentDetails({ assignmentId }: ViewAssignmentProps) {
               <div>
                 <p className="text-sm text-muted-foreground">Total Points</p>
                 <p className="font-medium">
-                  {totalPoints ? `${totalPoints} points` : 'N/A'}
+                  {totalPoints ? `${totalPoints} points` : 'Not scored'}
                 </p>
               </div>
             </div>
@@ -144,7 +144,9 @@ function AssignmentDetails({ assignmentId }: ViewAssignmentProps) {
                 >
                   <span>{item.criteria}</span>
                   <span className="font-medium">
-                    {item.max_points ? `${item.max_points} points` : 'N/A'}
+                    {item.max_points
+                      ? `${item.max_points} points`
+                      : 'Not scored'}
                   </span>
                 </div>
               ))}

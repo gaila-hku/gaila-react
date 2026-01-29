@@ -56,8 +56,12 @@ const UserUploader = () => {
         <p className="text-sm">CSV Format Requirements:</p>
         <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
           <li>
-            First row should be headers: username, password, role, first_name,
-            last_name, class
+            First row should be headers: username / password / role / first_name
+            / last_name / class
+          </li>
+          <li>
+            Make sure your headers are in exact wordings as above, in all
+            lowercase
           </li>
           <li>
             Role should be either &quot;student&quot;, &quot;teacher&quot; or

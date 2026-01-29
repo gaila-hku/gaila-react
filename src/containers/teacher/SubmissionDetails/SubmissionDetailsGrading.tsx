@@ -220,7 +220,7 @@ const SubmissionDetailsGrading = ({
                 </span>
               </>
             ) : (
-              <span className="text-sm text-muted-foreground">N/A</span>
+              <span className="text-sm text-muted-foreground">Not scored</span>
             )}
           </div>
         ))}

@@ -257,7 +257,7 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
             >
               <span className="text-muted-foreground">{item.criteria}</span>
               <Badge className="text-xs" variant="outline">
-                {item.max_points ? `${item.max_points}pts` : 'N/A'}
+                {item.max_points ? `${item.max_points}pts` : 'Not scored'}
               </Badge>
             </div>
           ))}
@@ -285,7 +285,7 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
           title={
             <>
               <AlertCircle className="h-4 w-4" />
-              Writing Checklist
+              Writing Checklist/Tips
             </>
           }
         >
