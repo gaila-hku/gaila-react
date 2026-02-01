@@ -69,7 +69,7 @@ const SubmissionDetailsContent = ({
             {segment.sequence}
           </mark>,
         );
-        lastIndex += segment.sequence.length;
+        lastIndex = segment.offset + segment.sequence.length;
       });
 
       // Add remaining text
