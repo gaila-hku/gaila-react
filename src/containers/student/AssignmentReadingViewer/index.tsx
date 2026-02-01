@@ -196,7 +196,7 @@ const AssignmentReadingViewer = () => {
           annotations: inputAnnotations,
           model_text_generated: modelTextGenerated,
         },
-        is_final: currentStage.submission?.is_final || false,
+        is_final: isFinal,
         changeStage: isFinal,
       });
     },
