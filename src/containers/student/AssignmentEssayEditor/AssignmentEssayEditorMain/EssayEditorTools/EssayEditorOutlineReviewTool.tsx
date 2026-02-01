@@ -75,7 +75,7 @@ const EssayEditorOutlineReviewTool = ({ toolId, latestResult }: Props) => {
         size="sm"
       >
         <Edit className="h-4 w-4" />
-        {isAgentLoading ? 'Reviewing...' : 'Review Outline'}
+        {isAgentLoading ? 'Reviewing...' : 'Advice to refine ideas'}
       </Button>
       {ideationReviewResult && (
         <div className="p-3 bg-secondary rounded-lg text-xs">
