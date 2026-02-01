@@ -87,7 +87,7 @@ const DashboardAnalyticsSummary = ({
       )}
 
       {/* FIXME: demo data */}
-      {(!enabledFlags || enabledFlags.complexity_scores) && (
+      {/* {(!enabledFlags || enabledFlags.complexity_scores) && (
         <Card
           className="h-fit"
           title={
@@ -129,7 +129,7 @@ const DashboardAnalyticsSummary = ({
             Indicates if your essay is error free
           </p>
         </Card>
-      )}
+      )} */}
     </>
   );
 };

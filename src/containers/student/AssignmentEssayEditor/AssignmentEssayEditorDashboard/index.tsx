@@ -25,7 +25,7 @@ type Props = {
   assignmentId: number;
 };
 
-const DASHBOARD_SECTIONS = [
+export const DASHBOARD_SECTIONS = [
   { key: 'performance', label: 'Performance metrics' },
   { key: 'agent_usage', label: 'Agent Usage' },
   {
