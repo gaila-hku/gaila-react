@@ -1,8 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import clsx from 'clsx';
 import { BarChart3, BookOpen, CheckCheck } from 'lucide-react';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import {
   Bar,
   BarChart,
@@ -37,6 +43,7 @@ const DASHBOARD_SECTIONS = [
 ];
 
 const AssignmentReflectionEditorGeneratedDashboard = () => {
+  const queryClient = useQueryClient();
   const { assignmentProgress, currentStage } =
     useAssignmentSubmissionProvider();
   const dashboardGenerateTool = currentStage?.tools.find(
@@ -69,6 +76,7 @@ const AssignmentReflectionEditorGeneratedDashboard = () => {
           res.gpt_log.gpt_answer,
         ) as DashboardGenerateResult;
         setDashboardData(newDashboardData);
+        queryClient.invalidateQueries([apiGetLatestSturcturedGptLog.queryKey]);
       } catch (e) {
         console.error(e);
       }
@@ -76,9 +84,11 @@ const AssignmentReflectionEditorGeneratedDashboard = () => {
   });
   const { mutate: saveTraceData } = useMutation(apiSaveTraceData);
 
+  const init = useRef(false);
   useEffect(() => {
-    if (latestGenerateData?.[0]) {
+    if (latestGenerateData?.[0] && !init.current) {
       setDashboardData(JSON.parse(latestGenerateData[0].gpt_answer));
+      init.current = true;
     }
   }, [latestGenerateData]);
 
