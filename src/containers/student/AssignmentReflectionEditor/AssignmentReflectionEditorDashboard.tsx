@@ -155,11 +155,11 @@ const AssignmentReflectionEditorDashboard = ({ assignmentId }: Props) => {
         return (
           <Card
             classes={{ description: '-mt-2 mb-4', root: 'h-fit' }}
-            description="How you spend your time in this assignment"
+            description="Your tools usage in this assignment"
             title={
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
-                Agent Usage
+                Tool Usage
               </div>
             }
           >
@@ -187,7 +187,7 @@ const AssignmentReflectionEditorDashboard = ({ assignmentId }: Props) => {
             title={
               <>
                 <Lightbulb className="h-5 w-5" />
-                Prompt Categories
+                How well did I use AI?
               </>
             }
           >

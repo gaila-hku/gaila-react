@@ -22,7 +22,7 @@ export const AssignmentLanguageViewer = () => {
     .config.vocabulary_enabled;
 
   const generalChatTool = currentStage?.tools.find(tool => {
-    return tool.key === 'language_general';
+    return tool.key === 'language_general' && tool.enabled;
   });
 
   const handleToNextStage = useCallback(() => {

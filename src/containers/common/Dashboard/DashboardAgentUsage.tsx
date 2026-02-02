@@ -35,7 +35,6 @@ const DashboardAgentUsage = ({ usageData }: Props) => {
   return (
     <>
       <div className="space-y-3">
-        <h4 className="text-sm font-semibold">Writing Stage Timeline</h4>
         <ResponsiveContainer height={usageData.length * 50} width="100%">
           <BarChart
             data={chartData}
@@ -63,7 +62,8 @@ const DashboardAgentUsage = ({ usageData }: Props) => {
       <div className="flex gap-2 pt-4 text-muted-foreground items-center">
         <Info className="h-4 w-4" />
         <p className="text-sm">
-          Utilize follow-up prompts you don&apos;t understand AI&apos;s output
+          Utilize follow-up prompts when you don&apos;t understand AI&apos;s
+          output
         </p>
       </div>
     </>

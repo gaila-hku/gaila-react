@@ -91,11 +91,11 @@ const DashboardPlagiarismDetector = ({
         description: '-mt-2 mb-2',
         root: 'h-fit',
       }}
-      description="Check your writing for plagiarism"
+      description="Check your writing for AI copying"
       title={
         <>
           <NotebookPen />
-          ChatGPT copying detector
+          How much did I copy AI?
         </>
       }
     >

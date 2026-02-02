@@ -26,14 +26,14 @@ type Props = {
 };
 
 export const DASHBOARD_SECTIONS = [
-  { key: 'performance', label: 'Performance metrics' },
-  { key: 'agent_usage', label: 'Agent Usage' },
+  // { key: 'performance', label: 'Performance metrics' },
+  { key: 'agent_usage', label: 'How much did I use AI?' },
   {
     key: 'copying_detector',
-    label: 'ChatGPT Copying Detector',
+    label: 'How much did I copy AI?',
   },
-  { key: 'prompt_category', label: 'Prompt Categories' },
-  { key: 'writing_insights', label: 'Writing Insights' },
+  { key: 'prompt_category', label: 'How well did I use AI?' },
+  { key: 'writing_insights', label: 'Advice for Improvement' },
 ];
 
 const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
@@ -123,11 +123,11 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
         return (
           <Card
             classes={{ description: '-mt-2 mb-4', root: 'h-fit' }}
-            description="How you spend your time in this assignment"
+            description="Your tools usage in this assignment"
             title={
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
-                Agent Usage
+                How much did I use AI?
               </div>
             }
           >
@@ -155,7 +155,7 @@ const AssignmentEssayEditorDashboard = ({ assignmentId }: Props) => {
             title={
               <>
                 <Lightbulb className="h-5 w-5" />
-                Prompt Categories
+                How well did I use AI?
               </>
             }
           >

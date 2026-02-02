@@ -79,7 +79,7 @@ const SubmissionDetailsAnalytics = ({
           },
           {
             key: 'time',
-            title: 'Agent Usage',
+            title: 'Tool Usage',
             content: <DashboardAgentUsage usageData={analytics.agent_usage} />,
           },
           {

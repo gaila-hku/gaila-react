@@ -24,7 +24,7 @@ const DASHBOARD_CONFIG_SECTIONS = [
       { key: 'goal_progress', label: 'Goal Progress' },
       { key: 'complexity_scores', label: 'Complexity Scores' },
       { key: 'accuracy_scores', label: 'Accuracy Scores' },
-      { key: 'writing_insights', label: 'Writing Insights' },
+      { key: 'writing_insights', label: 'Advice for Improvement' },
     ] as {
       key: keyof DashboardConfigType;
       label: string;
@@ -34,7 +34,7 @@ const DASHBOARD_CONFIG_SECTIONS = [
     key: 'ai_interaction',
     label: 'AI Interaction analysis',
     fields: [
-      { key: 'agent_usage', label: 'Agent Usage' },
+      { key: 'agent_usage', label: 'Tool Usage' },
       { key: 'copying_detector', label: 'ChatGPT Copying Detector' },
       { key: 'prompt_category_nature', label: 'Prompt Category - Nature' },
       { key: 'prompt_category_aspect', label: 'Prompt Category - Aspect' },

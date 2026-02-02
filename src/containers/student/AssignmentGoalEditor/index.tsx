@@ -44,7 +44,7 @@ const AssignmentGoalEditor = () => {
   const { alertMsg } = useAlert();
 
   const generalChatTool = currentStage?.tools.find(
-    tool => tool.key === 'goal_general',
+    tool => tool.key === 'goal_general' && tool.enabled,
   );
 
   const [goalValue, setGoalValue] = useState(defaultGoals);

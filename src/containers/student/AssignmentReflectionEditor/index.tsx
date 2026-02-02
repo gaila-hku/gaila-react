@@ -78,7 +78,7 @@ const AssignmentReflectionEditor = () => {
   );
 
   const generalChatTool = currentStage?.tools.find(
-    tool => tool.key === 'reflection_general',
+    tool => tool.key === 'reflection_general' && tool.enabled,
   );
 
   const onInputBlur = useCallback(

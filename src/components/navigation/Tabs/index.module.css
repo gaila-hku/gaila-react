@@ -26,14 +26,11 @@
   color: var(--color-gray-600);
   font-family: inherit;
   font-size: 0.875rem;
-  line-height: 1.25rem;
+  line-height: 1rem;
   font-weight: 500;
   user-select: none;
-  white-space: nowrap;
   word-break: keep-all;
-  padding-inline: 0.5rem;
-  padding-block: 0;
-  height: 2rem;
+  padding: 0.5rem;
 
   &[data-selected] {
     color: var(--color-gray-900);
@@ -66,7 +63,7 @@
   top: 50%;
   translate: var(--active-tab-left) -50%;
   width: var(--active-tab-width);
-  height: 1.5rem;
+  height: calc(100% - 0.5rem);
   border-radius: 999px;
   background-color: var(--color-white);
   transition-property: translate, width;

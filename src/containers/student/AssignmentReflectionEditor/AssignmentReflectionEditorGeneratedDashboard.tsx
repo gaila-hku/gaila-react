@@ -120,25 +120,23 @@ const AssignmentReflectionEditorGeneratedDashboard = () => {
     const chartData = [
       {
         name: 'Annotations',
-        'Referenced/Completed': usedAnnotaions.length,
-        'Unused/Incomplete':
-          readingData.annotations.length - usedAnnotaions.length,
+        Used: usedAnnotaions.length,
+        Unused: readingData.annotations.length - usedAnnotaions.length,
       },
       {
         name: 'Outline',
-        'Referenced/Completed': usedOutlinePoints.length,
-        'Unused/Incomplete':
-          outlineData.outline_points.length - usedOutlinePoints.length,
+        Used: usedOutlinePoints.length,
+        Unused: outlineData.outline_points.length - usedOutlinePoints.length,
       },
       {
         name: 'Vocabulary',
-        'Referenced/Completed': usedVocabs.length,
-        'Unused/Incomplete': vocabData.vocabs.length - usedVocabs.length,
+        Used: usedVocabs.length,
+        Unused: vocabData.vocabs.length - usedVocabs.length,
       },
       {
         name: 'Checklist',
-        'Referenced/Completed': usedChecklistItems.length,
-        'Unused/Incomplete':
+        Used: usedChecklistItems.length,
+        Unused:
           checklistData.checklist_items.length - usedChecklistItems.length,
       },
     ];
@@ -161,13 +159,9 @@ const AssignmentReflectionEditorGeneratedDashboard = () => {
                 <XAxis type="number" />
                 <YAxis dataKey="name" type="category" width={80} />
                 <RechartsTooltip />
+                <Bar dataKey="Used" fill="#3b82f6" stackId="a" />
                 <Bar
-                  dataKey="Referenced/Completed"
-                  fill="#3b82f6"
-                  stackId="a"
-                />
-                <Bar
-                  dataKey="Unused/Incomplete"
+                  dataKey="Unused"
                   fill="#8b5cf6"
                   radius={[0, 4, 4, 0]}
                   stackId="a"

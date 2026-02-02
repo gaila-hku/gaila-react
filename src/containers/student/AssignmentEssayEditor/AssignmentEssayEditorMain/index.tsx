@@ -21,7 +21,6 @@ import EssayEditorHeader from 'containers/student/AssignmentEssayEditor/Assignme
 import EssayEditorInput from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorInput';
 import EssayEditorOutlineEditButton from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOutlineEditButton';
 import EssayEditorOverview from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorOverview';
-import EssayEditorStageStepper from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorStageStepper';
 import EssayEditorSubmitModal from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorSubmitModal';
 import EssayEditorTools from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/EssayEditorTools';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
@@ -68,7 +67,7 @@ function AssignmentEssayEditorMain() {
   const { alertMsg } = useAlert();
 
   const generalChatTool = currentStage?.tools.find(
-    tool => tool.key === currentStage.stage_type + '_general',
+    tool => tool.key === currentStage.stage_type + '_general' && tool.enabled,
   );
 
   const [wordCountStatus, setWordCountStatus] = useState<WordCountStatus>({
@@ -380,7 +379,7 @@ function AssignmentEssayEditorMain() {
       <ResizableSidebar>
         {/* Main Editor */}
         <div className="space-y-6">
-          <EssayEditorStageStepper />
+          {/* <EssayEditorStageStepper /> */}
 
           {/* Header with save buttons */}
           <EssayEditorHeader
@@ -460,7 +459,7 @@ function AssignmentEssayEditorMain() {
           tabs={[
             {
               key: 'overview',
-              title: readonly ? 'Grade' : 'Overview',
+              title: teacherGrade ? 'Grade' : 'Self Assessment',
               content: (
                 <EssayEditorOverview
                   assignment={assignment}
@@ -475,7 +474,7 @@ function AssignmentEssayEditorMain() {
               ? [
                   {
                     key: 'tools',
-                    title: 'Tools',
+                    title: 'AI Assessment',
                     content: <EssayEditorTools />,
                   },
                 ]
