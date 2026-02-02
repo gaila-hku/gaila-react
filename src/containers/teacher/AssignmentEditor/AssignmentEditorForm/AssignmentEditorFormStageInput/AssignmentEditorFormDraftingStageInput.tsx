@@ -4,7 +4,14 @@ import CheckboxInput from 'components/input/CheckboxInput';
 
 import { DRAFTING_STAGE_TOOLS } from 'containers/teacher/AssignmentEditor/AssignmentEditorForm/AssignmentEditorFormStageInput/utils';
 
-import type { AssignmentStageEditType } from 'types/assignment';
+import type {
+  AssignmentStageDrafting,
+  AssignmentStageEditType,
+} from 'types/assignment';
+
+const DASHBOARD_OPTION = [
+  { key: 'dashboard_enabled', label: 'Show Dashboard' },
+];
 
 type Props = {
   stage: AssignmentStageEditType;
@@ -30,6 +37,15 @@ const AssignmentEditorFormDraftingStageInput = ({
     [onStageChange, stage],
   );
 
+  const onToggleDashboard = useCallback(
+    (value: boolean) => {
+      const newStage = { ...stage } as AssignmentStageDrafting;
+      newStage.config.dashboard_enabled = value;
+      onStageChange(newStage);
+    },
+    [onStageChange, stage],
+  );
+
   return (
     <>
       {DRAFTING_STAGE_TOOLS.map(tool => (
@@ -45,6 +61,13 @@ const AssignmentEditorFormDraftingStageInput = ({
           }
         />
       ))}
+      <CheckboxInput
+        labelSx={{
+          '& .MuiTypography-root': { fontSize: '0.875rem' },
+        }}
+        onChange={value => onToggleDashboard(!!value.length)}
+        options={DASHBOARD_OPTION}
+      />
     </>
   );
 };

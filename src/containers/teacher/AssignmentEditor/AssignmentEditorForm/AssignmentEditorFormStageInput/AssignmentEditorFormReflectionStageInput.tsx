@@ -15,12 +15,12 @@ import type {
   AssignmentStageReflection,
 } from 'types/assignment';
 
+const defaultReflectionQuestions = REFLECTION_QUESTIONS.map(s => s.question);
+
 type Props = {
   stage: AssignmentStageEditType;
   onStageChange: (stage: AssignmentStageEditType) => void;
 };
-
-const defaultReflectionQuestions = REFLECTION_QUESTIONS.map(s => s.question);
 
 const AssignmentEditorFormReflectionStageInput = ({
   stage,

@@ -105,18 +105,30 @@ export interface AssignmentStageLanguagePreparation
 
 export interface AssignmentStageOutlining extends AssignmentStageBase {
   stage_type: 'outlining';
+  config: {
+    dashboard_enabled?: boolean;
+  };
 }
 
 export interface AssignmentStageDrafting extends AssignmentStageBase {
   stage_type: 'drafting';
+  config: {
+    dashboard_enabled?: boolean;
+  };
 }
 
 export interface AssignmentStageRevising extends AssignmentStageBase {
   stage_type: 'revising';
   config: {
     revision_tool_ask_explanation?: boolean;
+    dashboard_enabled?: boolean;
   };
 }
+
+export type AssignmentStageWriting =
+  | AssignmentStageOutlining
+  | AssignmentStageDrafting
+  | AssignmentStageRevising;
 
 export interface AssignmentStageReflection extends AssignmentStageBase {
   stage_type: 'reflection';

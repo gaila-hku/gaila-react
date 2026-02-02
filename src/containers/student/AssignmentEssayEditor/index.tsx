@@ -11,6 +11,7 @@ import AssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEdi
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import { apiSaveTraceData } from 'api/trace-data';
+import type { AssignmentStageWriting } from 'types/assignment';
 
 const AssignmentEssayEditor = () => {
   const { assignmentProgress, currentStage, assignment } =
@@ -36,7 +37,10 @@ const AssignmentEssayEditor = () => {
     return <></>;
   }
 
-  if (!assignment?.config?.dashboard?.enabled) {
+  if (
+    !assignment?.config?.dashboard?.enabled ||
+    !(currentStage as AssignmentStageWriting)?.config.dashboard_enabled
+  ) {
     return (
       <AssignmentEssayEditorProvider>
         <AssignmentEssayEditorMain />

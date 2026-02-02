@@ -9,6 +9,10 @@ import type {
   AssignmentStageRevising,
 } from 'types/assignment';
 
+const DASHBOARD_OPTION = [
+  { key: 'dashboard_enabled', label: 'Show Dashboard' },
+];
+
 type Props = {
   stage: AssignmentStageEditType;
   onStageChange: (stage: AssignmentStageEditType) => void;
@@ -37,6 +41,15 @@ const AssignmentEditorFormRevisingStageInput = ({
     (value: boolean) => {
       const newStage = { ...stage } as AssignmentStageRevising;
       newStage.config.revision_tool_ask_explanation = value;
+      onStageChange(newStage);
+    },
+    [onStageChange, stage],
+  );
+
+  const onToggleDashboard = useCallback(
+    (value: boolean) => {
+      const newStage = { ...stage } as AssignmentStageRevising;
+      newStage.config.dashboard_enabled = value;
       onStageChange(newStage);
     },
     [onStageChange, stage],
@@ -89,6 +102,13 @@ const AssignmentEditorFormRevisingStageInput = ({
           )}
         </React.Fragment>
       ))}
+      <CheckboxInput
+        labelSx={{
+          '& .MuiTypography-root': { fontSize: '0.875rem' },
+        }}
+        onChange={value => onToggleDashboard(!!value.length)}
+        options={DASHBOARD_OPTION}
+      />
     </>
   );
 };
