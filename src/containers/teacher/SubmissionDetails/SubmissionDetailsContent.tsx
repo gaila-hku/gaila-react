@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { uniq } from 'lodash-es';
 import { AlertTriangle, Bot, CheckCircle, Circle } from 'lucide-react';
 
+import Card from 'components/display/Card';
 import Divider from 'components/display/Divider';
 import Empty from 'components/display/Empty';
 import Label from 'components/display/Label';
@@ -12,10 +13,12 @@ import SwitchInput from 'components/input/SwitchInput';
 import Tabs from 'components/navigation/Tabs';
 
 import GOAL_SECTIONS from 'containers/student/AssignmentGoalEditor/goalSections';
+import { getAnnotationBackgroundColor } from 'containers/student/AssignmentReadingViewer/utils';
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
 
 import type {
   AssignmentGoalContent,
+  AssignmentReadingContent,
   AssignmentReflectionContent,
   AssignmentStage,
   AssignmentSubmissionDetails,
@@ -162,17 +165,57 @@ const SubmissionDetailsContent = ({
         return <Empty text="No submission found" />;
       }
 
-      const header = (
-        <span>
-          Submitted: {dayjs(submission.submitted_at).format('MMM D, YYYY')}
-        </span>
-      );
+      if (stage_type === 'reading') {
+        const content = submission.content as AssignmentReadingContent;
+        const annotations = content.annotations;
+        if (!annotations.length) return <Empty text="No annotations made" />;
+        return (
+          <>
+            <div className="text-sm text-muted-foreground pb-2">
+              Last modified:{' '}
+              {dayjs(submission.submitted_at).format('MMM D, YYYY')}
+            </div>
+            <div className="space-y-3">
+              {annotations.map(annotation => (
+                <Card
+                  className="border-l-4 !p-4"
+                  key={annotation.id}
+                  style={{
+                    borderLeftColor: getAnnotationBackgroundColor(
+                      annotation.color,
+                    ),
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium italic text-muted-foreground line-clamp-2">
+                        &quot;{annotation.text}&quot;
+                      </p>
+                      {(annotation.label || annotation.note) && (
+                        <Divider className="!my-2" />
+                      )}
+                      {annotation.label && (
+                        <p className="text-sm">{annotation.label}</p>
+                      )}
+                      {annotation.note && (
+                        <p className="text-sm">{annotation.note}</p>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </>
+        );
+      }
 
       if (stage_type === 'goal_setting') {
         const content = submission.content as AssignmentGoalContent;
         return (
           <>
-            <div className="text-sm text-muted-foreground pb-2">{header}</div>
+            <div className="text-sm text-muted-foreground pb-2">
+              Submitted: {dayjs(submission.submitted_at).format('MMM D, YYYY')}
+            </div>
             <div className="space-y-3">
               {GOAL_SECTIONS.map(section => {
                 const goals = content[section.categoryKey];
@@ -222,7 +265,9 @@ const SubmissionDetailsContent = ({
         const reflections = submission.content as AssignmentReflectionContent;
         return (
           <>
-            <div className="text-sm text-muted-foreground pb-2">{header}</div>
+            <div className="text-sm text-muted-foreground pb-2">
+              Submitted: {dayjs(submission.submitted_at).format('MMM D, YYYY')}
+            </div>
             <div className="space-y-3">
               {REFLECTION_QUESTIONS.map((question, index) => {
                 const answer = reflections[index];

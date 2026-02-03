@@ -63,20 +63,21 @@ const SubmissionDetailsAnalytics = ({
       <Tabs
         className="w-full"
         tabs={[
-          {
-            key: 'metrics',
-            title: 'Writing Metrics',
-            content: (
-              <div className="grid grid-cols-2 gap-4">
-                <DashboardAnalyticsSummary
-                  assignment={assignment}
-                  essay={essay}
-                  goalContent={goalContent}
-                  promptAnalytics={analytics.prompt_data}
-                />
-              </div>
-            ),
-          },
+          // TODO: add reading aggregation
+          // {
+          //   key: 'metrics',
+          //   title: 'Writing Metrics',
+          //   content: (
+          //     <div className="grid grid-cols-2 gap-4">
+          //       <DashboardAnalyticsSummary
+          //         assignment={assignment}
+          //         essay={essay}
+          //         goalContent={goalContent}
+          //         promptAnalytics={analytics.prompt_data}
+          //       />
+          //     </div>
+          //   ),
+          // },
           {
             key: 'time',
             title: 'Tool Usage',
