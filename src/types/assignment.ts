@@ -88,6 +88,7 @@ export interface AssignmentStageReading extends AssignmentStageBase {
   config: {
     readings?: string[];
     annotation_enabled?: boolean;
+    annotation_labels?: string[];
   };
 }
 
@@ -170,6 +171,7 @@ export interface AssignmentReadingContent {
     text: string;
     note: string;
     color: string;
+    label?: string;
     start_index: number;
     end_index: number;
     text_index: number;

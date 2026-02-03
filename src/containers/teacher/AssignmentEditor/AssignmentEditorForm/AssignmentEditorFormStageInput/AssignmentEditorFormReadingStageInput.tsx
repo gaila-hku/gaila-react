@@ -35,6 +35,8 @@ const AssignmentEditorFormReadingStageInput = ({
   const [readings, setReadings] = useState<string[]>([]);
   const [readingInput, setReadingInput] = useState('');
   const [annotationEnabled, setAnnotationEnabled] = useState(false);
+  const [annotationLabels, setAnnotationLabels] = useState<string[]>([]);
+  const [annotationLabelInput, setAnnotationLabelInput] = useState('');
 
   const onStageToggleTools = useCallback(
     (toolKey: string, value: boolean) => {
@@ -55,6 +57,7 @@ const AssignmentEditorFormReadingStageInput = ({
     const configValue = (stage as AssignmentStageReading).config;
     setReadings(configValue.readings || []);
     setAnnotationEnabled(configValue.annotation_enabled || false);
+    setAnnotationLabels(configValue.annotation_labels || []);
   }, [stage]);
 
   const onAddReading = useCallback(() => {
@@ -91,6 +94,30 @@ const AssignmentEditorFormReadingStageInput = ({
     [onStageChange, stage],
   );
 
+  const onAddAnnotationLabel = useCallback(() => {
+    const newAnnotationLabels = [...annotationLabels];
+    newAnnotationLabels.push(annotationLabelInput.trim());
+    setAnnotationLabels(newAnnotationLabels);
+    setAnnotationLabelInput('');
+    onStageChange({
+      ...stage,
+      config: { ...stage.config, annotation_labels: newAnnotationLabels },
+    });
+  }, [annotationLabelInput, annotationLabels, onStageChange, stage]);
+
+  const onRemoveAnnotationLabel = useCallback(
+    (index: number) => {
+      const newAnnotationLabels = [...annotationLabels];
+      newAnnotationLabels.splice(index, 1);
+      setAnnotationLabels(newAnnotationLabels);
+      onStageChange({
+        ...stage,
+        config: { ...stage.config, annotation_labels: newAnnotationLabels },
+      });
+    },
+    [annotationLabels, onStageChange, stage],
+  );
+
   return (
     <>
       {READING_STAGE_TOOLS.map(tool => (
@@ -114,8 +141,8 @@ const AssignmentEditorFormReadingStageInput = ({
         options={ANNOTATION_OPTION}
         value={annotationEnabled ? ANNOTATION_OPTION.map(o => o.key) : []}
       />
-      <Divider className="!my-1" />
-      <div className="text-sm font-semibold py-2">Reading Materials</div>
+      <Divider className="!mt-1 !mb-2" />
+      <div className="text-sm font-semibold pb-2">Reading Materials</div>
       {readings.map((reading, index) => (
         <div className="flex gap-2 items-start pb-2" key={index}>
           <p className="text-sm">{index + 1}. </p>
@@ -140,6 +167,38 @@ const AssignmentEditorFormReadingStageInput = ({
           <Plus className="w-4 h-4 text-white" />
         </Clickable>
       </div>
+      {!!annotationEnabled && (
+        <>
+          <Divider className="!mt-3 !mb-2" />
+          <div className="text-sm font-semibold pb-2">
+            Annotation Labels (Optional)
+          </div>
+          {annotationLabels.map((label, index) => (
+            <div className="flex gap-2 items-start pb-2" key={index}>
+              <p className="text-sm">{index + 1}. </p>
+              <p className="text-sm whitespace-pre-wrap w-full">{label}</p>
+              <Clickable onClick={() => onRemoveAnnotationLabel(index)}>
+                <X className="w-4 h-4" />
+              </Clickable>
+            </div>
+          ))}
+          <div className="flex gap-2 items-end">
+            <TextInput
+              multiline
+              onChange={e => setAnnotationLabelInput(e.target.value)}
+              placeholder="e.g. Introduction/Body/Conclusion"
+              value={annotationLabelInput}
+            />
+            <Clickable
+              className="basis-[32px] h-[39px] flex items-center justify-center !bg-primary rounded"
+              disabled={!annotationLabelInput}
+              onClick={onAddAnnotationLabel}
+            >
+              <Plus className="w-4 h-4 text-white" />
+            </Clickable>
+          </div>
+        </>
+      )}
     </>
   );
 };

@@ -28,8 +28,10 @@ import Clickable from 'components/input/Clickable';
 import TextInput from 'components/input/TextInput';
 
 import {
+  getAnnotationBackgroundColor,
   getIndicesFromRange,
   highlightAnnotation,
+  highlightColors,
 } from 'containers/student/AssignmentReadingViewer/utils';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
@@ -44,11 +46,14 @@ const AssignmentReadingViewer = () => {
   const { assignment, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
 
-  const readings = useMemo(() => {
+  const [readings, annotationLabels] = useMemo(() => {
     if (!currentStage) {
-      return [];
+      return [[], []];
     }
-    return (currentStage as AssignmentStageReading).config.readings || [];
+    return [
+      (currentStage as AssignmentStageReading).config.readings || [],
+      (currentStage as AssignmentStageReading).config.annotation_labels || [],
+    ];
   }, [currentStage]);
 
   const [modelTextGenerated, setModelTextGenerated] = useState(false);
@@ -58,28 +63,19 @@ const AssignmentReadingViewer = () => {
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [selectedText, setSelectedText] = useState('');
   const [showAnnotationDialog, setShowAnnotationDialog] = useState(false);
-  const [dialogPosition, setDialogPosition] = useState({
+  const [selectionPosition, setSelectionPosition] = useState({
     top: 0,
     left: 0,
-    placement: 'below',
   });
 
   const [annotationNote, setAnnotationNote] = useState('');
-  const [selectedColor, setSelectedColor] = useState('#fef08a'); // yellow
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [selectionIndices, setSelectionIndices] = useState<{
     start: number;
     end: number;
   } | null>(null);
+
   const textContainerRef = useRef<HTMLDivElement>(null);
-
-  const highlightColors = [
-    { name: 'Yellow', value: '#fef08a' },
-    { name: 'Green', value: '#bbf7d0' },
-    { name: 'Blue', value: '#bfdbfe' },
-    { name: 'Pink', value: '#fbcfe8' },
-    { name: 'Purple', value: '#e9d5ff' },
-  ];
-
   // Init annotations from submission
   useEffect(() => {
     if (currentStage?.submission?.content) {
@@ -171,12 +167,10 @@ const AssignmentReadingViewer = () => {
       setShowAnnotationDialog(true);
       const rect = range.getBoundingClientRect();
       const containerRect = textContainerRef.current?.getBoundingClientRect();
-      if (containerRect) {
-        const top = rect.top - containerRect.top;
-        const left = rect.left - containerRect.left;
-        const placement = top < containerRect.height / 2 ? 'above' : 'below';
-        setDialogPosition({ top, left, placement });
-      }
+      setSelectionPosition({
+        top: rect.top + document.documentElement.scrollTop,
+        left: rect.left - containerRect.left,
+      });
     }
   }, []);
 
@@ -209,7 +203,9 @@ const AssignmentReadingViewer = () => {
         id: dayjs().valueOf(),
         text: selectedText,
         note: annotationNote,
-        color: selectedColor,
+        color:
+          highlightColors[selectedColorIndex % highlightColors.length].name,
+        label: annotationLabels[selectedColorIndex],
         start_index: selectionIndices.start,
         end_index: selectionIndices.end,
         text_index: currentTextIndex,
@@ -226,11 +222,12 @@ const AssignmentReadingViewer = () => {
       window.getSelection()?.removeAllRanges();
     }
   }, [
+    annotationLabels,
     annotationNote,
     annotations,
     currentTextIndex,
     saveAnnotations,
-    selectedColor,
+    selectedColorIndex,
     selectedText,
     selectionIndices,
   ]);
@@ -301,8 +298,8 @@ const AssignmentReadingViewer = () => {
                     {highlightColors.map(color => (
                       <div
                         className="w-4 h-4 rounded border border-border"
-                        key={color.value}
-                        style={{ backgroundColor: color.value }}
+                        key={color.backgroundColor}
+                        style={{ backgroundColor: color.backgroundColor }}
                         title={color.name}
                       />
                     ))}
@@ -397,18 +394,25 @@ const AssignmentReadingViewer = () => {
                       <Card
                         className="border-l-4 !p-4"
                         key={annotation.id}
-                        style={{ borderLeftColor: annotation.color }}
+                        style={{
+                          borderLeftColor: getAnnotationBackgroundColor(
+                            annotation.color,
+                          ),
+                        }}
                       >
                         <div className="flex items-center gap-3">
                           <div className="flex-1">
                             <p className="text-sm font-medium italic text-muted-foreground line-clamp-2">
                               &quot;{annotation.text}&quot;
                             </p>
+                            {(annotation.label || annotation.note) && (
+                              <Divider className="!my-2" />
+                            )}
+                            {annotation.label && (
+                              <p className="text-sm">{annotation.label}</p>
+                            )}
                             {annotation.note && (
-                              <>
-                                <Divider className="!my-2" />
-                                <p className="text-sm">{annotation.note}</p>
-                              </>
+                              <p className="text-sm">{annotation.note}</p>
                             )}
                           </div>
                           <Button
@@ -452,35 +456,57 @@ const AssignmentReadingViewer = () => {
           className={clsx(
             'absolute w-[400px]',
             'bg-white border-4 p-4 rounded-lg flex flex-col gap-4',
+            selectionPosition.top > window.innerHeight / 2 ? 'top-0' : '',
           )}
           style={{
             top:
-              dialogPosition.placement === 'below'
-                ? `${dialogPosition.top + 390}px`
-                : `${dialogPosition.top + 90}px`,
-            left: `${Math.max(20, Math.min(dialogPosition.left, window.innerWidth - 420))}px`,
+              selectionPosition.top > window.innerHeight / 2
+                ? selectionPosition.top
+                : selectionPosition.top + 24,
+            left: Math.max(
+              20,
+              Math.min(selectionPosition.left, window.innerWidth - 420),
+            ),
+            transform:
+              selectionPosition.top > window.innerHeight / 2
+                ? 'translateY(-100%)'
+                : '',
           }}
         >
           <div>
             <div className="flex items-start gap-2">
               <div className="flex-1">
                 <label className="text-sm font-medium mb-2 block">
-                  Highlight Color
+                  {annotationLabels.length ? 'Choose Label' : 'Highlight Color'}
                 </label>
-                <div className="flex gap-2">
-                  {highlightColors.map(color => (
-                    <button
-                      className={`w-10 h-10 rounded border-2 transition-all ${
-                        selectedColor === color.value
-                          ? 'border-primary ring-2 ring-primary/20 scale-110'
-                          : 'border-border hover:border-primary/50'
-                      }`}
-                      key={color.value}
-                      onClick={() => setSelectedColor(color.value)}
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                    />
-                  ))}
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    ...Array(annotationLabels.length || highlightColors.length),
+                  ].map((_, index) => {
+                    const color =
+                      highlightColors[index % highlightColors.length];
+                    const annotationLabel = annotationLabels[index];
+                    return (
+                      <Clickable
+                        className={clsx(
+                          'rounded border-2 border-solid transition-all',
+                          selectedColorIndex === index
+                            ? 'border-primary scale-110'
+                            : 'border-border hover:border-primary/50',
+                          annotationLabels.length ? 'px-1' : 'w-10 h-10',
+                        )}
+                        key={index}
+                        onClick={() => setSelectedColorIndex(index)}
+                        style={{
+                          backgroundColor: color.backgroundColor,
+                          color: color.textColor,
+                        }}
+                        title={color.name}
+                      >
+                        {!!annotationLabel && annotationLabel}
+                      </Clickable>
+                    );
+                  })}
                 </div>
               </div>
               <Clickable onClick={handleCancelAnnotation}>
