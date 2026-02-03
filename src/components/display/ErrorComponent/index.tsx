@@ -35,6 +35,10 @@ const ErrorComponent = ({
     return getErrorMessage(error);
   }, [error, message]);
 
+  if (!error) {
+    return <></>;
+  }
+
   return (
     <div
       className={clsx([
