@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {
   AssignmentGoalContent,
+  AssignmentLanguagePreparationContent,
   AssignmentProgress,
   AssignmentReadonlyMessage,
   AssignmentStage,
@@ -22,6 +23,7 @@ export interface AssignmentEssayEditorProviderType {
   setDraftConfirmed: (confirmed: boolean) => void;
   goalContent: AssignmentGoalContent | null;
   setGoalContent: (goals: AssignmentGoalContent | null) => void;
+  languageContent: AssignmentLanguagePreparationContent | null;
   nextStageType: AssignmentStage['stage_type'] | null;
   readonly: boolean;
   readonlyMessage: AssignmentReadonlyMessage | null;
@@ -44,6 +46,7 @@ const AssignmentEssayEditorProviderContext =
     setDraftConfirmed: () => {},
     goalContent: null,
     setGoalContent: () => {},
+    languageContent: null,
     nextStageType: null,
     readonly: false,
     readonlyMessage: null,

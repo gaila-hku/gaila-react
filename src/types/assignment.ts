@@ -179,8 +179,15 @@ export interface AssignmentReadingContent {
   model_text_generated?: boolean;
 }
 
+export interface VocabSubmissionItem {
+  id: string;
+  text: string;
+  type: 'word' | 'phrase';
+  will_be_used: boolean;
+}
+
 export interface AssignmentLanguagePreparationContent {
-  generated_vocabs: string[];
+  generated_vocabs: VocabSubmissionItem[];
 }
 
 export interface AssignmentOutliningContent {

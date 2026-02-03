@@ -12,7 +12,10 @@ import AssignmentLanguageViewerReading from 'containers/student/AssignmentLangua
 import AssignmentLanguageViewerVocab from 'containers/student/AssignmentLanguageViewer/AssignmentLanguageViewerVocab';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type { AssignmentStageLanguagePreparation } from 'types/assignment';
+import type {
+  AssignmentLanguagePreparationContent,
+  AssignmentStageLanguagePreparation,
+} from 'types/assignment';
 
 export const AssignmentLanguageViewer = () => {
   const { assignment, currentStage, saveSubmission } =
@@ -29,10 +32,13 @@ export const AssignmentLanguageViewer = () => {
     if (!assignment || !currentStage) {
       return;
     }
+    const submissionContent = currentStage.submission?.content as
+      | AssignmentLanguagePreparationContent
+      | undefined;
     saveSubmission({
       assignment_id: assignment.id,
       stage_id: currentStage.id,
-      content: { generated_vocabs: [] },
+      content: { generated_vocabs: submissionContent?.generated_vocabs || [] },
       is_final: true,
       changeStage: true,
     });

@@ -5,10 +5,11 @@ import { AlertTriangle } from 'lucide-react';
 import { Provider } from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/context';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
-import type {
-  AssignmentDraftingContent,
-  AssignmentGoalContent,
-  AssignmentOutliningContent,
+import {
+  type AssignmentDraftingContent,
+  type AssignmentGoalContent,
+  type AssignmentLanguagePreparationContent,
+  type AssignmentOutliningContent,
 } from 'types/assignment';
 
 type Props = {
@@ -36,6 +37,8 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
   const [goalContent, setGoalContent] = useState<AssignmentGoalContent | null>(
     null,
   );
+  const [languageContent, setLanguageContent] =
+    useState<AssignmentLanguagePreparationContent | null>(null);
 
   useEffect(() => {
     if (!assignmentProgress) {
@@ -90,7 +93,18 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       setEssay(draftingContent?.essay || '');
     }
     setEssayInit(true);
-  }, [assignmentProgress, currentStage, setGoalContent]);
+
+    // 4. Init language content
+    const languageStage = assignmentProgress.stages.find(stage => {
+      return stage.stage_type === 'language_preparation';
+    });
+    if (languageStage?.submission) {
+      setLanguageContent(
+        languageStage.submission
+          .content as AssignmentLanguagePreparationContent,
+      );
+    }
+  }, [assignmentProgress, currentStage]);
 
   const nextStageType = useMemo(() => {
     if (!assignmentProgress) {
@@ -169,6 +183,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       setDraftConfirmed,
       goalContent,
       setGoalContent,
+      languageContent,
       nextStageType,
       readonly,
       readonlyMessage,
@@ -183,6 +198,7 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       outlineConfirmed,
       draftConfirmed,
       goalContent,
+      languageContent,
       nextStageType,
       readonly,
       readonlyMessage,

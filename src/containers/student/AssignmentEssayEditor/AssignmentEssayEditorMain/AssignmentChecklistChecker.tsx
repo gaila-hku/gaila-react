@@ -64,7 +64,7 @@ const AssignmentChecklistChecker = () => {
       <>
         {checklist.map((item, index) => (
           <div className="flex items-start gap-2 text-sm" key={index}>
-            <CheckCircle className="h-3 w-3 text-green-500 mt-1 flex-shrink-0" />
+            <Circle className="h-3 w-3 mt-1 flex-shrink-0" />
             <span className="text-muted-foreground">{item.text}</span>
           </div>
         ))}

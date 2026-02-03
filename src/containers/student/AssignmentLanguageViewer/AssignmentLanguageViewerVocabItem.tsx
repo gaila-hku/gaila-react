@@ -1,15 +1,22 @@
 import React, { useCallback } from 'react';
 
+import clsx from 'clsx';
+
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
+import CheckboxInput from 'components/input/CheckboxInput';
+import Clickable from 'components/input/Clickable';
 
 import useAIChatBox from 'containers/common/AIChatBox/AIChatBoxContext/useAIChatBox';
 
-import type { VocabGenerateItem } from 'types/gpt';
+import type { VocabSubmissionItem } from 'types/assignment';
 
-type Props = { item: VocabGenerateItem };
+type Props = {
+  item: VocabSubmissionItem;
+  onToggleVocab: () => void;
+};
 
-const AssignmentLanguageViewerVocabItem = ({ item }: Props) => {
+const AssignmentLanguageViewerVocabItem = ({ item, onToggleVocab }: Props) => {
   const { sendMessage } = useAIChatBox();
 
   const handleVocabAction = useCallback(
@@ -24,9 +31,24 @@ const AssignmentLanguageViewerVocabItem = ({ item }: Props) => {
   );
 
   return (
-    <Card className="border-l-4 border-l-primary !py-2">
-      <div className="flex items-center justify-between gap-2">
-        <p className="font-medium">{item.text}</p>
+    <Card
+      className={clsx(
+        '!py-2 border-l-4 transition-all',
+        item.will_be_used ? 'border-l-primary' : 'border-l-muted',
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <Clickable
+          className="flex-1 flex items-center gap-2"
+          onClick={onToggleVocab}
+        >
+          <CheckboxInput
+            defaultValue={item.will_be_used ? [item.id] : []}
+            onChange={() => onToggleVocab()}
+            options={[{ key: item.id, label: '' }]}
+          />
+          <p className="font-medium">{item.text}</p>
+        </Clickable>
         <div className="flex gap-2">
           <Button
             className="text-xs"

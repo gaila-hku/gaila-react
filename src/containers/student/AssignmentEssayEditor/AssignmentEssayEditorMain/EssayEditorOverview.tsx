@@ -3,10 +3,11 @@ import React, { useMemo } from 'react';
 import dayjs from 'dayjs';
 import {
   BookOpen,
-  CheckCircle,
+  Check,
   ClipboardCheck,
   ClipboardList,
   GraduationCap,
+  Languages,
   Lightbulb,
   Star,
   Target,
@@ -34,7 +35,7 @@ type Props = {
 };
 
 const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
-  const { readonly, goalContent, currentStage } =
+  const { readonly, goalContent, languageContent, currentStage } =
     useAssignmentEssayEditorProvider();
 
   const wordCountDisplay = useMemo(() => {
@@ -83,6 +84,11 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
   const [completedGoalCount, totalGoalCount] = useMemo(
     () => getGoalCounts(goalContent),
     [goalContent],
+  );
+
+  const plannedVocab = useMemo(
+    () => languageContent?.generated_vocabs.filter(s => s.will_be_used) || [],
+    [languageContent],
   );
 
   return (
@@ -196,7 +202,6 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
         </Card>
       )}
 
-      {/* Assignment Prompt */}
       {!!assignment.instructions && (
         <Card
           classes={{
@@ -294,10 +299,34 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
         >
           {assignment.tips.map((tip, index) => (
             <div className="flex items-start gap-2 text-sm" key={index}>
-              <CheckCircle className="h-3 w-3 text-green-500 mt-1 flex-shrink-0" />
+              <Check className="h-3 w-3 mt-1 flex-shrink-0" />
               <span className="text-muted-foreground">{tip}</span>
             </div>
           ))}
+        </Card>
+      )}
+
+      {!!plannedVocab.length && (
+        <Card
+          classes={{
+            children: 'space-y-2',
+            title: 'flex items-center gap-2 text-base',
+            root: '!p-4',
+          }}
+          title={
+            <>
+              <Languages className="h-4 w-4" />
+              Vocabulary to use
+            </>
+          }
+        >
+          <ul className="list-disc list-outside pl-4 text-sm text-muted-foreground">
+            {plannedVocab.map(vocab => (
+              <li className="pl-1" key={vocab.id}>
+                {vocab.text}
+              </li>
+            ))}
+          </ul>
         </Card>
       )}
 
