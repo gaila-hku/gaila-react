@@ -2,11 +2,12 @@ import React, { useMemo } from 'react';
 
 import dayjs from 'dayjs';
 import {
-  AlertCircle,
   BookOpen,
   CheckCircle,
+  ClipboardCheck,
   ClipboardList,
   GraduationCap,
+  Lightbulb,
   Star,
   Target,
 } from 'lucide-react';
@@ -15,6 +16,7 @@ import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Divider from 'components/display/Divider';
 
+import AssignmentChecklistChecker from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/AssignmentChecklistChecker';
 import AssignmentGoalChecker from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorMain/AssignmentGoalChecker';
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
 
@@ -32,7 +34,8 @@ type Props = {
 };
 
 const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
-  const { readonly, goalContent } = useAssignmentEssayEditorProvider();
+  const { readonly, goalContent, currentStage } =
+    useAssignmentEssayEditorProvider();
 
   const wordCountDisplay = useMemo(() => {
     let display = '';
@@ -275,7 +278,7 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
         </Card>
       )}
 
-      {!!assignment.checklist?.length && (
+      {!!assignment.tips?.length && (
         <Card
           classes={{
             children: 'space-y-2',
@@ -284,12 +287,12 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
           }}
           title={
             <>
-              <AlertCircle className="h-4 w-4" />
-              Writing Checklist/Tips
+              <Lightbulb className="h-4 w-4" />
+              Writing Tips
             </>
           }
         >
-          {assignment.checklist.map((tip, index) => (
+          {assignment.tips.map((tip, index) => (
             <div className="flex items-start gap-2 text-sm" key={index}>
               <CheckCircle className="h-3 w-3 text-green-500 mt-1 flex-shrink-0" />
               <span className="text-muted-foreground">{tip}</span>
@@ -297,6 +300,25 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
           ))}
         </Card>
       )}
+
+      {!!assignment.checklist?.length &&
+        currentStage?.stage_type !== 'outlining' && (
+          <Card
+            classes={{
+              children: 'space-y-2',
+              title: 'flex items-center gap-2 text-base',
+              root: '!p-4',
+            }}
+            title={
+              <>
+                <ClipboardCheck className="h-4 w-4" />
+                Writing Checklist
+              </>
+            }
+          >
+            <AssignmentChecklistChecker />
+          </Card>
+        )}
     </div>
   );
 };

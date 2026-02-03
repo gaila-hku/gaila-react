@@ -12,6 +12,7 @@ export interface Assignment {
   due_date?: number | null;
   type?: string;
   instructions?: string;
+  tips?: string[];
   checklist?: string[];
   config?: {
     dashboard?: {
@@ -192,6 +193,12 @@ export interface AssignmentDraftingContent {
 export interface AssignmentRevisingContent {
   title: string;
   essay: string;
+  checklist_items: AssignmentChecklistItem[];
+}
+
+export interface AssignmentChecklistItem {
+  text: string;
+  completed: boolean;
 }
 
 export type AssignmentWritingContent =

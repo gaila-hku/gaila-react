@@ -134,6 +134,14 @@ const AssignmentEditorForm = ({
       <Divider />
 
       <AssignmentEditorFormChecklistInput
+        formDataValue={formData.current.tips || []}
+        isTips
+        onFormDataChange={onFormDataChange}
+      />
+
+      <Divider />
+
+      <AssignmentEditorFormChecklistInput
         formDataValue={formData.current.checklist || []}
         onFormDataChange={onFormDataChange}
       />

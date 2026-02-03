@@ -8,27 +8,29 @@ import TextInput from 'components/input/TextInput';
 type Props = {
   formDataValue: string[];
   onFormDataChange: (field: string, value: any) => void;
+  isTips?: boolean;
 };
 
 const AssignmentEditorFormChecklistInput = ({
   formDataValue,
   onFormDataChange,
+  isTips,
 }: Props) => {
   const [checklist, setChecklist] = useState<string[]>(['']);
 
   const handleAddChecklistItem = useCallback(() => {
     const newChecklist = [...checklist, ''];
     setChecklist(newChecklist);
-    onFormDataChange('checklist', newChecklist);
-  }, [onFormDataChange, checklist]);
+    onFormDataChange(isTips ? 'tips' : 'checklist', newChecklist);
+  }, [checklist, onFormDataChange, isTips]);
 
   const handleRemoveChecklistItem = useCallback(
     (index: number) => {
       const newChecklist = checklist.filter((_, i) => i !== index);
       setChecklist(newChecklist);
-      onFormDataChange('checklist', newChecklist);
+      onFormDataChange(isTips ? 'tips' : 'checklist', newChecklist);
     },
-    [onFormDataChange, checklist],
+    [checklist, onFormDataChange, isTips],
   );
 
   const handleChecklistChange = useCallback(
@@ -36,9 +38,9 @@ const AssignmentEditorFormChecklistInput = ({
       const newChecklist = [...checklist];
       newChecklist[index] = value;
       setChecklist(newChecklist);
-      onFormDataChange('checklist', newChecklist);
+      onFormDataChange(isTips ? 'tips' : 'checklist', newChecklist);
     },
-    [onFormDataChange, checklist],
+    [checklist, onFormDataChange, isTips],
   );
 
   useEffect(() => {
@@ -48,7 +50,9 @@ const AssignmentEditorFormChecklistInput = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium">Writing checklist for students</h4>
+        <h4 className="font-medium">
+          {isTips ? 'Writing tips' : 'Writing checklist'} for students
+        </h4>
         <Button
           className="gap-2"
           onClick={handleAddChecklistItem}
@@ -68,7 +72,11 @@ const AssignmentEditorFormChecklistInput = ({
               <TextInput
                 className="flex-1"
                 onChange={e => handleChecklistChange(index, e.target.value)}
-                placeholder="e.g. Use active voice in a speech / Start with a compelling hook / Refer to textbook P. 124"
+                placeholder={
+                  isTips
+                    ? 'e.g. Use active voice in a speech / Start with a compelling hook / Refer to textbook P. 124'
+                    : 'e.g. Check for past tense / spelling errors'
+                }
                 value={tip}
               />
             </div>
