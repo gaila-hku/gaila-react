@@ -85,12 +85,7 @@ const EssayEditorTools = () => {
       (!draftConfirmed || !revisingEnabled)
         ? ['ideation_guiding']
         : []),
-      ...(!!outlineReviewTool &&
-      outliningEnabled &&
-      !outlineConfirmed &&
-      (!draftConfirmed || !revisingEnabled)
-        ? ['outline_review']
-        : []),
+      ...(!!outlineReviewTool && outliningEnabled ? ['outline_review'] : []),
       ...(dictionaryTool ? ['dictionary'] : []),
       ...(!!autoGradeTool && (outlineConfirmed || !outliningEnabled)
         ? ['autograde']

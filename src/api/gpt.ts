@@ -11,7 +11,9 @@ import type { PartialBy } from 'utils/types/partialBy';
 export interface AskGptRequestData {
   assignment_tool_id: number;
   question: string;
-  essay: string | undefined;
+  essay?: string;
+  outline?: string;
+  extra?: string;
 }
 
 export const apiAskGpt = (payload: AskGptRequestData): Promise<GptLog> =>
@@ -50,6 +52,7 @@ interface GetGptLogQueryParam {
   assignment_tool_id: number;
   page: number;
   limit: number;
+  include_structured?: boolean;
 }
 
 export const apiGetGptChatLogs = async ({

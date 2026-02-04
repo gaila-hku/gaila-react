@@ -28,6 +28,7 @@ import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmis
 
 import type {
   AssignmentGoalContent,
+  AssignmentStageWriting,
   AssignmentWritingContent,
 } from 'types/assignment';
 import getWordCount from 'utils/helper/getWordCount';
@@ -446,7 +447,10 @@ function AssignmentEssayEditorMain() {
         <Tabs
           className={clsx([
             'sticky bottom-0',
-            outliningEnabled || revisingEnabled ? 'top-[137px]' : 'top-[80px]',
+            assignment?.config?.dashboard?.enabled ||
+            (currentStage as AssignmentStageWriting)?.config.dashboard_enabled
+              ? 'top-[137px]'
+              : 'top-[80px]',
           ])}
           classes={{
             panel: clsx([
