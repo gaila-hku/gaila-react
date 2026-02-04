@@ -32,6 +32,7 @@ import tuple from 'utils/types/tuple';
 type Props = {
   toolId: number;
   essay?: string;
+  reading?: string;
   firstMessage?: string;
   chatMutateFn?: UseMutateAsyncFunction<
     GptLog,
@@ -45,6 +46,7 @@ type Props = {
 const AIChatBoxProvider = ({
   toolId,
   essay,
+  reading,
   firstMessage,
   chatMutateFn = apiAskGpt,
   children,
@@ -113,6 +115,7 @@ const AIChatBoxProvider = ({
         question: question,
         assignment_tool_id: toolId,
         essay,
+        reading,
         is_structured: false,
       });
       setNewChatMessages(prev => [
@@ -120,7 +123,7 @@ const AIChatBoxProvider = ({
         gptResponseToChatMessage(gptResponse),
       ]);
     },
-    [chatInput, essay, sendQuestion, toolId],
+    [chatInput, essay, reading, sendQuestion, toolId],
   );
 
   const value = useMemo(

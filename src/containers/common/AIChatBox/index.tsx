@@ -132,7 +132,7 @@ const AIChatBox = ({
 
       {!error && <ErrorMessage error={error} />}
 
-      <div className="py-3 border-t">
+      <div className="pt-3 border-t">
         <div className="flex gap-2">
           <TextInput
             className="text-sm"

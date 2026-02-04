@@ -261,7 +261,7 @@ const EssayEditorOutlineReviewTool = ({ toolId, latestResult }: Props) => {
       {!!apiMessages.length && (
         <>
           <div
-            className="max-h-[320px] overflow-y-auto space-y-4"
+            className="max-h-[320px] overflow-y-auto pb-3 space-y-3"
             ref={chatScrollRef}
           >
             {isLoading && <Loading />}

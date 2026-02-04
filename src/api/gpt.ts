@@ -11,6 +11,7 @@ import type { PartialBy } from 'utils/types/partialBy';
 export interface AskGptRequestData {
   assignment_tool_id: number;
   question: string;
+  reading?: string;
   essay?: string;
   outline?: string;
   extra?: string;

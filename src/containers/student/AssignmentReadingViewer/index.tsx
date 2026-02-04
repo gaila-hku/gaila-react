@@ -15,20 +15,17 @@ import {
   ChevronRight,
   Highlighter,
   Sparkles,
-  StickyNote,
-  Trash2,
   X,
 } from 'lucide-react';
 
 import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
-import Divider from 'components/display/Divider';
 import Button from 'components/input/Button';
 import Clickable from 'components/input/Clickable';
 import TextInput from 'components/input/TextInput';
 
+import AssignmentReadingViewerSidebar from 'containers/student/AssignmentReadingViewer/AssignmentReadingViewerSidebar';
 import {
-  getAnnotationBackgroundColor,
   getIndicesFromRange,
   highlightAnnotation,
   highlightColors,
@@ -265,7 +262,7 @@ const AssignmentReadingViewer = () => {
   }, [handleTextSelection]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="container mx-auto px-4 max-w-7xl">
         <h1 className="text-3xl font-bold mb-2">Reading</h1>
         <p className="text-muted-foreground mb-4">
@@ -332,7 +329,7 @@ const AssignmentReadingViewer = () => {
                     </div>
                   </div>
 
-                  <div className="max-h-[500px] pr-4 overflow-auto whitespace-pre-line">
+                  <div className="pr-4 whitespace-pre-line">
                     <div className="select-text" ref={textContainerRef}>
                       {readings[currentTextIndex]}
                     </div>
@@ -363,89 +360,24 @@ const AssignmentReadingViewer = () => {
 
           {/* Annotations Sidebar */}
           <div className="lg:col-span-1">
-            <Card
-              className="sticky top-[90px]"
-              classes={{
-                title: 'flex items-center gap-2',
-                description: '-mt-2 mb-2',
-              }}
-              description={`${currentTextAnnotations.length} note${currentTextAnnotations.length === 1 ? '' : 's'} added`}
-              title={
-                <>
-                  <StickyNote className="h-5 w-5 text-primary" />
-                  My Annotations
-                </>
-              }
-            >
-              <div className="h-[calc(100vh-360px)] pr-4 overflow-auto">
-                {currentTextAnnotations.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <StickyNote className="h-8 w-8 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">
-                      No annotations yet
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Select text to add highlights and notes
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {currentTextAnnotations.map(annotation => (
-                      <Card
-                        className="border-l-4 !p-4"
-                        key={annotation.id}
-                        style={{
-                          borderLeftColor: getAnnotationBackgroundColor(
-                            annotation.color,
-                          ),
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium italic text-muted-foreground line-clamp-2">
-                              &quot;{annotation.text}&quot;
-                            </p>
-                            {(annotation.label || annotation.note) && (
-                              <Divider className="!my-2" />
-                            )}
-                            {annotation.label && (
-                              <p className="text-sm">{annotation.label}</p>
-                            )}
-                            {annotation.note && (
-                              <p className="text-sm">{annotation.note}</p>
-                            )}
-                          </div>
-                          <Button
-                            className="h-6 w-6 flex-shrink-0"
-                            onClick={() =>
-                              handleDeleteAnnotation(annotation.id)
-                            }
-                            size="icon"
-                            variant="ghost"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <div className="sticky top-[90px]">
+              <AssignmentReadingViewerSidebar
+                annotations={currentTextAnnotations}
+                currentReading={readings[currentTextIndex]}
+                handleDeleteAnnotation={handleDeleteAnnotation}
+              />
 
               {modelTextGenerated && (
-                <>
-                  <Divider className="my-4" />
-                  <Button
-                    className="w-full gap-2"
-                    onClick={() => saveAnnotations(annotations, true)}
-                    size="lg"
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                    Continue to Next Stage
-                  </Button>
-                </>
+                <Button
+                  className="w-full gap-2 mt-4"
+                  onClick={() => saveAnnotations(annotations, true)}
+                  size="lg"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Continue to Next Stage
+                </Button>
               )}
-            </Card>
+            </div>
           </div>
         </div>
       </div>
