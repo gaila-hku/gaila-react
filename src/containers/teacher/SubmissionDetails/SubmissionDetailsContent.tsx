@@ -12,8 +12,8 @@ import Label from 'components/display/Label';
 import SwitchInput from 'components/input/SwitchInput';
 import Tabs from 'components/navigation/Tabs';
 
+import { getAnnotationBackgroundColor } from 'containers/common/Annotation/utils';
 import GOAL_SECTIONS from 'containers/student/AssignmentGoalEditor/goalSections';
-import { getAnnotationBackgroundColor } from 'containers/student/AssignmentReadingViewer/utils';
 import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/reflectionQuestions';
 
 import type {

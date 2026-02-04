@@ -63,7 +63,10 @@ const AssignmentLanguageViewerVocab = () => {
       saveSubmission({
         assignment_id: assignment.id,
         stage_id: currentStage.id,
-        content: { generated_vocabs: allVocabs },
+        content: {
+          annotations: submissionContent?.annotations || [],
+          generated_vocabs: allVocabs,
+        },
         is_final: currentStage.submission?.is_final || false,
       });
     },
@@ -111,12 +114,15 @@ const AssignmentLanguageViewerVocab = () => {
       saveSubmission({
         assignment_id: assignment.id,
         stage_id: currentStage.id,
-        content: { generated_vocabs: newVocabs },
+        content: {
+          annotations: submissionContent?.annotations || [],
+          generated_vocabs: newVocabs,
+        },
         is_final: currentStage.submission?.is_final || false,
         refetchProgress: true,
       });
     },
-    [assignment, currentStage, saveSubmission, vocabList],
+    [assignment, currentStage, saveSubmission, submissionContent, vocabList],
   );
 
   if (!init.current) {

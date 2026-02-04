@@ -87,7 +87,10 @@ const EssayEditorOverview = ({ grade, assignment, onChangeGoals }: Props) => {
   );
 
   const plannedVocab = useMemo(
-    () => languageContent?.generated_vocabs.filter(s => s.will_be_used) || [],
+    () => [
+      ...(languageContent?.annotations.filter(s => s.will_be_used) || []),
+      ...(languageContent?.generated_vocabs.filter(s => s.will_be_used) || []),
+    ],
     [languageContent],
   );
 

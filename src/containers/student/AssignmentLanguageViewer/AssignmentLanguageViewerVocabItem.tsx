@@ -5,7 +5,6 @@ import clsx from 'clsx';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 import CheckboxInput from 'components/input/CheckboxInput';
-import Clickable from 'components/input/Clickable';
 
 import useAIChatBox from 'containers/common/AIChatBox/AIChatBoxContext/useAIChatBox';
 
@@ -38,17 +37,14 @@ const AssignmentLanguageViewerVocabItem = ({ item, onToggleVocab }: Props) => {
       )}
     >
       <div className="flex items-center gap-2">
-        <Clickable
-          className="flex-1 flex items-center gap-2"
-          onClick={onToggleVocab}
-        >
+        <div className="flex-1 flex items-center gap-2">
           <CheckboxInput
             defaultValue={item.will_be_used ? [item.id] : []}
             onChange={() => onToggleVocab()}
             options={[{ key: item.id, label: '' }]}
           />
           <p className="font-medium">{item.text}</p>
-        </Clickable>
+        </div>
         <div className="flex gap-2">
           <Button
             className="text-xs"

@@ -1,25 +1,78 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 
-import { Book, CheckCircle, List } from 'lucide-react';
+import {
+  Book,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  List,
+} from 'lucide-react';
 
+import Badge from 'components/display/Badge';
 import Button from 'components/input/Button';
 import Tabs from 'components/navigation/Tabs';
 
-import AIChatBox from 'containers/common/AIChatBox';
 import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
+import useAnnotation from 'containers/common/Annotation/useAnnotation';
 import ResizableSidebar from 'containers/common/ResizableSidebar';
-import AssignmentLanguageViewerReading from 'containers/student/AssignmentLanguageViewer/AssignmentLanguageViewerReading';
+import AssignmentLanguageViewerSidebar from 'containers/student/AssignmentLanguageViewer/AssignmentLanguageViewerSidebar';
 import AssignmentLanguageViewerVocab from 'containers/student/AssignmentLanguageViewer/AssignmentLanguageViewerVocab';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import type {
+  AnnotationItem,
   AssignmentLanguagePreparationContent,
   AssignmentStageLanguagePreparation,
+  LanguageStageAnnotationItem,
 } from 'types/assignment';
 
 export const AssignmentLanguageViewer = () => {
   const { assignment, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
+
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+
+  const sampleTexts = useMemo(() => {
+    if (!currentStage) {
+      return [];
+    }
+    return (
+      (currentStage as AssignmentStageLanguagePreparation).config.readings || []
+    );
+  }, [currentStage]);
+
+  const textContainerRef = useRef<HTMLDivElement>(null);
+
+  const saveAnnotations = useCallback(
+    (inputAnnotations: AnnotationItem[], isFinal: boolean) => {
+      if (!assignment || !currentStage) {
+        return;
+      }
+      saveSubmission({
+        assignment_id: assignment.id,
+        stage_id: currentStage.id,
+        content: {
+          ...(currentStage.submission?.content || { generated_vocabs: [] }),
+          annotations: inputAnnotations,
+        },
+        is_final: currentStage.submission?.is_final || isFinal,
+        changeStage: isFinal,
+      });
+    },
+    [assignment, currentStage, saveSubmission],
+  );
+
+  const {
+    annotations,
+    currentTextAnnotations,
+    handleDeleteAnnotation,
+    annotationDialog,
+  } = useAnnotation({
+    textContainerRef,
+    currentTextIndex,
+    saveAnnotations,
+    dialogHorizontalOffset: 0,
+  });
 
   const vocabEnabled = (currentStage as AssignmentStageLanguagePreparation)
     .config.vocabulary_enabled;
@@ -38,11 +91,23 @@ export const AssignmentLanguageViewer = () => {
     saveSubmission({
       assignment_id: assignment.id,
       stage_id: currentStage.id,
-      content: { generated_vocabs: submissionContent?.generated_vocabs || [] },
+      content: submissionContent || { generated_vocabs: [], annotations },
       is_final: true,
       changeStage: true,
     });
-  }, [assignment, currentStage, saveSubmission]);
+  }, [annotations, assignment, currentStage, saveSubmission]);
+
+  const handleNextSample = useCallback(() => {
+    if (currentTextIndex < sampleTexts.length - 1) {
+      setCurrentTextIndex(currentTextIndex + 1);
+    }
+  }, [currentTextIndex, sampleTexts.length]);
+
+  const handlePreviousSample = useCallback(() => {
+    if (currentTextIndex > 0) {
+      setCurrentTextIndex(currentTextIndex - 1);
+    }
+  }, [currentTextIndex]);
 
   const tabs = useMemo(
     () => [
@@ -58,9 +123,42 @@ export const AssignmentLanguageViewer = () => {
                 </div>
               ),
               content: (
-                <div className="h-[calc(100vh-290px)]">
-                  <AssignmentLanguageViewerReading />
-                </div>
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <Badge variant="secondary">
+                      Sample {currentTextIndex + 1} of {sampleTexts.length}
+                    </Badge>
+                    <div className="flex gap-2">
+                      <Button
+                        className="gap-1"
+                        disabled={currentTextIndex === 0}
+                        onClick={handlePreviousSample}
+                        size="sm"
+                        variant="outline"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Previous
+                      </Button>
+                      <Button
+                        className="gap-1"
+                        disabled={currentTextIndex === sampleTexts.length - 1}
+                        onClick={handleNextSample}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="pr-4 whitespace-pre-line">
+                    <div className="select-text" ref={textContainerRef}>
+                      {sampleTexts[currentTextIndex]}
+                    </div>
+                  </div>
+                  {annotationDialog}
+                </>
               ),
             },
           ]
@@ -84,7 +182,15 @@ export const AssignmentLanguageViewer = () => {
           ]
         : []),
     ],
-    [currentStage, vocabEnabled],
+    [
+      annotationDialog,
+      currentStage,
+      currentTextIndex,
+      handleNextSample,
+      handlePreviousSample,
+      sampleTexts,
+      vocabEnabled,
+    ],
   );
 
   return (
@@ -105,6 +211,16 @@ export const AssignmentLanguageViewer = () => {
             ) : (
               tabs[0]?.content || <></>
             )}
+          </div>
+
+          <div className="sticky top-[90px]">
+            <AssignmentLanguageViewerSidebar
+              annotations={
+                currentTextAnnotations as LanguageStageAnnotationItem[]
+              }
+              currentReading={sampleTexts[currentTextIndex]}
+              handleDeleteAnnotation={handleDeleteAnnotation}
+            />
             <Button
               className="w-full gap-2 mt-4"
               onClick={handleToNextStage}
@@ -114,15 +230,6 @@ export const AssignmentLanguageViewer = () => {
               Continue to Next Stage
             </Button>
           </div>
-
-          {generalChatTool && (
-            <AIChatBox
-              chatName="Language Assistant"
-              className="!h-[calc(100vh-200px)]"
-              description="Ask questions about vocabulary, grammar, and language patterns"
-              placeholder="Ask about language..."
-            />
-          )}
         </ResizableSidebar>
       </AIChatBoxProvider>
     </div>
