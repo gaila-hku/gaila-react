@@ -1,15 +1,8 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Info, List, Sparkles } from 'lucide-react';
 import { useMutation } from 'react-query';
 
-import Loading from 'components/display/Loading';
 import Button from 'components/input/Button';
 
 import AssignmentLanguageViewerVocabItem from 'containers/student/AssignmentLanguageViewer/AssignmentLanguageViewerVocabItem';
@@ -38,13 +31,8 @@ const AssignmentLanguageViewerVocab = () => {
       | undefined;
   }, [currentStage?.submission?.content]);
 
-  const init = useRef(false);
   useEffect(() => {
-    if (init.current || !submissionContent) {
-      return;
-    }
-    setVocabList(submissionContent.generated_vocabs);
-    init.current = true;
+    setVocabList(submissionContent?.generated_vocabs || []);
   }, [submissionContent]);
 
   const saveNewVocabs = useCallback(
@@ -124,10 +112,6 @@ const AssignmentLanguageViewerVocab = () => {
     },
     [assignment, currentStage, saveSubmission, submissionContent, vocabList],
   );
-
-  if (!init.current) {
-    return <Loading />;
-  }
 
   return (
     <>
