@@ -132,32 +132,30 @@ const EssayEditorOutlineReviewTool = ({ toolId, latestResult }: Props) => {
 
     if (apiMessages.length) {
       const logs = Array.from(apiMessages).reverse();
-      allMessages.push(
-        ...logs.map((log, index) =>
-          renderOutlineReviewLog(
-            log,
-            outlineReviewResult,
-            handleProceed,
-            index === logs.length - 1 && !newChatMessages.length,
-          ),
+      const messages = logs.flatMap((log, index) =>
+        renderOutlineReviewLog(
+          log,
+          outlineReviewResult,
+          handleProceed,
+          index === logs.length - 1 && !newChatMessages.length,
         ),
       );
+      allMessages.push(...messages);
     }
 
     if (newChatMessages.length) {
-      allMessages.push(
-        ...newChatMessages.map((message, index) => {
-          if ('role' in message) {
-            return renderChatMessage(message);
-          }
-          return renderOutlineReviewLog(
-            message,
-            outlineReviewResult,
-            handleProceed,
-            index === newChatMessages.length - 1,
-          );
-        }),
-      );
+      const messages = newChatMessages.flatMap((message, index) => {
+        if ('role' in message) {
+          return renderChatMessage(message);
+        }
+        return renderOutlineReviewLog(
+          message,
+          outlineReviewResult,
+          handleProceed,
+          index === newChatMessages.length - 1,
+        );
+      });
+      allMessages.push(...messages);
     }
 
     return allMessages;
@@ -205,6 +203,7 @@ const EssayEditorOutlineReviewTool = ({ toolId, latestResult }: Props) => {
       outline,
       extra: JSON.stringify({ current_step: 1, is_next_step: false }),
     });
+    setOutlineReviewResult(JSON.parse(res.gpt_answer));
     setNewChatMessages(prev => [...prev, res]);
   }, [alertMsg, askReviewAgent, outline, toolId]);
 
@@ -258,7 +257,7 @@ const EssayEditorOutlineReviewTool = ({ toolId, latestResult }: Props) => {
         </>
       }
     >
-      {!!apiMessages.length && (
+      {!!displayMessages.length && (
         <>
           <div
             className="max-h-[320px] overflow-y-auto pb-3 space-y-3"
@@ -299,12 +298,12 @@ const EssayEditorOutlineReviewTool = ({ toolId, latestResult }: Props) => {
         disabled={isAgentLoading}
         onClick={handleOutlineReview}
         size="sm"
-        variant={apiMessages.length ? 'secondary' : 'default'}
+        variant={displayMessages.length ? 'secondary' : 'default'}
       >
         <Edit className="h-4 w-4" />
         {isAgentLoading
           ? 'Reviewing...'
-          : apiMessages.length
+          : displayMessages.length
             ? 'Restart Review'
             : 'Advice to Refine Ideas'}
       </Button>

@@ -81,8 +81,11 @@ export const renderOutlineReviewLog = (
     return renderGptLog(log);
   }
 
+  console.log(log, reviewResult);
+
   const messages: ChatMessage[] = [];
-  if (log.user_question !== 'OUTLINE_REVIEW') {
+  const isStart = log.user_question === 'OUTLINE_REVIEW';
+  if (!isStart) {
     messages.push({
       id: `${log.id}-user`,
       role: 'user',
@@ -119,7 +122,7 @@ export const renderOutlineReviewLog = (
             ))}
           </div>
         </div>
-        {extra.is_next_step ? (
+        {extra.is_next_step || isStart ? (
           <>
             <p className="text-sm leading-relaxed font-medium">
               {currentReviewResult.title}
