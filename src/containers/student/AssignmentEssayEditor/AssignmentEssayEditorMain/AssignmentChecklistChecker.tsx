@@ -23,7 +23,7 @@ const AssignmentChecklistChecker = () => {
     }
     return (
       (currentStage.submission?.content as AssignmentRevisingContent)
-        .checklist_items || readonlyChecklist
+        ?.checklist_items || readonlyChecklist
     );
   }, [assignment?.checklist, currentStage]);
 
