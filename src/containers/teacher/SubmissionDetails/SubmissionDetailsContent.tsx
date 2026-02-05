@@ -18,6 +18,7 @@ import REFLECTION_QUESTIONS from 'containers/student/AssignmentReflectionEditor/
 
 import type {
   AssignmentGoalContent,
+  AssignmentLanguagePreparationContent,
   AssignmentReadingContent,
   AssignmentReflectionContent,
   AssignmentStage,
@@ -209,6 +210,87 @@ const SubmissionDetailsContent = ({
         );
       }
 
+      if (stage_type === 'language_preparation') {
+        const content =
+          submission.content as AssignmentLanguagePreparationContent;
+        const annotations = content.annotations;
+        const vocabs = content.generated_vocabs;
+        if (!annotations.length) return <Empty text="No annotations made" />;
+        return (
+          <>
+            <div className="text-sm text-muted-foreground pb-2">
+              Last modified:{' '}
+              {dayjs(submission.submitted_at).format('MMM D, YYYY')}
+            </div>
+            <Divider />
+            <div className="flex font-medium text-md">Annotations</div>
+            <div className="space-y-3">
+              {annotations.map(annotation => (
+                <Card
+                  className="border-l-4 !p-4"
+                  key={annotation.id}
+                  style={{
+                    borderLeftColor: getAnnotationBackgroundColor(
+                      annotation.color,
+                    ),
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    {annotation.will_be_used ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : (
+                      <Circle className="h-4 w-4" />
+                    )}
+                    <div className="flex-1">
+                      <p className="text-sm font-medium italic text-muted-foreground line-clamp-2">
+                        &quot;{annotation.text}&quot;
+                      </p>
+                      {(annotation.label || annotation.note) && (
+                        <Divider className="!my-2" />
+                      )}
+                      {annotation.label && (
+                        <p className="text-sm">{annotation.label}</p>
+                      )}
+                      {annotation.note && (
+                        <p className="text-sm">{annotation.note}</p>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+            <Divider className="!my-4" />
+            <div className="flex font-medium text-md">
+              Generated Vocabularies
+            </div>
+            <div className="space-y-3">
+              {vocabs.map(vocab => (
+                <Card
+                  className={clsx(
+                    'border-l-4 !p-4',
+                    vocab.will_be_used ? 'border-l-primary' : 'border-l-muted',
+                  )}
+                  key={vocab.id}
+                >
+                  <div className="flex items-center gap-3">
+                    {vocab.will_be_used ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : (
+                      <Circle className="h-4 w-4" />
+                    )}
+                    <div className="flex-1">
+                      <p className="text-sm font-medium italic text-muted-foreground line-clamp-2">
+                        &quot;{vocab.text}&quot;
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </>
+        );
+      }
+
       if (stage_type === 'goal_setting') {
         const content = submission.content as AssignmentGoalContent;
         return (
@@ -261,6 +343,7 @@ const SubmissionDetailsContent = ({
           </>
         );
       }
+
       if (stage_type === 'reflection') {
         const reflections = submission.content as AssignmentReflectionContent;
         return (
@@ -306,9 +389,6 @@ const SubmissionDetailsContent = ({
   const tabs = useMemo(() => {
     const tabKeys: string[] = [];
     for (const stage of stages) {
-      if (stage.stage_type === 'language_preparation') {
-        continue;
-      }
       if (
         (stage.stage_type === 'outlining' ||
           stage.stage_type === 'drafting' ||
