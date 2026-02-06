@@ -124,7 +124,7 @@ const AssignmentReadingViewer = () => {
       <div className="container mx-auto px-4 max-w-7xl">
         <h1 className="text-3xl font-bold mb-2">Reading</h1>
         <p className="text-muted-foreground mb-4">
-          Read and analyze the model text to understand the genre and structure
+          Read and analyze the model text to understand the genre structure
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
