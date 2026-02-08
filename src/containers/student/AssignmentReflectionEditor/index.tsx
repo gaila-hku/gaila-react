@@ -48,6 +48,16 @@ const AssignmentReflectionEditor = () => {
     }));
   };
 
+  const reflectionQuestions =
+    (
+      currentStage as AssignmentStageReflection
+    ).config.reflection_questions?.map(question => ({
+      question,
+      placeholder:
+        REFLECTION_QUESTIONS.find(q => q.question === question)?.placeholder ||
+        '',
+    })) || REFLECTION_QUESTIONS;
+
   const handleSubmit = useCallback(
     (isFinal: boolean, isManual: boolean) => {
       if (!assignmentProgress || !currentStage) {
@@ -58,7 +68,7 @@ const AssignmentReflectionEditor = () => {
         r?.trim(),
       ).length;
 
-      if (isFinal && answeredCount === 0) {
+      if (isFinal && answeredCount === 0 && !!reflectionQuestions.length) {
         alertMsg(
           'Please answer at least one reflection question before submitting.',
         );
@@ -74,7 +84,14 @@ const AssignmentReflectionEditor = () => {
         changeStage: isFinal,
       });
     },
-    [alertMsg, assignmentProgress, currentStage, reflections, saveSubmission],
+    [
+      alertMsg,
+      assignmentProgress,
+      currentStage,
+      reflectionQuestions.length,
+      reflections,
+      saveSubmission,
+    ],
   );
 
   const generalChatTool = currentStage?.tools.find(
@@ -104,15 +121,6 @@ const AssignmentReflectionEditor = () => {
     return <></>;
   }
 
-  const reflectionQuestions =
-    (
-      currentStage as AssignmentStageReflection
-    ).config.reflection_questions?.map(question => ({
-      question,
-      placeholder:
-        REFLECTION_QUESTIONS.find(q => q.question === question)?.placeholder ||
-        '',
-    })) || REFLECTION_QUESTIONS;
   return (
     <>
       {/* Header */}
