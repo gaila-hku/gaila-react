@@ -7,6 +7,7 @@ import Button from 'components/input/Button';
 import CheckboxInput from 'components/input/CheckboxInput';
 
 import useAIChatBox from 'containers/common/AIChatBox/AIChatBoxContext/useAIChatBox';
+import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
 import type { VocabSubmissionItem } from 'types/assignment';
 
@@ -17,6 +18,11 @@ type Props = {
 
 const AssignmentLanguageViewerVocabItem = ({ item, onToggleVocab }: Props) => {
   const { sendMessage } = useAIChatBox();
+  const { currentStage } = useAssignmentSubmissionProvider();
+
+  const generalChatTool = currentStage?.tools.find(tool => {
+    return tool.key === 'language_general' && tool.enabled;
+  });
 
   const handleVocabAction = useCallback(
     (word: string, action: 'definition' | 'example') => {
@@ -45,24 +51,26 @@ const AssignmentLanguageViewerVocabItem = ({ item, onToggleVocab }: Props) => {
           />
           <p className="font-medium">{item.text}</p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            className="text-xs"
-            onClick={() => handleVocabAction(item.text, 'definition')}
-            size="sm"
-            variant="outline"
-          >
-            Definition
-          </Button>
-          <Button
-            className="text-xs"
-            onClick={() => handleVocabAction(item.text, 'example')}
-            size="sm"
-            variant="outline"
-          >
-            Example
-          </Button>
-        </div>
+        {!!generalChatTool && (
+          <div className="flex gap-2">
+            <Button
+              className="text-xs"
+              onClick={() => handleVocabAction(item.text, 'definition')}
+              size="sm"
+              variant="outline"
+            >
+              Definition
+            </Button>
+            <Button
+              className="text-xs"
+              onClick={() => handleVocabAction(item.text, 'example')}
+              size="sm"
+              variant="outline"
+            >
+              Example
+            </Button>
+          </div>
+        )}
       </div>
     </Card>
   );
