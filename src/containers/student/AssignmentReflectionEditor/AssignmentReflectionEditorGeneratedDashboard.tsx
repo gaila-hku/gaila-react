@@ -110,7 +110,7 @@ const AssignmentReflectionEditorGeneratedDashboard = () => {
             </>
           }
         >
-          <div className="text-primary text-sm my-4">
+          <div className="text-primary text-sm my-4 whitespace-pre-wrap">
             {vocabData.suggestions}
           </div>
           <div className="max-h-[calc(100vh-420px)] overflow-auto pr-4 space-y-2">
@@ -153,7 +153,7 @@ const AssignmentReflectionEditorGeneratedDashboard = () => {
             </>
           }
         >
-          <div className="text-primary text-sm my-4">
+          <div className="text-primary text-sm my-4 whitespace-pre-wrap">
             {checklistData.suggestions}
           </div>
           <div className="max-h-[calc(100vh-420px)] overflow-auto pr-4 space-y-2">
