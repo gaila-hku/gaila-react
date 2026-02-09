@@ -134,7 +134,7 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
                       </Badge>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                     {criterion.feedback}
                   </p>
                 </div>
@@ -147,7 +147,7 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
                 <Bot className="h-3 w-3" />
                 Overall Feedback
               </h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {autogradeResult.overall_feedback}
               </p>
             </div>

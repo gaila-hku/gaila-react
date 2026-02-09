@@ -46,7 +46,6 @@ function AssignmentEssayEditorMain() {
     currentStage,
     saveSubmission,
     isSaving,
-    outliningEnabled,
     revisingEnabled,
   } = useAssignmentSubmissionProvider();
   const {
@@ -454,7 +453,7 @@ function AssignmentEssayEditorMain() {
           classes={{
             panel: clsx([
               'overflow-auto',
-              outliningEnabled || revisingEnabled
+              (currentStage as AssignmentStageWriting)?.config.dashboard_enabled
                 ? 'h-[calc(100vh-210px)]'
                 : 'h-[calc(100vh-152px)]',
             ]),
