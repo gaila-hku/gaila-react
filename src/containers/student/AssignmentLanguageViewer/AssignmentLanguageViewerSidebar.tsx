@@ -9,7 +9,6 @@ import CheckboxInput from 'components/input/CheckboxInput';
 import Tabs from 'components/navigation/Tabs';
 
 import AIChatBox from 'containers/common/AIChatBox';
-import AIChatBoxProvider from 'containers/common/AIChatBox/AIChatBoxContext';
 import { getAnnotationBackgroundColor } from 'containers/common/Annotation/utils';
 import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmissionEditorSwitcher/AssignmentSubmissionProvider/useAssignmentSubmissionProvider';
 
@@ -21,13 +20,11 @@ import type {
 type Props = {
   annotations: LanguageStageAnnotationItem[];
   handleDeleteAnnotation: (id: number) => void;
-  currentReading: string;
 };
 
 const AssignmentLanguageViewerSidebar = ({
   annotations,
   handleDeleteAnnotation,
-  currentReading,
 }: Props) => {
   const { assignment, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
@@ -156,26 +153,17 @@ const AssignmentLanguageViewerSidebar = ({
         key: 'general_chat',
         title: 'AI Chat',
         content: (
-          <div>
-            <AIChatBoxProvider
-              firstMessage="Ask me about your reading, or specific writing sturctures!"
-              reading={currentReading}
-              toolId={generalChatTool.id}
-            >
-              <AIChatBox
-                chatName="Reading Assistant"
-                className="!h-[calc(100vh-294px)]"
-                description="Ask me anything about reading material"
-              />
-            </AIChatBoxProvider>
-          </div>
+          <AIChatBox
+            chatName="Reading Assistant"
+            className="!h-[calc(100vh-294px)]"
+            description="Ask me anything about reading material"
+          />
         ),
       });
     }
     return tabs;
   }, [
     annotations,
-    currentReading,
     generalChatTool,
     handleDeleteAnnotation,
     onToggleAnnotation,

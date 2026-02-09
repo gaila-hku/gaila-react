@@ -202,6 +202,7 @@ export const AssignmentLanguageViewer = () => {
 
       <AIChatBoxProvider
         firstMessage="Hello! I'm here to help you with language preparation for your essay. I can help you understand vocabulary, provide examples, and discuss language patterns. What would you like to know?"
+        reading={sampleTexts[currentTextIndex]}
         toolId={generalChatTool?.id || -1}
       >
         <ResizableSidebar initWidth={500}>
@@ -218,7 +219,6 @@ export const AssignmentLanguageViewer = () => {
               annotations={
                 currentTextAnnotations as LanguageStageAnnotationItem[]
               }
-              currentReading={sampleTexts[currentTextIndex]}
               handleDeleteAnnotation={handleDeleteAnnotation}
             />
             <Button
