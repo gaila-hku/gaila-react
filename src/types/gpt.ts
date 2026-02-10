@@ -107,6 +107,7 @@ export interface StudentRevisionExplanationListingItem
 export interface VocabGenerateItem {
   text: string;
   type: 'word' | 'phrase';
+  category: string;
 }
 
 export interface VocabGenerateResult {

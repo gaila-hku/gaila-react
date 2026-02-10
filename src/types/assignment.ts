@@ -102,6 +102,7 @@ export interface AssignmentStageLanguagePreparation
   config: {
     readings?: string[];
     vocabulary_enabled: boolean;
+    vocab_categories?: string[];
   };
 }
 
@@ -185,6 +186,7 @@ export interface VocabSubmissionItem {
   id: string;
   text: string;
   type: 'word' | 'phrase';
+  category: string;
   will_be_used: boolean;
 }
 

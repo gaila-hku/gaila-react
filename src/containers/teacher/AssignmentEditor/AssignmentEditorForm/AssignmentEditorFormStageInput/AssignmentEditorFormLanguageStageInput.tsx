@@ -35,6 +35,8 @@ const AssignmentEditorFormLanguageStageInput = ({
   const [readings, setReadings] = useState<string[]>([]);
   const [readingInput, setReadingInput] = useState('');
   const [vocabEnabled, setVocabEnabled] = useState(false);
+  const [vocabCategories, setVocabCategories] = useState<string[]>([]);
+  const [vocabCategoryInput, setVocabCategoryInput] = useState('');
 
   const onStageToggleTools = useCallback(
     (toolKey: string, value: boolean) => {
@@ -55,6 +57,7 @@ const AssignmentEditorFormLanguageStageInput = ({
     const configValue = (stage as AssignmentStageLanguagePreparation).config;
     setReadings(configValue.readings || []);
     setVocabEnabled(configValue.vocabulary_enabled || false);
+    setVocabCategories(configValue.vocab_categories || []);
   }, [stage]);
 
   const onAddReading = useCallback(() => {
@@ -89,6 +92,30 @@ const AssignmentEditorFormLanguageStageInput = ({
       setVocabEnabled(value);
     },
     [onStageChange, stage],
+  );
+
+  const onAddVocabCategory = useCallback(() => {
+    const newCategories = [...vocabCategories];
+    newCategories.push(vocabCategoryInput.trim());
+    setVocabCategories(newCategories);
+    setVocabCategoryInput('');
+    onStageChange({
+      ...stage,
+      config: { ...stage.config, vocab_categories: newCategories },
+    });
+  }, [onStageChange, stage, vocabCategories, vocabCategoryInput]);
+
+  const onRemoveVocabCategory = useCallback(
+    (index: number) => {
+      const newCategories = [...vocabCategories];
+      newCategories.splice(index, 1);
+      setVocabCategories(newCategories);
+      onStageChange({
+        ...stage,
+        config: { ...stage.config, vocab_categories: newCategories },
+      });
+    },
+    [onStageChange, stage, vocabCategories],
   );
 
   return (
@@ -140,6 +167,38 @@ const AssignmentEditorFormLanguageStageInput = ({
           <Plus className="w-4 h-4 text-white" />
         </Clickable>
       </div>
+      {!!vocabEnabled && (
+        <>
+          <Divider className="!mt-3 !mb-2" />
+          <div className="text-sm font-semibold pb-2">
+            Vocabulary Categories (Optional)
+          </div>
+          {vocabCategories.map((label, index) => (
+            <div className="flex gap-2 items-start pb-2" key={index}>
+              <p className="text-sm">{index + 1}. </p>
+              <p className="text-sm whitespace-pre-wrap w-full">{label}</p>
+              <Clickable onClick={() => onRemoveVocabCategory(index)}>
+                <X className="w-4 h-4" />
+              </Clickable>
+            </div>
+          ))}
+          <div className="flex gap-2 items-end">
+            <TextInput
+              multiline
+              onChange={e => setVocabCategoryInput(e.target.value)}
+              placeholder="e.g. Introduction/Body/Conclusion"
+              value={vocabCategoryInput}
+            />
+            <Clickable
+              className="basis-[32px] h-[39px] flex items-center justify-center !bg-primary rounded"
+              disabled={!vocabCategoryInput}
+              onClick={onAddVocabCategory}
+            >
+              <Plus className="w-4 h-4 text-white" />
+            </Clickable>
+          </div>
+        </>
+      )}
     </>
   );
 };

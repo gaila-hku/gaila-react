@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { entries } from 'lodash-es';
 import { Info, List, Sparkles } from 'lucide-react';
 import { useMutation } from 'react-query';
 
@@ -11,6 +12,7 @@ import useAssignmentSubmissionProvider from 'containers/student/AssignmentSubmis
 import { apiGenerateVocab } from 'api/gpt';
 import type {
   AssignmentLanguagePreparationContent,
+  AssignmentStageLanguagePreparation,
   VocabSubmissionItem,
 } from 'types/assignment';
 import type { VocabGenerateResult } from 'types/gpt';
@@ -36,6 +38,32 @@ const AssignmentLanguageViewerVocab = ({ setCurrentSidebarTab }: Props) => {
   useEffect(() => {
     setVocabList(submissionContent?.generated_vocabs || []);
   }, [submissionContent]);
+
+  const groupedVocabs = useMemo(() => {
+    if (!vocabList.length || !currentStage) {
+      return {};
+    }
+
+    const categories = [
+      ...((currentStage as AssignmentStageLanguagePreparation).config
+        .vocab_categories || []),
+      'Others',
+    ];
+    const groups = Object.fromEntries(
+      categories.map(category => [category, [] as VocabSubmissionItem[]]),
+    );
+
+    for (const vocab of vocabList) {
+      const category = vocab.category;
+      if (groups[category]) {
+        groups[category].push(vocab);
+      } else {
+        groups['Others'].push(vocab);
+      }
+    }
+
+    return groups;
+  }, [currentStage, vocabList]);
 
   const saveNewVocabs = useCallback(
     (newVocabs: AssignmentLanguagePreparationContent['generated_vocabs']) => {
@@ -72,6 +100,7 @@ const AssignmentLanguageViewerVocab = ({ setCurrentSidebarTab }: Props) => {
             id: `${data.id}-${index}`,
             text: item.text,
             type: item.type,
+            category: item.category,
             will_be_used: false,
           }));
           setVocabList(newVocabs);
@@ -127,13 +156,22 @@ const AssignmentLanguageViewerVocab = ({ setCurrentSidebarTab }: Props) => {
             </p>
           </div>
           <div className="space-y-3 mb-2">
-            {vocabList.map((item, index) => (
-              <AssignmentLanguageViewerVocabItem
-                item={item}
-                key={index}
-                onToggleVocab={() => handleToggleVocab(item)}
-                setCurrentSidebarTab={setCurrentSidebarTab}
-              />
+            {entries(groupedVocabs).map(([category, vocabs], index) => (
+              <div key={`${category}-${index}`}>
+                {vocabs.length > 0 && (
+                  <h3 className="text-lg mb-2">{category}</h3>
+                )}
+                <div className="space-y-3 mb-2">
+                  {vocabs.map((item, i) => (
+                    <AssignmentLanguageViewerVocabItem
+                      item={item}
+                      key={`${category}-${index}-${i}`}
+                      onToggleVocab={() => handleToggleVocab(item)}
+                      setCurrentSidebarTab={setCurrentSidebarTab}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
           <Button
