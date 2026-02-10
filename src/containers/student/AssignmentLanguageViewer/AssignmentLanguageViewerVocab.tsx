@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { entries } from 'lodash-es';
+import { entries, keys } from 'lodash-es';
 import { Info, List, Sparkles } from 'lucide-react';
 import { useMutation } from 'react-query';
 
@@ -158,7 +158,7 @@ const AssignmentLanguageViewerVocab = ({ setCurrentSidebarTab }: Props) => {
           <div className="space-y-3 mb-2">
             {entries(groupedVocabs).map(([category, vocabs], index) => (
               <div key={`${category}-${index}`}>
-                {vocabs.length > 0 && (
+                {vocabs.length > 0 && keys(groupedVocabs).length > 1 && (
                   <h3 className="text-lg mb-2">{category}</h3>
                 )}
                 <div className="space-y-3 mb-2">
