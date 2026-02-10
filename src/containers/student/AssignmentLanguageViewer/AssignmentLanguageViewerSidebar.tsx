@@ -20,11 +20,15 @@ import type {
 type Props = {
   annotations: LanguageStageAnnotationItem[];
   handleDeleteAnnotation: (id: number) => void;
+  tabValue: string;
+  setTabValue: (x: string) => void;
 };
 
 const AssignmentLanguageViewerSidebar = ({
   annotations,
   handleDeleteAnnotation,
+  tabValue,
+  setTabValue,
 }: Props) => {
   const { assignment, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
@@ -173,7 +177,7 @@ const AssignmentLanguageViewerSidebar = ({
     return tabs[0].content;
   }
 
-  return <Tabs tabs={tabs} />;
+  return <Tabs onClick={setTabValue} tabValue={tabValue} tabs={tabs} />;
 };
 
 export default AssignmentLanguageViewerSidebar;

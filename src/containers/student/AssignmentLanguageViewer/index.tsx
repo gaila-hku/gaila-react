@@ -31,6 +31,7 @@ export const AssignmentLanguageViewer = () => {
     useAssignmentSubmissionProvider();
 
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [currentSidebarTab, setCurrentSidebarTab] = useState('annotations');
 
   const sampleTexts = useMemo(() => {
     if (!currentStage) {
@@ -175,7 +176,9 @@ export const AssignmentLanguageViewer = () => {
               ),
               content: (
                 <div className="h-[calc(100vh-290px)]">
-                  <AssignmentLanguageViewerVocab />
+                  <AssignmentLanguageViewerVocab
+                    setCurrentSidebarTab={setCurrentSidebarTab}
+                  />
                 </div>
               ),
             },
@@ -220,6 +223,8 @@ export const AssignmentLanguageViewer = () => {
                 currentTextAnnotations as LanguageStageAnnotationItem[]
               }
               handleDeleteAnnotation={handleDeleteAnnotation}
+              setTabValue={setCurrentSidebarTab}
+              tabValue={currentSidebarTab}
             />
             <Button
               className="w-full gap-2 mt-4"

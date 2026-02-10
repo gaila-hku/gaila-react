@@ -14,10 +14,15 @@ import type { VocabSubmissionItem } from 'types/assignment';
 type Props = {
   item: VocabSubmissionItem;
   onToggleVocab: () => void;
+  setCurrentSidebarTab: (tab: string) => void;
 };
 
-const AssignmentLanguageViewerVocabItem = ({ item, onToggleVocab }: Props) => {
-  const { sendMessage } = useAIChatBox();
+const AssignmentLanguageViewerVocabItem = ({
+  item,
+  onToggleVocab,
+  setCurrentSidebarTab,
+}: Props) => {
+  const { sendMessage, isAgentTyping } = useAIChatBox();
   const { currentStage } = useAssignmentSubmissionProvider();
 
   const generalChatTool = currentStage?.tools.find(tool => {
@@ -30,9 +35,10 @@ const AssignmentLanguageViewerVocabItem = ({ item, onToggleVocab }: Props) => {
         action === 'definition'
           ? `Provide a clear definition of "${word}".`
           : `Give me examples of how to use "${word}" in writing`;
+      setCurrentSidebarTab('general_chat');
       sendMessage(prompt);
     },
-    [sendMessage],
+    [sendMessage, setCurrentSidebarTab],
   );
 
   return (
@@ -55,6 +61,7 @@ const AssignmentLanguageViewerVocabItem = ({ item, onToggleVocab }: Props) => {
           <div className="flex gap-2">
             <Button
               className="text-xs"
+              disabled={isAgentTyping}
               onClick={() => handleVocabAction(item.text, 'definition')}
               size="sm"
               variant="outline"
@@ -63,6 +70,7 @@ const AssignmentLanguageViewerVocabItem = ({ item, onToggleVocab }: Props) => {
             </Button>
             <Button
               className="text-xs"
+              disabled={isAgentTyping}
               onClick={() => handleVocabAction(item.text, 'example')}
               size="sm"
               variant="outline"

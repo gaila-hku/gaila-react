@@ -15,7 +15,9 @@ import type {
 } from 'types/assignment';
 import type { VocabGenerateResult } from 'types/gpt';
 
-const AssignmentLanguageViewerVocab = () => {
+type Props = { setCurrentSidebarTab: (tab: string) => void };
+
+const AssignmentLanguageViewerVocab = ({ setCurrentSidebarTab }: Props) => {
   const { assignment, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
 
@@ -130,6 +132,7 @@ const AssignmentLanguageViewerVocab = () => {
                 item={item}
                 key={index}
                 onToggleVocab={() => handleToggleVocab(item)}
+                setCurrentSidebarTab={setCurrentSidebarTab}
               />
             ))}
           </div>

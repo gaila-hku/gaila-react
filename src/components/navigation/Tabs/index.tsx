@@ -12,6 +12,7 @@ type Props = {
     content: React.ReactNode;
   }[];
   defaultTab?: string;
+  tabValue?: string;
   classes?: {
     tab?: string;
     indicator?: string;
@@ -25,7 +26,15 @@ type Props = {
   style?: React.CSSProperties;
 };
 
-function Tabs({ tabs, defaultTab, classes, className, onClick, style }: Props) {
+function Tabs({
+  tabs,
+  defaultTab,
+  tabValue,
+  classes,
+  className,
+  onClick,
+  style,
+}: Props) {
   if (!tabs.length) {
     return <></>;
   }
@@ -35,6 +44,7 @@ function Tabs({ tabs, defaultTab, classes, className, onClick, style }: Props) {
       className={clsx(styles.tabs, classes?.root, className)}
       defaultValue={defaultTab || tabs[0].key}
       style={style}
+      value={tabValue}
     >
       <div className={clsx('bg-white', classes?.tabListWrapper)}>
         <BaseTabs.List className={clsx(styles.list, classes?.tabList)}>
