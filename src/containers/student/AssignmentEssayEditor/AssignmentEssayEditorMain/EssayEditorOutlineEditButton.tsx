@@ -67,6 +67,7 @@ const EssayEditorOutlineEditButton = () => {
           </div>
           <EssayEditorInput
             disableAutoSave
+            isOutline
             onChange={setOutlineInputValue}
             value={outlineInputValue}
           />

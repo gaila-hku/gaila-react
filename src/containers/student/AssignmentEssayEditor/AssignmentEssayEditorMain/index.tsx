@@ -404,6 +404,7 @@ function AssignmentEssayEditorMain() {
               <EssayEditorInput
                 disabled={outlineConfirmed}
                 handleAutoSave={handleAutoSave}
+                isOutline
                 minHeight={outlineConfirmed ? 0 : 400}
                 onChange={setOutline}
                 value={outline}
@@ -416,6 +417,7 @@ function AssignmentEssayEditorMain() {
                 <Card title="Outline">
                   <EssayEditorInput
                     disabled
+                    isOutline
                     onChange={setOutline}
                     value={outline}
                   />

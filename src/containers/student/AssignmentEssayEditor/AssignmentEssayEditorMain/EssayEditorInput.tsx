@@ -17,6 +17,7 @@ type Props = {
   minHeight?: number;
   disabled?: boolean;
   disableAutoSave?: boolean;
+  isOutline?: boolean;
 };
 
 const EssayEditorInput = ({
@@ -27,6 +28,7 @@ const EssayEditorInput = ({
   minHeight,
   disabled: inputDisabled,
   disableAutoSave,
+  isOutline,
 }: Props) => {
   const { assignment } = useAssignmentSubmissionProvider();
   const { readonly, currentStage } = useAssignmentEssayEditorProvider();
@@ -103,7 +105,7 @@ const EssayEditorInput = ({
       onBlur={onBlur}
       onChange={onChange}
       onPaste={onPaste}
-      placeholder="Start writing your essay here..."
+      placeholder={`Start writing your ${isOutline ? 'outline' : 'essay'} here..."`}
       sx={{
         '& .MuiInputBase-root': {
           padding: 1.5,
