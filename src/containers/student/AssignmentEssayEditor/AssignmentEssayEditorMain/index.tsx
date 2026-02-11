@@ -8,7 +8,7 @@ import React, {
 
 import clsx from 'clsx';
 import { defaultsDeep } from 'lodash-es';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Save } from 'lucide-react';
 
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
@@ -390,8 +390,27 @@ function AssignmentEssayEditorMain() {
           {/* Outline editor */}
           {currentStage.stage_type === 'outlining' ? (
             <Card
+              action={
+                readonly || outlineConfirmed ? (
+                  <></>
+                ) : (
+                  <div className="flex gap-2 -mt-1">
+                    <Button
+                      className="gap-2 w-full sm:w-auto"
+                      disabled={isSaving}
+                      onClick={() =>
+                        saveSubmissionContent({}, false, 'Essay draft saved!')
+                      }
+                      variant="secondary"
+                    >
+                      <Save className="h-4 w-4" />
+                      Save Draft
+                    </Button>
+                  </div>
+                )
+              }
               classes={{
-                description: '-mt-2 mb-2',
+                description: '-mt-3',
               }}
               description="Create a structured outline for your essay. This will help guide your writing in the next stage."
               title="Outline Your Essay"
@@ -424,7 +443,29 @@ function AssignmentEssayEditorMain() {
                   <EssayEditorOutlineEditButton />
                 </Card>
               )}
-              <Card title="Essay Content">
+              <Card
+                action={
+                  readonly ? (
+                    <></>
+                  ) : (
+                    <div className="flex gap-2 -mt-1">
+                      <Button
+                        className="gap-2 w-full sm:w-auto"
+                        disabled={isSaving}
+                        onClick={() =>
+                          saveSubmissionContent({}, false, 'Essay draft saved!')
+                        }
+                        variant="secondary"
+                      >
+                        <Save className="h-4 w-4" />
+                        Save Draft
+                      </Button>
+                    </div>
+                  )
+                }
+                classes={{ header: '-mb-2' }}
+                title="Essay Content"
+              >
                 {readonly ? (
                   <div className={clsx('text-xs', readonlyMessage?.textClass)}>
                     {readonlyMessage?.shortMessage}

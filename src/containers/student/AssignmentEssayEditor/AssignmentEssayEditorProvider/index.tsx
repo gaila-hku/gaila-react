@@ -112,10 +112,10 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
     }
     return (
       assignmentProgress.stages.find(
-        (s, index) => s.enabled && index > assignmentProgress.current_stage,
+        (s, index) => s.enabled && index > (currentStage?.order_index || 0),
       )?.stage_type || null
     );
-  }, [assignmentProgress]);
+  }, [assignmentProgress, currentStage?.order_index]);
 
   const [readonly, readonlyMessage] = useMemo(() => {
     if (providerReadonly) {

@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
 
 import dayjs from 'dayjs';
-import { FileText, Save } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
-import Button from 'components/input/Button';
 import TextInput from 'components/input/TextInput';
 
 import useAssignmentEssayEditorProvider from 'containers/student/AssignmentEssayEditor/AssignmentEssayEditorProvider/useAssignmentEssayEditorProvider';
@@ -26,8 +25,7 @@ const EssayEditorHeader = ({
   wordCountStatus,
   saveSubmissionContent,
 }: Props) => {
-  const { assignment, isSaving, outliningEnabled } =
-    useAssignmentSubmissionProvider();
+  const { assignment, outliningEnabled } = useAssignmentSubmissionProvider();
   const { outlineConfirmed, title, setTitle, readonly } =
     useAssignmentEssayEditorProvider();
 
@@ -47,21 +45,6 @@ const EssayEditorHeader = ({
 
   return (
     <Card
-      action={
-        <div className="flex gap-2">
-          <Button
-            className="gap-2 w-full sm:w-auto"
-            disabled={readonly || isSaving}
-            onClick={() =>
-              saveSubmissionContent({}, false, 'Essay draft saved!')
-            }
-            variant="secondary"
-          >
-            <Save className="h-4 w-4" />
-            Save Draft
-          </Button>
-        </div>
-      }
       title={
         <>
           <div className="flex gap-4 mb-2">
