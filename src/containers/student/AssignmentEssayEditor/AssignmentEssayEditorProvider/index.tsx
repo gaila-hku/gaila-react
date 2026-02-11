@@ -111,8 +111,9 @@ const AssignmentEssayEditorProvider = ({ children }: Props) => {
       return null;
     }
     return (
-      assignmentProgress.stages[assignmentProgress.current_stage + 1]
-        ?.stage_type || null
+      assignmentProgress.stages.find(
+        (s, index) => s.enabled && index > assignmentProgress.current_stage,
+      )?.stage_type || null
     );
   }, [assignmentProgress]);
 
