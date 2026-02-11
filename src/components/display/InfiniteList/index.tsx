@@ -44,7 +44,7 @@ const InfiniteList = <
 
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
+      if (entries[0].isIntersecting && !isLoading && !endReached) {
         setPageLimit(limit => (limit ?? initPageLimit) + 5);
         setPages(prev => prev + 1);
       }
@@ -58,7 +58,7 @@ const InfiniteList = <
         observer.unobserve(endDivEle);
       }
     };
-  }, [initPageLimit, setPageLimit, setPages, data]);
+  }, [initPageLimit, setPageLimit, setPages, data, isLoading, endReached]);
 
   if (error) {
     return <ErrorComponent error={error} />;

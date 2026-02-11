@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { isNumber } from 'lodash-es';
 import { ArrowLeft, Bot, Edit, FileText } from 'lucide-react';
 import { useQuery } from 'react-query';
 
@@ -14,13 +13,15 @@ import Button from 'components/input/Button';
 import AssignmentToolEditModal from 'containers/admin/ChatbotListing/AssignmentToolEditModal';
 
 import { apiGetAssignments, apiGetAssignmentTools } from 'api/assignment';
-import type { AssignmentTool } from 'types/assignment';
+import type {
+  AssignmentTool,
+  TeacherAssignmentListingItem,
+} from 'types/assignment';
 import tuple from 'utils/types/tuple';
 
 const AssignmentChatbotListing = () => {
-  const [activeAssignmentId, setActiveAssignmentId] = useState<number | null>(
-    null,
-  );
+  const [activeAssignment, setActiveAssignment] =
+    useState<TeacherAssignmentListingItem | null>(null);
 
   const [editingTool, setEditingTool] = useState<AssignmentTool | null>(null);
 
@@ -31,27 +32,27 @@ const AssignmentChatbotListing = () => {
   } = useQuery(
     tuple([
       apiGetAssignmentTools.queryKey,
-      { assignment_id: activeAssignmentId! },
+      { assignment_id: activeAssignment?.id || -1 },
     ]),
     apiGetAssignmentTools,
     {
-      enabled: isNumber(activeAssignmentId),
+      enabled: !!activeAssignment,
     },
   );
 
   return (
     <>
-      {activeAssignmentId ? (
+      {activeAssignment ? (
         <>
           <Button
-            className="gap-2 mb-4"
-            onClick={() => setActiveAssignmentId(null)}
+            className="gap-2"
+            onClick={() => setActiveAssignment(null)}
             variant="ghost"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Assignments
           </Button>
-
+          <h3 className="text-xl mb-2">{activeAssignment.title}</h3>
           {isToolLoading ? (
             <Loading />
           ) : tools ? (
@@ -126,7 +127,11 @@ const AssignmentChatbotListing = () => {
                     </div>
                     <div className="flex-[0_0_36px] flex gap-1">
                       <Button
-                        onClick={() => setActiveAssignmentId(assignment.id)}
+                        onClick={() =>
+                          setActiveAssignment(
+                            assignment as TeacherAssignmentListingItem,
+                          )
+                        }
                         size="sm"
                         variant="ghost"
                       >
