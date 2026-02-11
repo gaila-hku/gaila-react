@@ -1,5 +1,9 @@
 import React from 'react';
 
+import Tabs from 'components/navigation/Tabs';
+
+import ChatbotListing from 'containers/admin/ChatbotListing';
+import AssignmentChatbotListing from 'containers/admin/ChatbotListing/AssignmentChatbotListing';
 import AuthPageWrapper from 'containers/auth/AuthPageWrapper';
 import TeacherHeader from 'containers/teacher/TeacherHeader';
 
@@ -16,8 +20,21 @@ const AgentConfigurationPage = () => {
             Configure default settings for AI chatbot assistants
           </p>
         </div>
-        {/* TODO: add this */}
-        <div>Coming Soon!</div>
+
+        <Tabs
+          tabs={[
+            {
+              key: 'general',
+              title: 'General Configurations',
+              content: <ChatbotListing />,
+            },
+            {
+              key: 'assignment',
+              title: 'Assignment-specific Configurations',
+              content: <AssignmentChatbotListing />,
+            },
+          ]}
+        />
       </div>
     </AuthPageWrapper>
   );

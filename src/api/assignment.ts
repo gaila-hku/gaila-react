@@ -12,6 +12,7 @@ import type {
   AssignmentSubmission,
   AssignmentSubmissionDetails,
   AssignmentSubmissionListingItem,
+  AssignmentTool,
   RubricItem,
 } from 'types/assignment';
 import type { ListingResponse } from 'types/response';
@@ -252,3 +253,19 @@ export const apiGetAssignmentOptions = async (_: {
   return res;
 };
 apiGetAssignmentOptions.queryKey = '/assignment/options';
+
+export const apiGetAssignmentTools = async ({
+  queryKey,
+}: {
+  queryKey: [string, { assignment_id: number }];
+}) => {
+  const [, { assignment_id }] = queryKey;
+  const res = await callAPIHandler<AssignmentTool[]>(
+    'get',
+    '/chatbot-setting/listing',
+    { assignment_id },
+    true,
+  );
+  return res;
+};
+apiGetAssignmentTools.queryKey = '/chatbot-setting/listing/{assignment_id}';

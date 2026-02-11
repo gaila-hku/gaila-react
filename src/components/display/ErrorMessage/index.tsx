@@ -18,6 +18,10 @@ const ErrorMessage = ({ error, message, className }: Props) => {
     return getErrorMessage(error);
   }, [error, message]);
 
+  if (!error) {
+    return <></>;
+  }
+
   return <div className={clsx('text-red-400', className)}>{errorMessage}</div>;
 };
 

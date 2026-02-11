@@ -1,4 +1,5 @@
 import type { AssignmentCreatePayload } from 'api/assignment';
+import type { ChatbotConfig } from 'types/chatbot';
 import type { ClassOption } from 'types/class';
 import type { StudentReminder } from 'types/reminder';
 import type { ListingResponse } from 'types/response';
@@ -383,3 +384,14 @@ export type AssignmentReadonlyMessage = {
   bgClass: string;
   textClass: string;
 };
+
+export interface AssignmentTool {
+  id: number;
+  assignment_id?: number;
+  assignment_stage_id?: number;
+  tool_key: string;
+  chatbot_template_id?: number;
+  custom_role_prompt?: string;
+  custom_config?: Partial<ChatbotConfig>;
+  enabled: boolean;
+}
