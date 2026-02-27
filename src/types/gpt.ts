@@ -56,8 +56,6 @@ export interface DictionaryResult {
 }
 
 export interface AutoGradeResult {
-  overall_score: number | null;
-  max_score: number | null;
   overall_feedback: string;
   criteria_scores: {
     criteria: string;

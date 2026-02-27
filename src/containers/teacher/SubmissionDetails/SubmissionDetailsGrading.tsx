@@ -126,7 +126,12 @@ const SubmissionDetailsGrading = ({
       `${result.criteria_scores.map(item => `${item.criteria}:\n${item.feedback}`).join('\n\n')}\n\nOverall:\n${result.overall_feedback}`,
     );
     if (maxScore) {
-      setGrade(result.overall_score);
+      setGrade(
+        result.criteria_scores.reduce(
+          (sum, item) => sum + (item.score || 0),
+          0,
+        ),
+      );
     }
     successMsg(
       'AI grading completed! Review and adjust the rubric scores and feedback as needed.',

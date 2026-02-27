@@ -46,15 +46,22 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
     setAutogradeResult(result);
   }, [latestResult]);
 
-  const scoreRatio = useMemo(() => {
-    if (
-      !autogradeResult ||
-      autogradeResult.overall_score === null ||
-      autogradeResult.max_score === null
-    ) {
-      return 0;
+  const [overallScore, maxScore, scoreRatio] = useMemo(() => {
+    if (!autogradeResult) {
+      return [null, null, 0];
     }
-    return (autogradeResult.overall_score / autogradeResult.max_score) * 100;
+    const overallScore = autogradeResult.criteria_scores.reduce(
+      (sum, item) => sum + (item.score || 0),
+      0,
+    );
+    const maxScore = autogradeResult.criteria_scores.reduce(
+      (sum, item) => sum + (item.max_score || 0),
+      0,
+    );
+    if (maxScore === 0 || overallScore === 0) {
+      return [null, null, 0];
+    }
+    return [overallScore, maxScore, (overallScore / maxScore) * 100];
   }, [autogradeResult]);
 
   return (
@@ -86,17 +93,15 @@ const EssayEditorAutoGradeTool = ({ toolId, latestResult, essay }: Props) => {
         <div className="max-h-[400px] overflow-auto">
           <div className="space-y-3 pr-4">
             {/* Overall Score */}
-            {autogradeResult.overall_score !== null && (
+            {overallScore !== null && (
               <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border-2 border-primary/20">
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground mb-1">
                     Overall Score
                   </p>
                   <p className="text-2xl font-bold text-primary">
-                    {autogradeResult.overall_score}
-                    <span className="text-sm">
-                      /{autogradeResult.max_score}
-                    </span>
+                    {overallScore}
+                    <span className="text-sm">/{maxScore}</span>
                   </p>
                   <Badge
                     className="mt-2 text-xs"
