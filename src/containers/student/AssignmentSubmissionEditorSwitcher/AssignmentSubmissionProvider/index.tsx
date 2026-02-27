@@ -127,7 +127,7 @@ const AssignmentSubmissionProvider = ({ assignmentId, children }: Props) => {
         {
           title: 'Essay Submitted',
           longMessage:
-            ' You have already submitted your essay. Your teacher will grade ir soon. While you wait, you can review your essay and use the AI Chat for learning purposes.',
+            'You have already submitted your essay. Your teacher will grade it soon. While you wait, you can review your essay and use the AI Chat for learning purposes.',
           shortMessage:
             'This essay has been submitted and can no longer be edited.',
           icon: <CheckCircle className="h-5 w-5" />,

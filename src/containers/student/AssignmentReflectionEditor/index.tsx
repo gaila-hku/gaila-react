@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import {
   ActivitySquare,
-  ArrowRight,
   FileCheck,
   FileText,
   MessageSquare,
@@ -224,8 +223,8 @@ const AssignmentReflectionEditor = () => {
       )}
 
       {/* Submit Button */}
-      <div className="flex justify-end gap-4 mt-4">
-        {reflectionQuestions.length > 0 && (
+      {reflectionQuestions.length > 0 && (
+        <div className="flex justify-end gap-4 mt-4">
           <Button
             className="gap-2"
             disabled={readonly || isSaving}
@@ -236,17 +235,8 @@ const AssignmentReflectionEditor = () => {
             <Save className="h-4 w-4" />
             Save Draft
           </Button>
-        )}
-        <Button
-          className="gap-2"
-          disabled={readonly || isSaving}
-          onClick={() => handleSubmit(true, true)}
-          size="lg"
-        >
-          Finish Reflection
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-      </div>
+        </div>
+      )}
     </>
   );
 };

@@ -25,7 +25,6 @@ type Props = {
 
 const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
   const { currentStage } = useAssignmentSubmissionProvider();
-  const { readonly } = useAssignmentEssayEditorProvider();
 
   const isRevisionAskExplanation =
     (currentStage?.stage_type === 'revising' &&
@@ -128,14 +127,14 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
               <ul className="text-xs list-disc list-outside pl-3 space-y-1">
                 <li>
                   AI has proposed the following revisions. For each item, tell
-                  us if you agree with the suggestion
+                  us if you agree with the suggestion.
                 </li>
                 <li>
                   If you agree, think about why AI suggested the change and
                   revise your essay accordingly. If not, tell us why you
-                  disagree
+                  disagree.
                 </li>
-                {readonly ? (
+                {/* {readonly ? (
                   <li className="text-rose-400">
                     This assignment is currently readonly. You can no longer
                     apply changes, but you may still submit your reaonsing.
@@ -145,7 +144,7 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
                     You can apply or reject the changes in one click after
                     giving your reason
                   </li>
-                )}
+                )} */}
               </ul>
               <div className="flex items-center justify-between gap-2 mb-2">
                 <Badge
