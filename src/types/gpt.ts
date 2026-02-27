@@ -71,13 +71,14 @@ export interface RevisionResult {
   revision_items: {
     aspect_id: string;
     aspect_title: string;
-    max_suggestions: number;
-    suggestions: {
-      order: number;
-      current_text: string;
-      replace_text: string;
-      applicability: 'low' | 'medium' | 'high';
-    }[];
+    // max_suggestions: number;
+    // suggestions: {
+    //   order: number;
+    //   current_text: string;
+    //   replace_text: string;
+    //   applicability: 'low' | 'medium' | 'high';
+    // }[];
+    comment?: string;
     explanation: string;
   }[];
 }

@@ -50,7 +50,7 @@ const RevisionExplanationHistory = ({ studentId, assignmentId }: Props) => {
         revision_result: revisionItem ? (
           <div className="max-h-[200px] overflow-y-auto">
             <h4 className="font-medium">{revisionItem.aspect_title}</h4>
-            {revisionItem.suggestions.map((chunk, index) => (
+            {/* {revisionItem.suggestions.map((chunk, index) => (
               <React.Fragment key={index}>
                 <p className="text-xs text-rose-500">{chunk.current_text}</p>
                 <div className="flex items-start gap-1">
@@ -58,7 +58,8 @@ const RevisionExplanationHistory = ({ studentId, assignmentId }: Props) => {
                   <p className="text-xs text-green-500">{chunk.replace_text}</p>
                 </div>
               </React.Fragment>
-            ))}
+            ))} */}
+            <div className="text-xs mt-2">{revisionItem.comment}</div>
             <div className="text-xs mt-2">{revisionItem.explanation}</div>
           </div>
         ) : (
