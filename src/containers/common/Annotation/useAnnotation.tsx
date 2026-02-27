@@ -314,6 +314,7 @@ const useAnnotation = ({
     currentTextAnnotations,
     handleDeleteAnnotation,
     annotationDialog,
+    rebuildHighlights,
   };
 };
 

@@ -13,13 +13,20 @@ import { apiGenerateVocab } from 'api/gpt';
 import type {
   AssignmentLanguagePreparationContent,
   AssignmentStageLanguagePreparation,
+  LanguageStageAnnotationItem,
   VocabSubmissionItem,
 } from 'types/assignment';
 import type { VocabGenerateResult } from 'types/gpt';
 
-type Props = { setCurrentSidebarTab: (tab: string) => void };
+type Props = {
+  annotations: LanguageStageAnnotationItem[];
+  setCurrentSidebarTab: (tab: string) => void;
+};
 
-const AssignmentLanguageViewerVocab = ({ setCurrentSidebarTab }: Props) => {
+const AssignmentLanguageViewerVocab = ({
+  annotations,
+  setCurrentSidebarTab,
+}: Props) => {
   const { assignment, currentStage, saveSubmission } =
     useAssignmentSubmissionProvider();
 
@@ -82,13 +89,19 @@ const AssignmentLanguageViewerVocab = ({ setCurrentSidebarTab }: Props) => {
         assignment_id: assignment.id,
         stage_id: currentStage.id,
         content: {
-          annotations: submissionContent?.annotations || [],
+          annotations,
           generated_vocabs: allVocabs,
         },
         is_final: currentStage.submission?.is_final || false,
       });
     },
-    [assignment, currentStage, saveSubmission, submissionContent],
+    [
+      annotations,
+      assignment,
+      currentStage,
+      saveSubmission,
+      submissionContent?.generated_vocabs,
+    ],
   );
 
   const { mutateAsync: generateVocab, isLoading: isGeneratingVocab } =
@@ -134,14 +147,14 @@ const AssignmentLanguageViewerVocab = ({ setCurrentSidebarTab }: Props) => {
         assignment_id: assignment.id,
         stage_id: currentStage.id,
         content: {
-          annotations: submissionContent?.annotations || [],
+          annotations,
           generated_vocabs: newVocabs,
         },
         is_final: currentStage.submission?.is_final || false,
         refetchProgress: true,
       });
     },
-    [assignment, currentStage, saveSubmission, submissionContent, vocabList],
+    [annotations, assignment, currentStage, saveSubmission, vocabList],
   );
 
   return (

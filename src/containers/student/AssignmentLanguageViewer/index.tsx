@@ -68,6 +68,7 @@ export const AssignmentLanguageViewer = () => {
     currentTextAnnotations,
     handleDeleteAnnotation,
     annotationDialog,
+    rebuildHighlights,
   } = useAnnotation({
     textContainerRef,
     currentTextIndex,
@@ -177,6 +178,7 @@ export const AssignmentLanguageViewer = () => {
               content: (
                 <div className="h-[calc(100vh-290px)]">
                   <AssignmentLanguageViewerVocab
+                    annotations={annotations}
                     setCurrentSidebarTab={setCurrentSidebarTab}
                   />
                 </div>
@@ -187,6 +189,7 @@ export const AssignmentLanguageViewer = () => {
     ],
     [
       annotationDialog,
+      annotations,
       currentStage,
       currentTextIndex,
       handleNextSample,
@@ -211,7 +214,13 @@ export const AssignmentLanguageViewer = () => {
         <ResizableSidebar initWidth={500}>
           <div>
             {tabs.length > 1 ? (
-              <Tabs className="w-full" tabs={tabs} />
+              <Tabs
+                className="w-full"
+                onClick={key => {
+                  if (key === 'samples') rebuildHighlights();
+                }}
+                tabs={tabs}
+              />
             ) : (
               tabs[0]?.content || <></>
             )}
