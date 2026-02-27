@@ -81,8 +81,6 @@ export const renderOutlineReviewLog = (
     return renderGptLog(log);
   }
 
-  console.log(log, reviewResult);
-
   const messages: ChatMessage[] = [];
   const isStart = log.user_question === 'OUTLINE_REVIEW';
   if (!isStart) {

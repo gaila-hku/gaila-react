@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { type SetStateAction, useCallback, useState } from 'react';
 
 import { ArrowRight } from 'lucide-react';
 import { useMutation } from 'react-query';
@@ -20,6 +20,8 @@ type Props = {
   explanationItem: StudentRevisionExplanation | null;
   isExplanationLoading: boolean;
   isRevisionAskExplanation: boolean;
+  setCurrentLogIndex?: React.Dispatch<SetStateAction<number>>;
+  isLast?: boolean;
 };
 
 const EssayEditorRevisionToolRevisionItem = ({
@@ -29,6 +31,8 @@ const EssayEditorRevisionToolRevisionItem = ({
   explanationItem,
   isExplanationLoading,
   isRevisionAskExplanation,
+  setCurrentLogIndex,
+  isLast,
 }: Props) => {
   const { essay, setEssay, readonly } = useAssignmentEssayEditorProvider();
 
@@ -66,6 +70,7 @@ const EssayEditorRevisionToolRevisionItem = ({
         ...(isRevisionAskExplanation ? { explanation } : {}),
       });
       // applyRevision(revisionItem.suggestions);
+      setCurrentLogIndex?.(s => s + 1);
     },
     [
       submitExplanation,
@@ -73,6 +78,7 @@ const EssayEditorRevisionToolRevisionItem = ({
       agreeing,
       isRevisionAskExplanation,
       explanation,
+      setCurrentLogIndex,
     ],
   );
 
@@ -150,7 +156,7 @@ const EssayEditorRevisionToolRevisionItem = ({
             onClick={() => handleSubmitExplanation(revisionItem)}
             size="sm"
           >
-            Submit
+            {isLast || !isRevisionAskExplanation ? 'Submit' : 'Submit & Next'}
           </Button>
         </>
       ) : (

@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { CheckCircle, ClipboardList } from 'lucide-react';
 import { useMutation, useQuery } from 'react-query';
 
+import Badge from 'components/display/Badge';
 import Card from 'components/display/Card';
 import Button from 'components/input/Button';
 
@@ -35,6 +36,7 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
     useMutation(apiAskRevisionAgent);
 
   const [revisionLog, setRevisionLog] = useState<GptLog | null>(null);
+  const [currentLogIndex, setCurrentLogIndex] = useState(0);
   const revisionResult = revisionLog
     ? (JSON.parse(revisionLog.gpt_answer) as RevisionResult)
     : null;
@@ -54,8 +56,27 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
       },
     ]),
     apiGetRevisionExplanations,
-    { enabled: !!revisionResult },
+    {
+      enabled: !!revisionResult,
+    },
   );
+
+  useEffect(() => {
+    if (!explanationData || !revisionResult) {
+      return;
+    }
+    if (explanationData.length === revisionResult.revision_items.length) {
+      setCurrentLogIndex(explanationData.length);
+      return;
+    }
+    const lastIndex = revisionResult.revision_items.findIndex(
+      s =>
+        !explanationData.find(
+          explanationItem => explanationItem.aspect_id === s.aspect_id,
+        ),
+    );
+    setCurrentLogIndex(lastIndex);
+  }, [explanationData, revisionResult]);
 
   const handleRevisionCheck = useCallback(async () => {
     const res = await askRevisionAgent({
@@ -102,45 +123,99 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
 
       {!!revisionResult && (
         <div className="space-y-2">
-          {isRevisionAskExplanation && (
-            <ul className="text-xs list-disc list-outside pl-3 space-y-1">
-              <li>
-                AI has proposed the following revisions. For each item, tell us
-                if you agree with the suggestion
-              </li>
-              <li>
-                If you agree, think about why AI suggested the change and revise
-                your essay accordingly. If not, tell us why you disagree
-              </li>
-              {readonly ? (
-                <li className="text-rose-400">
-                  This assignment is currently readonly. You can no longer apply
-                  changes, but you may still submit your reaonsing.
-                </li>
-              ) : (
+          {isRevisionAskExplanation ? (
+            <>
+              <ul className="text-xs list-disc list-outside pl-3 space-y-1">
                 <li>
-                  You can apply or reject the changes in one click after giving
-                  your reason
+                  AI has proposed the following revisions. For each item, tell
+                  us if you agree with the suggestion
                 </li>
-              )}
-            </ul>
+                <li>
+                  If you agree, think about why AI suggested the change and
+                  revise your essay accordingly. If not, tell us why you
+                  disagree
+                </li>
+                {readonly ? (
+                  <li className="text-rose-400">
+                    This assignment is currently readonly. You can no longer
+                    apply changes, but you may still submit your reaonsing.
+                  </li>
+                ) : (
+                  <li>
+                    You can apply or reject the changes in one click after
+                    giving your reason
+                  </li>
+                )}
+              </ul>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <Badge
+                  className=" bg-white text-primary border-primary/20 text-[10px]"
+                  variant="outline"
+                >
+                  Revision{' '}
+                  {Math.min(
+                    currentLogIndex + 1,
+                    revisionResult.revision_items.length,
+                  )}{' '}
+                  / {revisionResult.revision_items.length}
+                </Badge>
+                <div className="flex gap-1 justify-end">
+                  {revisionResult.revision_items.map((_, i) => (
+                    <div
+                      className={`h-1 w-4 rounded-full ${
+                        i < currentLogIndex
+                          ? 'bg-green-500'
+                          : i === currentLogIndex
+                            ? 'bg-primary animate-pulse'
+                            : 'bg-gray-500'
+                      }`}
+                      key={i}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {revisionResult.revision_items
+                .filter((_, i) => i <= currentLogIndex)
+                .map((item, index) => (
+                  <EssayEditorRevisionToolRevisionItem
+                    explanationItem={
+                      explanationData?.find(
+                        explanationItem =>
+                          explanationItem.aspect_id === item.aspect_id,
+                      ) || null
+                    }
+                    isExplanationLoading={isExplanationLoading}
+                    isLast={index === revisionResult.revision_items.length - 1}
+                    isRevisionAskExplanation={isRevisionAskExplanation}
+                    key={item.aspect_id}
+                    refetchExplanations={fetchRevisionExplanations}
+                    revisionItem={item}
+                    revisionLogId={revisionLog?.id || -1}
+                    setCurrentLogIndex={setCurrentLogIndex}
+                  />
+                ))}
+            </>
+          ) : (
+            <>
+              {revisionResult.revision_items.map(item => (
+                <EssayEditorRevisionToolRevisionItem
+                  explanationItem={
+                    explanationData?.find(
+                      explanationItem =>
+                        explanationItem.aspect_id === item.aspect_id,
+                    ) || null
+                  }
+                  isExplanationLoading={isExplanationLoading}
+                  isRevisionAskExplanation={isRevisionAskExplanation}
+                  key={item.aspect_id}
+                  refetchExplanations={fetchRevisionExplanations}
+                  revisionItem={item}
+                  revisionLogId={revisionLog?.id || -1}
+                />
+              ))}
+            </>
           )}
-          {revisionResult.revision_items.map(item => (
-            <EssayEditorRevisionToolRevisionItem
-              explanationItem={
-                explanationData?.find(
-                  explanationItem =>
-                    explanationItem.aspect_id === item.aspect_id,
-                ) || null
-              }
-              isExplanationLoading={isExplanationLoading}
-              isRevisionAskExplanation={isRevisionAskExplanation}
-              key={item.aspect_id}
-              refetchExplanations={fetchRevisionExplanations}
-              revisionItem={item}
-              revisionLogId={revisionLog?.id || -1}
-            />
-          ))}
         </div>
       )}
 
