@@ -109,8 +109,8 @@ const EssayEditorRevisionTool = ({ toolId, latestLog, essay }: Props) => {
                 if you agree with the suggestion
               </li>
               <li>
-                If you agree, think about why AI suggested the change. If not,
-                tell us why you disagree
+                If you agree, think about why AI suggested the change and revise
+                your essay accordingly. If not, tell us why you disagree
               </li>
               {readonly ? (
                 <li className="text-rose-400">
