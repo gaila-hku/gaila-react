@@ -28,8 +28,20 @@ type Props = {
 };
 
 const natureKeyMap = {
-  perform: 'Perform-oriented',
-  learning: 'Learning-oriented',
+  perform: {
+    name: 'Perform-oriented',
+    tooltip:
+      'Perform-oriented prompts:\n' +
+      'Ask AI to help do the work for me\n' +
+      'For example: Write a good intro; write a good conclusion',
+  },
+  learning: {
+    name: 'Learning-oriented',
+    tooltip:
+      'Learning-oriented prompts:\n' +
+      'Ask AI to help you learn\n' +
+      'For example: How to write a good intro; How to write a good conclusion',
+  },
 };
 
 const aspectKeyMap = {
@@ -138,8 +150,9 @@ const DashboardPromptChart = ({
       };
     }, {});
 
-    return Object.entries(natureKeyMap).map(([key, name]) => ({
-      name,
+    return Object.entries(natureKeyMap).map(([key, obj]) => ({
+      key,
+      name: obj.name,
       'Your Prompts': structuredData[key]?.count || 0,
       'Class Avg': structuredData[key]?.class_avg || 0,
       selfColor: '#aac5f2',
@@ -157,7 +170,53 @@ const DashboardPromptChart = ({
         >
           <BarChart data={promptNatureData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" interval={0} tick={{ fontSize: 12 }} />
+            <XAxis
+              dataKey="key"
+              tick={({ x, y, payload }) => {
+                return (
+                  <>
+                    <g transform={`translate(${x},${y})`}>
+                      <text
+                        dy={8}
+                        fill="#666"
+                        fontSize={12}
+                        textAnchor="middle"
+                        x={0}
+                        y={0}
+                      >
+                        {natureKeyMap[payload.value].name}
+                      </text>
+                    </g>
+                    <Tooltip
+                      title={
+                        <p className="whitespace-pre-wrap text-sm">
+                          {natureKeyMap[payload.value].tooltip}
+                        </p>
+                      }
+                    >
+                      <g transform={`translate(${x + 60},${y - 4})`}>
+                        <svg
+                          className="lucide lucide-circle-question-mark"
+                          fill="white"
+                          height="16"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                          <path d="M12 17h.01"></path>
+                        </svg>
+                      </g>
+                    </Tooltip>
+                  </>
+                );
+              }}
+            />
             <YAxis tick={{ fontSize: 12 }} />
             <RechartsTooltip />
             <Bar dataKey="Your Prompts" fill="#8b5cf6">
@@ -266,7 +325,7 @@ const DashboardPromptChart = ({
                     >
                       <g transform={`translate(${x + 46},${y - 4})`}>
                         <svg
-                          className="lucide lucide-info absolute top-0 right-0 z-10"
+                          className="lucide lucide-circle-question-mark"
                           fill="white"
                           height="16"
                           stroke="currentColor"
@@ -278,8 +337,8 @@ const DashboardPromptChart = ({
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <circle cx="12" cy="12" r="10"></circle>
-                          <path d="M12 16v-4"></path>
-                          <path d="M12 8h.01"></path>
+                          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                          <path d="M12 17h.01"></path>
                         </svg>
                       </g>
                     </Tooltip>
